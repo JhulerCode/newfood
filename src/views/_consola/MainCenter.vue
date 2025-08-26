@@ -4,6 +4,7 @@
         <vColaboradores v-if="useVistas.show.vColaboradores" />
         <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
+        <vImpresoras v-if="useVistas.show.vImpresoras" />
     </section>
 </template>
 
@@ -14,6 +15,7 @@ import vEmpresa from '../ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
+import vImpresoras from '../ajustes/impresoras/vImpresoras.vue'
 
 export default {
     components: {
@@ -21,6 +23,7 @@ export default {
         vColaboradores,
         VPagoComprobantes,
         vPagoMetodos,
+        vImpresoras,
     },
     data: () => ({
         useVistas: useVistas(),

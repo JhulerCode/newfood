@@ -56,6 +56,14 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
+                    {
+                        id: 'vImpresoras', label: 'Impresoras', permisos: [
+                            { id: 'vImpresoras:listar', label: 'Listar' },
+                            { id: 'vImpresoras:crear', label: 'Crear' },
+                            { id: 'vImpresoras:editar', label: 'Editar' },
+                            { id: 'vImpresoras:eliminar', label: 'Eliminar' },
+                        ]
+                    },
                 ]
             },
         ],
