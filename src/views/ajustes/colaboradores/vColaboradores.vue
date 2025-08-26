@@ -4,14 +4,26 @@
             <strong>Colaboradores</strong>
 
             <div class="buttons">
-                <JdButton text="Nuevo" title="Crear nuevo" @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vColaboradores:crear')" />
+                <JdButton
+                    text="Nuevo"
+                    title="Crear nuevo"
+                    @click="nuevo()"
+                    v-if="useAuth.verifyPermiso('vColaboradores:crear')"
+                />
             </div>
         </div>
 
-        <JdTable :name="tableName" :columns="columns" :datos="vista.colaboradores || []" :colAct="true"
-            :configFiltros="openConfigFiltros" :configCols="true" :reload="loadColaboradores"
-            :rowOptions="tableRowOptions" @rowOptionSelected="runMethod">
+        <JdTable
+            :name="tableName"
+            :columns="columns"
+            :datos="vista.colaboradores || []"
+            :colAct="true"
+            :configFiltros="openConfigFiltros"
+            :configCols="true"
+            :reload="loadColaboradores"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod"
+        >
         </JdTable>
     </div>
 
@@ -63,7 +75,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'apellidos',
@@ -72,7 +84,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'doc_tipo',
@@ -82,7 +94,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'doc_numero',
@@ -91,7 +103,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'cargo',
@@ -102,7 +114,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'fecha_nacimiento',
@@ -111,7 +123,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'sexo',
@@ -121,7 +133,7 @@ export default {
                 width: '8rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'correo',
@@ -130,7 +142,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'telefono',
@@ -139,7 +151,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'direccion',
@@ -148,7 +160,7 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'activo',
@@ -159,7 +171,7 @@ export default {
                 width: '5rem',
                 show: true,
                 seek: true,
-                sort: true
+                sort: true,
             },
             {
                 id: 'has_signin',
@@ -170,13 +182,28 @@ export default {
                 width: '5rem',
                 show: true,
                 seek: true,
-                sort: true
-            }
+                sort: true,
+            },
         ],
         tableRowOptions: [
-            { label: 'Ver', icon: 'fa-regular fa-folder-open', action: 'ver', permiso: 'vColaboradores:ver' },
-            { label: 'Editar', icon: 'fa-solid fa-pen-to-square', action: 'editar', permiso: 'vColaboradores:editar' },
-            { label: 'Eliminar', icon: 'fa-solid fa-trash-can', action: 'eliminar', permiso: 'vColaboradores:eliminar' },
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vColaboradores:ver',
+            },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vColaboradores:editar',
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vColaboradores:eliminar',
+            },
         ],
     }),
     created() {
@@ -219,15 +246,15 @@ export default {
             await this.loadDatosSistema()
 
             const cols = this.columns
-            cols.find(a => a.id == 'sexo').lista = this.vista.generos
-            cols.find(a => a.id == 'doc_tipo').lista = this.vista.documentos_identidad
-            cols.find(a => a.id == 'activo').lista = this.vista.estados
-            cols.find(a => a.id == 'cargo').lista = this.vista.colaborador_cargos
+            cols.find((a) => a.id == 'sexo').lista = this.vista.generos
+            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.documentos_identidad
+            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'cargo').lista = this.vista.colaborador_cargos
 
             const send = {
                 table: this.tableName,
                 cols,
-                reload: this.loadColaboradores
+                reload: this.loadColaboradores,
             }
 
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
@@ -276,7 +303,6 @@ export default {
             Object.assign(this.vista, res.data)
         },
     },
-
 }
 </script>
 

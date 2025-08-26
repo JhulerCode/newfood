@@ -12,12 +12,11 @@ export const useAuth = defineStore('auth', {
         menu: [
             {
                 label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
-                    { label: 'Sistema', goto: 'vSistema' },
-                    { label: 'Impresoras', goto: 'vImpresoras' },
                     { label: 'Empresa', goto: 'vEmpresa' },
                     { label: 'Colaboradores', goto: 'vColaboradores' },
-                    { label: 'Documentos', goto: 'vDocumentos' },
+                    { label: 'Comprobantes de pago', goto: 'vPagoComprobantes' },
                     { label: 'Tipos de pago', goto: 'vPagoTipos' },
+                    { label: 'Impresoras', goto: 'vImpresoras' },
                     { label: 'Cajas', goto: 'vCajas' },
                     { label: 'Áreas de producción', goto: 'vProducciónÁreas' },
                     { label: 'Salones y mesas', goto: 'vSalonesMesas' },
@@ -29,6 +28,12 @@ export const useAuth = defineStore('auth', {
             {
                 id: 'operaciones', label: 'Operaciones', vistas: [
                     {
+                        id: 'vEmpresa', label: 'Empresa', permisos: [
+                            { id: 'vEmpresa:ver', label: 'Ver' },
+                            { id: 'vEmpresa:editar', label: 'Editar' },
+                        ]
+                    },
+                    {
                         id: 'vColaboradores', label: 'Colaboradores', permisos: [
                             { id: 'vColaboradores:listar', label: 'Listar' },
                             { id: 'vColaboradores:crear', label: 'Crear' },
@@ -38,11 +43,11 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vEmpresa', label: 'Empresa', permisos: [
-                            { id: 'vEmpresa:ver', label: 'Ver' },
-                            { id: 'vEmpresa:editar', label: 'Editar' },
+                        id: 'vPagoComprobantes', label: 'Comprobantes de pago', permisos: [
+                            { id: 'vPagoComprobantes:listar', label: 'Listar' },
+                            { id: 'vPagoComprobantes:editar', label: 'Editar' },
                         ]
-                    }
+                    },
                 ]
             },
         ],
