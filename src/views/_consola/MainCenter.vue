@@ -7,6 +7,7 @@
         <vImpresoras v-if="useVistas.show.vImpresoras" />
         <vCajas v-if="useVistas.show.vCajas" />
         <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
+        <vSalones v-if="useVistas.show.vSalones" />
     </section>
 </template>
 
@@ -20,6 +21,7 @@ import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
 import vImpresoras from '@/views/ajustes/impresoras/vImpresoras.vue'
 import vCajas from '@/views/ajustes/cajas/vCajas.vue'
 import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
+import vSalones from '@/views/ajustes/salones/vSalones.vue'
 
 export default {
     components: {
@@ -30,6 +32,7 @@ export default {
         vImpresoras,
         vCajas,
         vProduccionAreas,
+        vSalones,
     },
     data: () => ({
         useVistas: useVistas(),

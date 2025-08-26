@@ -19,7 +19,7 @@ export const useAuth = defineStore('auth', {
                     // { label: 'Impresoras', goto: 'vImpresoras' },
                     { label: 'Cajas', goto: 'vCajas' },
                     { label: 'Áreas de producción', goto: 'vProduccionAreas' },
-                    { label: 'Salones y mesas', goto: 'vSalonesMesas' },
+                    { label: 'Salones y mesas', goto: 'vSalones' },
                     { label: 'Productos', goto: 'vProductos' },
                 ]
             },
@@ -78,6 +78,18 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProduccionAreas:crear', label: 'Crear' },
                             { id: 'vProduccionAreas:editar', label: 'Editar' },
                             { id: 'vProduccionAreas:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vSalones', label: 'Salones y mesas', permisos: [
+                            { id: 'vSalones:listar', label: 'Listar' },
+                            { id: 'vSalones:crear', label: 'Crear' },
+                            { id: 'vSalones:editar', label: 'Editar' },
+                            { id: 'vSalones:eliminar', label: 'Eliminar' },
+                            { id: 'vSalones:listarMesa', label: 'Listar mesas' },
+                            { id: 'vSalones:crearMesa', label: 'Crear mesa' },
+                            { id: 'vSalones:editarMesa', label: 'Editar mesa' },
+                            { id: 'vSalones:eliminarMesa', label: 'Eliminar mesa' },
                         ]
                     },
                 ]
