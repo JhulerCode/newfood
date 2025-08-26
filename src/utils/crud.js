@@ -14,6 +14,8 @@ const urls = {
     pago_comprobantes: `${host}/api/pago_comprobantes`,
     pago_metodos: `${host}/api/pago_metodos`,
     impresoras: `${host}/api/impresoras`,
+    cajas: `${host}/api/cajas`,
+    produccion_areas: `${host}/api/produccion_areas`,
 }
 
 async function get(url) {

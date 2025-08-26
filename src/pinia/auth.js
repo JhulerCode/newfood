@@ -16,9 +16,9 @@ export const useAuth = defineStore('auth', {
                     { label: 'Colaboradores', goto: 'vColaboradores' },
                     { label: 'Comprobantes de pago', goto: 'vPagoComprobantes' },
                     { label: 'Métodos de pago', goto: 'vPagoMetodos' },
-                    { label: 'Impresoras', goto: 'vImpresoras' },
+                    // { label: 'Impresoras', goto: 'vImpresoras' },
                     { label: 'Cajas', goto: 'vCajas' },
-                    { label: 'Áreas de producción', goto: 'vProducciónÁreas' },
+                    { label: 'Áreas de producción', goto: 'vProduccionAreas' },
                     { label: 'Salones y mesas', goto: 'vSalonesMesas' },
                     { label: 'Productos', goto: 'vProductos' },
                 ]
@@ -56,12 +56,28 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
+                    // {
+                    //     id: 'vImpresoras', label: 'Impresoras', permisos: [
+                    //         { id: 'vImpresoras:listar', label: 'Listar' },
+                    //         { id: 'vImpresoras:crear', label: 'Crear' },
+                    //         { id: 'vImpresoras:editar', label: 'Editar' },
+                    //         { id: 'vImpresoras:eliminar', label: 'Eliminar' },
+                    //     ]
+                    // },
                     {
-                        id: 'vImpresoras', label: 'Impresoras', permisos: [
-                            { id: 'vImpresoras:listar', label: 'Listar' },
-                            { id: 'vImpresoras:crear', label: 'Crear' },
-                            { id: 'vImpresoras:editar', label: 'Editar' },
-                            { id: 'vImpresoras:eliminar', label: 'Eliminar' },
+                        id: 'vCajas', label: 'Cajas', permisos: [
+                            { id: 'vCajas:listar', label: 'Listar' },
+                            { id: 'vCajas:crear', label: 'Crear' },
+                            { id: 'vCajas:editar', label: 'Editar' },
+                            { id: 'vCajas:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vProduccionAreas', label: 'Áreas de producción', permisos: [
+                            { id: 'vProduccionAreas:listar', label: 'Listar' },
+                            { id: 'vProduccionAreas:crear', label: 'Crear' },
+                            { id: 'vProduccionAreas:editar', label: 'Editar' },
+                            { id: 'vProduccionAreas:eliminar', label: 'Eliminar' },
                         ]
                     },
                 ]

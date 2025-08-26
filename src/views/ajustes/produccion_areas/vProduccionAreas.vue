@@ -1,14 +1,14 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Métodos de pago</strong>
+            <strong>Áreas de producción</strong>
 
             <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vPagoMetodos:crear')"
+                    v-if="useAuth.verifyPermiso('vProduccionAreas:crear')"
                 />
             </div>
         </div>
@@ -16,23 +16,23 @@
         <JdTable
             :name="tableName"
             :columns="columns"
-            :datos="vista.pago_metodos || []"
+            :datos="vista.produccion_areas || []"
             :colAct="true"
-            :reload="loadPagoComprobantes"
+            :reload="loadCajas"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
         >
         </JdTable>
     </div>
 
-    <mPagoMetodo v-if="useModals.show.mPagoMetodo" />
+    <mProduccionArea v-if="useModals.show.mProduccionArea" />
 </template>
 
 <script>
 import JdButton from '@/components/inputs/JdButton.vue'
 import JdTable from '@/components/JdTable.vue'
 
-import mPagoMetodo from './mPagoMetodo.vue'
+import mProduccionArea from './mProduccionArea.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,7 +46,7 @@ export default {
         JdButton,
         JdTable,
 
-        mPagoMetodo,
+        mProduccionArea,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -55,7 +55,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vPagoMetodos',
+        tableName: 'vProduccionAreas',
         columns: [
             {
                 id: 'nombre',
@@ -66,9 +66,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'color',
-                title: 'Color',
-                format: 'color',
+                id: 'impresora',
+                title: 'Impresora',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -90,24 +89,23 @@ export default {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vPagoMetodos:editar',
+                permiso: 'vProduccionAreas:editar',
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
-                permiso: 'vPagoMetodos:eliminar',
+                permiso: 'vProduccionAreas:eliminar',
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vPagoMetodos
+        this.vista = this.useVistas.vProduccionAreas
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true)
-            this.loadPagoComprobantes()
+        if (this.useAuth.verifyPermiso('vProduccionAreas:listar') == true) this.loadCajas()
     },
     methods: {
         setQuery() {
@@ -117,24 +115,24 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
-        async loadPagoComprobantes() {
+        async loadCajas() {
             this.setQuery()
 
-            this.vista.pago_metodos = []
+            this.vista.produccion_areas = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.produccion_areas}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.pago_metodos = res.data
+            this.vista.produccion_areas = res.data
         },
 
         nuevo() {
             const item = { activo: true }
 
-            this.useModals.setModal('mPagoMetodo', 'Nuevo método de pago', 1, item)
+            this.useModals.setModal('mProduccionArea', 'Nueva área de producción', 1, item)
         },
 
         runMethod(method, item) {
@@ -142,24 +140,24 @@ export default {
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_metodos}/uno/${item.id}`)
+            const res = await get(`${urls.produccion_areas}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mPagoMetodo', 'Editar comprobante de pago', 2, res.data)
+            this.useModals.setModal('mProduccionArea', 'Editar área de producción', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.pago_metodos, item)
+            const res = await delet(urls.produccion_areas, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vPagoMetodos', 'pago_metodos', item)
+            this.useVistas.removeItem('vProduccionAreas', 'produccion_areas', item)
         },
     },
 }

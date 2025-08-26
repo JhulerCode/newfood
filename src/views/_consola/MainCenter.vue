@@ -5,17 +5,21 @@
         <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
         <vImpresoras v-if="useVistas.show.vImpresoras" />
+        <vCajas v-if="useVistas.show.vCajas" />
+        <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
     </section>
 </template>
 
 <script>
 import { useVistas } from '@/pinia/vistas.js'
 
-import vEmpresa from '../ajustes/empresa/vEmpresa.vue'
+import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
-import vImpresoras from '../ajustes/impresoras/vImpresoras.vue'
+import vImpresoras from '@/views/ajustes/impresoras/vImpresoras.vue'
+import vCajas from '@/views/ajustes/cajas/vCajas.vue'
+import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
 
 export default {
     components: {
@@ -24,6 +28,8 @@ export default {
         VPagoComprobantes,
         vPagoMetodos,
         vImpresoras,
+        vCajas,
+        vProduccionAreas,
     },
     data: () => ({
         useVistas: useVistas(),

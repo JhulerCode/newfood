@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Comprobantes de pago</strong>
+            <strong>Impresoras</strong>
 
             <div class="buttons">
                 <JdButton
