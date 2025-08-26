@@ -55,7 +55,7 @@ export default {
                 text: 'Actualizar',
                 action: 'modificar',
                 show: true,
-                permiso: 'vColaboradores:editar',
+                permiso: 'vPagoComprobantes:editar',
             },
         ],
     }),
@@ -81,7 +81,7 @@ export default {
             return false
         },
         shapeDatos() {
-            if (this.modal.item.numero == "") {
+            if (this.modal.item.numero == '') {
                 this.modal.item.numero = null
             }
         },

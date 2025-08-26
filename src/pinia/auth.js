@@ -15,7 +15,7 @@ export const useAuth = defineStore('auth', {
                     { label: 'Empresa', goto: 'vEmpresa' },
                     { label: 'Colaboradores', goto: 'vColaboradores' },
                     { label: 'Comprobantes de pago', goto: 'vPagoComprobantes' },
-                    { label: 'Tipos de pago', goto: 'vPagoTipos' },
+                    { label: 'Métodos de pago', goto: 'vPagoMetodos' },
                     { label: 'Impresoras', goto: 'vImpresoras' },
                     { label: 'Cajas', goto: 'vCajas' },
                     { label: 'Áreas de producción', goto: 'vProducciónÁreas' },
@@ -46,6 +46,14 @@ export const useAuth = defineStore('auth', {
                         id: 'vPagoComprobantes', label: 'Comprobantes de pago', permisos: [
                             { id: 'vPagoComprobantes:listar', label: 'Listar' },
                             { id: 'vPagoComprobantes:editar', label: 'Editar' },
+                        ]
+                    },
+                    {
+                        id: 'vPagoMetodos', label: 'Métodos de pago', permisos: [
+                            { id: 'vPagoMetodos:listar', label: 'Listar' },
+                            { id: 'vPagoMetodos:crear', label: 'Crear' },
+                            { id: 'vPagoMetodos:editar', label: 'Editar' },
+                            { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
                 ]

@@ -3,6 +3,7 @@
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
         <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
+        <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
     </section>
 </template>
 
@@ -11,13 +12,15 @@ import { useVistas } from '@/pinia/vistas.js'
 
 import vEmpresa from '../ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
-import VPagoComprobantes from '../ajustes/Comprobantes de pago/vPagoComprobantes.vue';
+import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
+import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
 
 export default {
     components: {
         vEmpresa,
         vColaboradores,
         VPagoComprobantes,
+        vPagoMetodos,
     },
     data: () => ({
         useVistas: useVistas(),
