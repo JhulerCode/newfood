@@ -27,22 +27,10 @@
                         v-if="loaded"
                         @click.stop="reload()"
                     ></i>
-
-                    <!-- <i class="fa-solid fa-xmark" v-if="inputModel" @click.stop="setNull()"></i>
+                    <i class="fa-solid fa-xmark" v-if="inputModel" @click.stop="setNull()"></i>
                     <i
                         :class="`${isVisible ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'}`"
-                    ></i> -->
-
-                    <iReload height="0.8rem" width="0.8rem" v-if="loaded" @click.stop="reload()" />
-
-                    <iXmark
-                        height="0.8rem"
-                        width="0.8rem"
-                        v-if="inputModel"
-                        @click.stop="setNull()"
-                    />
-                    <iCaretUp height="1rem" width="1rem" v-if="isVisible" />
-                    <iCaretDown height="1rem" width="1rem" v-else />
+                    ></i>
                 </div>
             </div>
 
@@ -82,18 +70,7 @@
 </template>
 
 <script>
-import iReload from '../icons/iReload.vue'
-import iXmark from '../icons/iXmark.vue'
-import iCaretDown from '../icons/iCaretDown.vue'
-import iCaretUp from '../icons/iCaretUp.vue'
-
 export default {
-    components: {
-        iReload,
-        iXmark,
-        iCaretDown,
-        iCaretUp,
-    },
     props: {
         modelValue: [String, Number, Boolean],
 
@@ -302,7 +279,7 @@ export default {
             .actions {
                 display: flex;
                 align-items: center;
-                // gap: 0.3rem;
+                gap: 0.3rem;
                 margin-left: 0.5rem;
             }
         }

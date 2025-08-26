@@ -9,29 +9,8 @@ const urls = {
 
     sistema: `${host}/api/sistema`,
 
-    activity_logs: `${host}/api/activity_logs`,
-    articulo_categorias: `${host}/api/articulo_categorias`,
-    articulos: `${host}/api/articulos`,
-    caja_aperturas: `${host}/api/caja_aperturas`,
-    caja_movimientos: `${host}/api/caja_movimientos`,
     colaboradores: `${host}/api/colaboradores`,
-    cuarentena_productos: `${host}/api/cuarentena_productos`,
-    documentos: `${host}/api/documentos`,
-    formatos: `${host}/api/formatos`,
-    formato_values: `${host}/api/formato_values`,
-    inspecciones: `${host}/api/inspecciones`,
-    kardex: `${host}/api/kardex`,
-    maquinas: `${host}/api/maquinas`,
-    monedas: `${host}/api/monedas`,
-    precio_listas: `${host}/api/precio_listas`,
-    precio_lista_items: `${host}/api/precio_lista_items`,
-    produccion_ordenes: `${host}/api/produccion_ordenes`,
-    receta_insumos: `${host}/api/receta_insumos`,
-    sessions: `${host}/api/sessions`,
-    socios: `${host}/api/socios`,
-    socio_pedidos: `${host}/api/socio_pedidos`,
-    tipo_cambios: `${host}/api/tipo_cambios`,
-    transacciones: `${host}/api/transacciones`,
+    empresa: `${host}/api/empresa`,
 }
 
 async function get(url) {

@@ -7,13 +7,7 @@
         </div>
 
         <div class="right">
-            <input
-                :type="tipo_input"
-                :placeholder="placeholder"
-                v-model="inputModel"
-                v-if="!disabled"
-                class="input1"
-            />
+            <input :type="tipo_input" :placeholder="placeholder" v-model="inputModel" v-if="!disabled" class="input1" />
 
             <div class="disabled" v-else>
                 {{ inputModel }}
@@ -21,21 +15,13 @@
         </div>
 
         <div class="action" @click="showPass">
-            <iEye v-if="!ver_pass" height="1rem" />
-            <iEyeClosed v-else height="1rem" />
+            <i :class="ver_pass ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
         </div>
     </label>
 </template>
 
 <script>
-import iEye from '@/components/icons/iEye.vue'
-import iEyeClosed from '@/components/icons/iEyeClosed.vue'
-
 export default {
-    components: {
-        iEye,
-        iEyeClosed,
-    },
     props: {
         modelValue: [String, Number],
 

@@ -1,5 +1,6 @@
 <template>
     <section class="main-center">
+        <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
     </section>
 </template>
@@ -7,15 +8,17 @@
 <script>
 import { useVistas } from '@/pinia/vistas.js'
 
-import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue';
+import vEmpresa from '../ajustes/empresa/vEmpresa.vue'
+import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 
 export default {
     components: {
-        vColaboradores
+        vEmpresa,
+        vColaboradores,
     },
     data: () => ({
-        useVistas: useVistas()
-    })
+        useVistas: useVistas(),
+    }),
 }
 </script>
 
@@ -31,7 +34,7 @@ export default {
         padding: 2rem 2rem;
         border-radius: 0.5rem;
 
-        >.head {
+        > .head {
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
@@ -53,7 +56,7 @@ export default {
         }
     }
 
-    .vista-fill{
+    .vista-fill {
         height: 100%;
         display: flex;
         flex-direction: column;

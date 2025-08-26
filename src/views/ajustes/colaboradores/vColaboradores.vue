@@ -94,6 +94,17 @@ export default {
                 sort: true
             },
             {
+                id: 'cargo',
+                title: 'Cargo',
+                prop: 'cargo1.nombre',
+                type: 'select',
+                mostrar: 'id',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true
+            },
+            {
                 id: 'fecha_nacimiento',
                 title: 'Fecha de nacimiento',
                 type: 'date',
@@ -133,15 +144,6 @@ export default {
             {
                 id: 'direccion',
                 title: 'Dirección',
-                type: 'text',
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true
-            },
-            {
-                id: 'cargo',
-                title: 'Cargo',
                 type: 'text',
                 width: '10rem',
                 show: true,
@@ -220,6 +222,7 @@ export default {
             cols.find(a => a.id == 'sexo').lista = this.vista.generos
             cols.find(a => a.id == 'doc_tipo').lista = this.vista.documentos_identidad
             cols.find(a => a.id == 'activo').lista = this.vista.estados
+            cols.find(a => a.id == 'cargo').lista = this.vista.colaborador_cargos
 
             const send = {
                 table: this.tableName,
@@ -265,7 +268,7 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['generos', 'documentos_identidad', 'estados']
+            const qry = ['generos', 'documentos_identidad', 'estados', 'colaborador_cargos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
