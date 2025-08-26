@@ -2,7 +2,6 @@
     <header>
         <div class="left">
             <div class="btn" @click="toogleNavbar">
-                <iBars height="1.2rem" />
                 <i class="fa-solid fa-bars"></i>
             </div>
 
@@ -38,16 +37,16 @@
 </template>
 
 <script>
-import iBars from '@/components/icons/iBars.vue'
-import ThemeConfig from '@/views/_signin/ThemeConfig.vue'
-import ScreenConfig from '@/views/_signin/ScreenConfig.vue'
+import ThemeConfig from '@/components/actions/ThemeConfig.vue'
+import ScreenConfig from '@/components/actions/ScreenConfig.vue'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
 
+// import { urls, patch } from '@/utils/crud'
+
 export default {
     components: {
-        iBars,
         ThemeConfig,
         ScreenConfig,
     },
@@ -55,33 +54,12 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
     }),
-    created() {
-        if (this.useAuth.isDarkMode) {
-            document.body.classList.add('dark-mode')
-        }
-    },
     methods: {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
         },
-
-        darkLigthMode() {
-            document.body.classList.toggle('dark-mode')
-            this.useAuth.isDarkMode = document.body.classList.contains('dark-mode')
-        },
-        fullScreen() {
-            // Alterna el modo pantalla completa
-            const doc = window.document
-            const docEl = doc.documentElement
-
-            const requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullscreen || docEl.msRequestFullscreen
-            const cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen
-
-            if (!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-                requestFullScreen.call(docEl)
-            } else {
-                cancelFullScreen.call(doc)
-            }
+        reloadWindow() {
+            window.location.reload()
         },
 
         openUserMenu() {
@@ -112,7 +90,7 @@ header {
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            
+
             &:hover {
                 background-color: var(--bg-color);
             }

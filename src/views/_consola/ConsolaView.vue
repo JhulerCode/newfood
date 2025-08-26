@@ -1,7 +1,7 @@
 <template>
     <main>
         <MainHead />
-        
+
         <div class="main-body">
             <SideBar class="side-bar"/>
 
@@ -13,19 +13,16 @@
     <mUserPreferences v-if="useModals?.show?.mUserPreferences" />
 
     <mLogin v-if="useModals?.show?.mLogin" />
-
-    <LoadingSpin v-if="useAuth.loading.show" :text="useAuth.loading.text" scale="1.5" style="z-index: 3"/>
 </template>
 
 <script>
-import MainHead from '@/views/_consola/header/MainHead.vue'
-import SideBar from '@/views/_consola/sidebar/SideBar.vue'
-import MainCenter from '@/views/_consola/center/MainCenter.vue'
+import MainHead from '@/views/_consola/MainHead.vue'
+import SideBar from '@/views/_consola/SideBar.vue'
+import MainCenter from '@/views/_consola/MainCenter.vue'
 import mLogin from '@/components/mLogin.vue'
-import LoadingSpin from '@/components/LoadingSpin.vue'
 
-import mUserMenu from './header/mUserMenu.vue'
-import mUserPreferences from './header/mUserPreferences.vue'
+import mUserMenu from './mUserMenu.vue'
+import mUserPreferences from './mUserPreferences.vue'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'
@@ -36,31 +33,30 @@ export default {
         MainHead,
         SideBar,
         MainCenter,
-        mLogin,
-        LoadingSpin,
 
         mUserMenu,
         mUserPreferences,
+
+        mLogin,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
     }),
-    created() {
-        this.isLogged()
+    mounted() {
+        window.addEventListener('keydown', this.shortCuts)
+    },
+    unmounted() {
+        window.removeEventListener('keydown', this.shortCuts)
     },
     methods: {
-        async isLogged() {
-            const auth = await this.useAuth.verify()
-            // console.log(this.useAuth.usuario)
-            if (!auth) {
-                this.$router.replace({ name: 'SignIn', query: { ruc: this.useAuth.ruc } })
+        shortCuts(event) {
+            if (event.ctrlKey && event.key.toLowerCase() === 'b') {
+                event.preventDefault()
+                this.useAuth.showNavbar = !this.useAuth.showNavbar
             }
-            else {
-                this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
-            }
-        }
+        },
     },
 }
 </script>
@@ -74,16 +70,13 @@ main {
     grid-template-columns: 1fr;
     overflow-x: hidden;
     background-color: var(--bg-color2);
-    // background-color: var(--primary-color);
-    
+
     .main-body {
         height: 100%;
-        // display: flex;
         display: grid;
         grid-template-columns: auto 1fr;
         overflow-y: hidden;
         padding: 0 1rem 1rem 1rem;
-        // gap: 1rem;
     }
 }
 
@@ -91,11 +84,4 @@ main {
     top: 4rem;
     right: 2rem;
 }
-
-// @media (max-width: 540px) {
-//     .main-body{
-//         grid-template-columns: auto 100% !important;
-//         // overflow-x: hidden;
-//     }
-// }
 </style>

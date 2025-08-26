@@ -2,62 +2,100 @@
     <div class="jd-select" :style="`grid-template-columns: ${label || icon ? 'auto 1fr' : '1fr'}`">
         <div class="left" v-if="label || icon">
             <span v-if="label">{{ label }}</span>
+
             <i v-if="icon" :class="icon"></i>
+
             <span v-if="nec" class="nec"> *</span>
         </div>
 
         <div class="right" ref="right">
-            <div class="se-muestra" :class="{ 'no-disabled': !disabled, disabled: disabled }" @click="toogleList">
+            <div
+                class="se-muestra"
+                :class="{ 'no-disabled': !disabled, disabled: disabled }"
+                @click="toogleList"
+            >
                 <div class="text">
-                    <span :title="setMostrar()">{{ setMostrar() }}</span>
-                    
+                    <span :title="mostrarValor">{{ mostrarValor }}</span>
+
                     <small v-if="inputModel == null">{{ placeholder }}</small>
                 </div>
 
                 <div class="actions" v-if="!disabled">
-                    <i class="fa-solid fa-rotate-right" title="Recargar" v-if="loaded" @click.stop="reload()"></i>
-                    <i class="fa-solid fa-xmark" v-if="inputModel" @click.stop="setNull()"></i>
-                    <i :class="`${isVisible ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'}`"></i>
+                    <i
+                        class="fa-solid fa-rotate-right"
+                        title="Recargar"
+                        v-if="loaded"
+                        @click.stop="reload()"
+                    ></i>
+
+                    <!-- <i class="fa-solid fa-xmark" v-if="inputModel" @click.stop="setNull()"></i>
+                    <i
+                        :class="`${isVisible ? 'fa-solid fa-caret-up' : 'fa-solid fa-caret-down'}`"
+                    ></i> -->
+
+                    <iReload height="0.8rem" width="0.8rem" v-if="loaded" @click.stop="reload()" />
+
+                    <iXmark
+                        height="0.8rem"
+                        width="0.8rem"
+                        v-if="inputModel"
+                        @click.stop="setNull()"
+                    />
+                    <iCaretUp height="1rem" width="1rem" v-if="isVisible" />
+                    <iCaretDown height="1rem" width="1rem" v-else />
                 </div>
             </div>
 
-            <div class="lista-box" ref="lista-box" v-if="isVisible" :class="{ 'lista-is-open': isVisible }">
-                <input type="search" placeholder="Buscar..." v-model="txtBuscar" v-if="lista.length > 10">
+            <div
+                class="lista-box"
+                ref="lista-box"
+                v-if="isVisible"
+                :class="{ 'lista-is-open': isVisible }"
+            >
+                <input
+                    type="search"
+                    placeholder="Buscar..."
+                    v-model="txtBuscar"
+                    v-if="lista.length > 10"
+                />
 
-                <ul >
+                <ul>
                     <li v-if="lista.length == 0"><small>Sin datos</small></li>
 
-                    <li
-                        v-else-if="lista.filter(a => a[mostrar].toLowerCase().includes(this.txtBuscar.toLowerCase())).length == 0">
+                    <li v-else-if="listaFiltrada.length == 0">
                         <small>Sin resultados</small>
                     </li>
 
-                    <li v-for="(a, i) in lista.filter(a => a[mostrar].toLowerCase().includes(this.txtBuscar.toLowerCase()))"
-                        :key="i" @click="elegir(a[id])" :class="{ selected: inputModel == a[id] }" v-else>
-                        {{ a[mostrar] }}
+                    <li
+                        v-else
+                        v-for="(a, i) in listaFiltrada"
+                        :key="i"
+                        @click="elegir(a[id])"
+                        :class="{ selected: inputModel == a[id] }"
+                    >
+                        {{ getNestedProp(a, mostrar) }}
                     </li>
                 </ul>
             </div>
         </div>
-
-        <!-- <select v-model="inputModel">
-            <option v-for="(a, i) in lista" :key="i" :value="a[id]">
-                {{ a[mostrar] }}
-            </option>
-        </select> -->
-        <!-- <input type="text" v-model="inputModel"> -->
     </div>
 </template>
 
 <script>
-// import loadingSpin from '@/components/LoadingSpin.vue'
+import iReload from '../icons/iReload.vue'
+import iXmark from '../icons/iXmark.vue'
+import iCaretDown from '../icons/iCaretDown.vue'
+import iCaretUp from '../icons/iCaretUp.vue'
 
 export default {
     components: {
-        // loadingSpin
+        iReload,
+        iXmark,
+        iCaretDown,
+        iCaretUp,
     },
     props: {
-        modelValue: [String, Number],
+        modelValue: [String, Number, Boolean],
 
         label: String,
         icon: String,
@@ -77,6 +115,32 @@ export default {
             set(newValue) {
                 this.$emit('update:modelValue', newValue)
             },
+        },
+        mostrarValor() {
+            if (
+                this.inputModel !== null &&
+                this.inputModel !== undefined &&
+                this.inputModel !== ''
+            ) {
+                const send = this.lista.find((a) => a[this.id] == this.inputModel)
+
+                if (send) {
+                    return this.getNestedProp(send, this.mostrar)
+                    // return send[this.mostrar]
+                }
+            }
+
+            return ''
+        },
+        listaFiltrada() {
+            if (!this.txtBuscar) return this.lista
+
+            const textoBuscado = this.normalizarTexto(this.txtBuscar)
+
+            return this.lista.filter((a) => {
+                const valor = this.getNestedProp(a, this.mostrar)
+                return this.normalizarTexto(valor).includes(textoBuscado)
+            })
         },
     },
     data: () => ({
@@ -119,8 +183,7 @@ export default {
                     document.addEventListener('click', this.handleClickOutside)
                     window.addEventListener('keydown', this.handleEscapeKey)
                 }, 0)
-            }
-            else {
+            } else {
                 this.ocultar()
             }
         },
@@ -135,8 +198,7 @@ export default {
             if (id !== null && id !== undefined) {
                 if (this.lista.length > 0) {
                     this.inputModel = id
-                }
-                else {
+                } else {
                     const inter = setInterval(() => {
                         if (this.lista.length > 0) {
                             this.inputModel = id
@@ -153,7 +215,10 @@ export default {
             this.inputModel = id
 
             if (isChanged) {
-                this.$emit('elegir', this.lista.find(a => a[this.id] == id))
+                this.$emit(
+                    'elegir',
+                    this.lista.find((a) => a[this.id] == id),
+                )
             }
 
             this.ocultar()
@@ -163,21 +228,21 @@ export default {
 
             this.$emit('elegir', null)
         },
-        setMostrar() {
-            if (this.inputModel !== null && this.inputModel !== undefined && this.inputModel !== '') {
-                const send = this.lista.find(a => a[this.id] == this.inputModel)
+        getNestedProp(obj, prop) {
+            const result = prop.split('.').reduce((acc, part) => acc?.[part], obj)
 
-                if (send) {
-                    return send[this.mostrar]
-                }
-                else {
-                    return ''
-                }
-            }
+            return result === undefined || result === null ? '' : result
+        },
+        normalizarTexto(texto) {
+            return texto
+                .toString()
+                .normalize('NFD') // separa letras y tildes
+                .replace(/[\u0300-\u036f]/g, '') // elimina los signos diacríticos
+                .toLowerCase()
         },
         reload() {
             this.$emit('reload')
-        }
+        },
     },
 }
 </script>
@@ -237,7 +302,7 @@ export default {
             .actions {
                 display: flex;
                 align-items: center;
-                gap: 0.3rem;
+                // gap: 0.3rem;
                 margin-left: 0.5rem;
             }
         }

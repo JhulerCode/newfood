@@ -173,7 +173,8 @@ async function tryOficialExcel(element, file, reader, headers) {
         const cell = firstRow.getCell(i)
         headers1.push(cell ? cell.value : null)
     }
-
+    // console.log(headers)
+    // console.log(headers1)
     if (JSON.stringify(headers) !== JSON.stringify(headers1)) return { code: 2, msg: 'El archivo no es el formato oficial' }
 
     const jsonData = []
@@ -199,8 +200,7 @@ async function tryOficialExcel(element, file, reader, headers) {
     return { code: 0, data: jsonObject }
 }
 
-async function downloadExcel(columns, datos, nombre = `${Date.now()}.xlsx`) {
-    datos
+async function downloadExcel(columns, datos = [], nombre = `${Date.now()}.xlsx`) {
     const workbook = new ExcelJS.Workbook()
     const worksheet = workbook.addWorksheet('Hoja1')
 

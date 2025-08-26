@@ -7,35 +7,20 @@
         </div>
 
         <div class="right">
-            <input
-                :type="tipo_input"
-                :placeholder="placeholder"
-                v-model="inputModel"
-                v-if="!disabled"
-                class="input1"
-            />
-
-            <div class="disabled" v-else>
-                {{ inputModel }}
-            </div>
+            <!-- <div class="disabled" v-else> -->
+            {{ inputModel }}
         </div>
 
-        <div class="action" @click="showPass">
-            <iEye v-if="!ver_pass" height="1rem" />
-            <iEyeClosed v-else height="1rem" />
+        <div class="actions">
+            <i class="fa-solid fa-trash-can" @click="deleteFile" v-if="inputModel"></i>
+            <i class="fa-solid fa-upload" @click="$refs.inputFile.click()"></i>
         </div>
     </label>
+    <input type="file" :placeholder="placeholder" :accept="accept" hidden @change="handleFile" ref="inputFile" />
 </template>
 
 <script>
-import iEye from '@/components/icons/iEye.vue'
-import iEyeClosed from '@/components/icons/iEyeClosed.vue'
-
 export default {
-    components: {
-        iEye,
-        iEyeClosed,
-    },
     props: {
         modelValue: [String, Number],
 
@@ -45,7 +30,9 @@ export default {
         placeholder: String,
         disabled: { type: Boolean, default: false },
         height: { type: [String, Number], default: '2.2' },
+        accept: { type: String },
     },
+    emits: ['update:modelValue', 'deleteFile', 'handleFile'],
     data: () => ({
         tipo_input: 'password',
         ver_pass: false,
@@ -61,9 +48,17 @@ export default {
         },
     },
     methods: {
-        showPass() {
-            this.ver_pass = !this.ver_pass
-            this.tipo_input = this.ver_pass ? 'text' : 'password'
+        deleteFile() {
+            this.inputModel = null
+            this.$emit('deleteFile')
+        },
+        handleFile(e) {
+            const file = e.target.files[0]
+
+            if (file) {
+                this.inputModel = file.name
+                this.$emit('handleFile', file)
+            }
         },
     },
 }
@@ -72,7 +67,7 @@ export default {
 <style lang="scss" scoped>
 .container-input {
     display: grid;
-    grid-template-columns: auto 1fr 2.5rem;
+    grid-template-columns: auto 1fr auto;
     width: 100%;
     // height: 2.2rem;
 
@@ -113,15 +108,22 @@ export default {
         }
     }
 
-    .action {
+    .actions {
         display: flex;
         align-items: center;
-        justify-content: center;
+        // justify-content: center;
         border-radius: 0.2rem;
         border: var(--border);
         border-left: initial !important;
-        cursor: pointer;
         background-color: var(--bg-color);
+        padding: 0.5rem;
+        gap: 0.5rem;
+
+        i {
+            cursor: pointer;
+        }
     }
+
+
 }
 </style>

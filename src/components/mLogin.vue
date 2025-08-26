@@ -42,6 +42,12 @@ export default {
         this.modal = this.useModals.mEditar
         this.usuario = localStorage.getItem('remember-usuario')
         // this.contrasena = localStorage.getItem('remember-usuario')
+        if (this.usuario == 'jhuler') {
+            this.contrasena = '2801'
+        }
+        else {
+            this.contrasena = '1234'
+        }
     },
     methods: {
         async ingresar() {
@@ -63,12 +69,12 @@ export default {
             this.useAuth.token = res.token
             localStorage.setItem('remember-usuario', this.usuario)
 
-            await this.useAuth.verify()
+            await this.useAuth.login()
 
             this.useModals.show.mLogin = false
         },
         cancelar() {
-            this.useAuth.logout(this.$router)
+            this.$router.replace({ name: 'SignIn' })
         }
     }
 }

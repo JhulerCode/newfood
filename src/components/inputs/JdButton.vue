@@ -1,5 +1,7 @@
 <template>
     <div class="jd-button" :title="title" :class="`${small ? 'small' : 'normal'}`">
+        <LoadingSpin :borderRadius="small ? 0.3 : 0.4" :scale="small ? 0.7 : 1" v-if="spin" />
+
         <div ref="btn" class="btn" :class="`btn${tipo}`">
             <!--:style="{ backgroundColor: `var(--${backColor})` }"
              @mouseenter="handleMouseEnter()"
@@ -15,8 +17,11 @@
 </template>
 
 <script>
+import LoadingSpin from '@/components/LoadingSpin.vue'
+
 export default {
     components: {
+        LoadingSpin
     },
     props: {
         // backColor: { type: String, default: 'bg-color2' },
@@ -145,7 +150,7 @@ export default {
 
 .small {
     .btn {
-        padding: calc(0.3rem - 2px) 0.5rem !important;
+        padding: calc(0.3rem - 2px) 0.35rem !important;
         border-radius: 0.3rem;
 
         * {
