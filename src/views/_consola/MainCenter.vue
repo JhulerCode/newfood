@@ -1,5 +1,7 @@
 <template>
     <section class="main-center">
+        <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
+
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
         <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
@@ -14,6 +16,10 @@
 <script>
 import { useVistas } from '@/pinia/vistas.js'
 
+// ----- ARTÍCULOS ----- //
+import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
+
+// ----- AJSUTES ----- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
@@ -25,6 +31,8 @@ import vSalones from '@/views/ajustes/salones/vSalones.vue'
 
 export default {
     components: {
+        vArticuloCategorias,
+
         vEmpresa,
         vColaboradores,
         VPagoComprobantes,

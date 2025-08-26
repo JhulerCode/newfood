@@ -6,18 +6,18 @@ const host = import.meta.env.VITE_API_HOST
 
 const urls = {
     signin: `${host}/signin`,
-
     sistema: `${host}/api/sistema`,
 
+    articulo_categorias: `${host}/api/articulo_categorias`,
+    cajas: `${host}/api/cajas`,
     colaboradores: `${host}/api/colaboradores`,
     empresa: `${host}/api/empresa`,
+    impresoras: `${host}/api/impresoras`,
+    mesas: `${host}/api/mesas`,
     pago_comprobantes: `${host}/api/pago_comprobantes`,
     pago_metodos: `${host}/api/pago_metodos`,
-    impresoras: `${host}/api/impresoras`,
-    cajas: `${host}/api/cajas`,
     produccion_areas: `${host}/api/produccion_areas`,
     salones: `${host}/api/salones`,
-    mesas: `${host}/api/mesas`,
 }
 
 async function get(url) {

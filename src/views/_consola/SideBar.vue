@@ -42,16 +42,16 @@ export default {
     computed: {
         menu() {
             return this.useAuth.menu
-                // .map(seccion => {
-                //     const hijosFiltrados = seccion.children.filter(a =>
-                //         (this.useAuth.usuario.permisos || []).some(p => p.startsWith(a.goto + ':'))
-                //     )
+                .map(seccion => {
+                    const hijosFiltrados = seccion.children.filter(a =>
+                        (this.useAuth.usuario.permisos || []).some(p => p.startsWith(a.goto + ':'))
+                    )
 
-                //     return hijosFiltrados.length > 0
-                //         ? { ...seccion, children: hijosFiltrados }
-                //         : null
-                // })
-                // .filter(seccion => seccion !== null)
+                    return hijosFiltrados.length > 0
+                        ? { ...seccion, children: hijosFiltrados }
+                        : null
+                })
+                .filter(seccion => seccion !== null)
         },
     },
     methods: {

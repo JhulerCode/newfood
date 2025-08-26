@@ -11,6 +11,14 @@ export const useAuth = defineStore('auth', {
 
         menu: [
             {
+                label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
+                    { label: 'Categorías', goto: 'vArticuloCategorias' },
+                    { label: 'Insumos', goto: 'vInsumos' },
+                    { label: 'Productos', goto: 'vProductos' },
+                    { label: 'Combos', goto: 'vCombos' },
+                ]
+            },
+            {
                 label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
                     { label: 'Empresa', goto: 'vEmpresa' },
                     { label: 'Colaboradores', goto: 'vColaboradores' },
@@ -26,7 +34,43 @@ export const useAuth = defineStore('auth', {
         ],
         listaPermisos: [
             {
-                id: 'operaciones', label: 'Operaciones', vistas: [
+                id: 'articulos', label: 'Artículos', vistas: [
+                    {
+                        id: 'vArticuloCategorias', label: 'Categorías', permisos: [
+                            { id: 'vArticuloCategorias:listar', label: 'Listar' },
+                            { id: 'vArticuloCategorias:crear', label: 'Crear' },
+                            { id: 'vArticuloCategorias:editar', label: 'Editar' },
+                            { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vInsumos', label: 'Insumos', permisos: [
+                            { id: 'vInsumos:listar', label: 'Listar' },
+                            { id: 'vInsumos:crear', label: 'Crear' },
+                            { id: 'vInsumos:editar', label: 'Editar' },
+                            { id: 'vInsumos:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vProductos', label: 'Productos', permisos: [
+                            { id: 'vProductos:listar', label: 'Listar' },
+                            { id: 'vProductos:crear', label: 'Crear' },
+                            { id: 'vProductos:editar', label: 'Editar' },
+                            { id: 'vProductos:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        id: 'vCombos', label: 'Combos', permisos: [
+                            { id: 'vCombos:listar', label: 'Listar' },
+                            { id: 'vCombos:crear', label: 'Crear' },
+                            { id: 'vCombos:editar', label: 'Editar' },
+                            { id: 'vCombos:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                ]
+            },
+            {
+                id: 'ajustes', label: 'Ajustes', vistas: [
                     {
                         id: 'vEmpresa', label: 'Empresa', permisos: [
                             { id: 'vEmpresa:ver', label: 'Ver' },
