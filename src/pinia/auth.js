@@ -28,7 +28,6 @@ export const useAuth = defineStore('auth', {
                     { label: 'Cajas', goto: 'vCajas' },
                     { label: 'Áreas de producción', goto: 'vProduccionAreas' },
                     { label: 'Salones y mesas', goto: 'vSalones' },
-                    { label: 'Productos', goto: 'vProductos' },
                 ]
             },
         ],
@@ -49,6 +48,14 @@ export const useAuth = defineStore('auth', {
                             { id: 'vInsumos:crear', label: 'Crear' },
                             { id: 'vInsumos:editar', label: 'Editar' },
                             { id: 'vInsumos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vInsumos:clonar', label: 'Clonar' },
+                            { id: 'vInsumos:kardex', label: 'Ver kardex' },
+                            { id: 'vInsumos:ajusteStock', label: 'Ajuste stock' },
+
+                            { id: 'vInsumos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vInsumos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vInsumos:eliminarBulk', label: 'Eliminar masivo' },
                         ]
                     },
                     {
@@ -57,6 +64,19 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductos:crear', label: 'Crear' },
                             { id: 'vProductos:editar', label: 'Editar' },
                             { id: 'vProductos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vProductos:clonar', label: 'Clonar' },
+                            { id: 'vInsumos:kardex', label: 'Ver kardex' },
+                            { id: 'vInsumos:ajusteStock', label: 'Ajuste stock' },
+
+                            { id: 'vProductos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vProductos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vProductos:eliminarBulk', label: 'Eliminar masivo' },
+
+                            { id: 'vProductos:listarReceta', label: 'Listar receta' },
+                            { id: 'vProductos:crearReceta', label: 'Crear receta' },
+                            { id: 'vProductos:editarReceta', label: 'Editar receta' },
+                            { id: 'vProductos:eliminarReceta', label: 'Eliminar receta' },
                         ]
                     },
                     {

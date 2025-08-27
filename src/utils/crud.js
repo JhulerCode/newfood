@@ -9,6 +9,7 @@ const urls = {
     sistema: `${host}/api/sistema`,
 
     articulo_categorias: `${host}/api/articulo_categorias`,
+    articulos: `${host}/api/articulos`,
     cajas: `${host}/api/cajas`,
     colaboradores: `${host}/api/colaboradores`,
     empresa: `${host}/api/empresa`,
@@ -17,6 +18,7 @@ const urls = {
     pago_comprobantes: `${host}/api/pago_comprobantes`,
     pago_metodos: `${host}/api/pago_metodos`,
     produccion_areas: `${host}/api/produccion_areas`,
+    receta_insumos: `${host}/api/receta_insumos`,
     salones: `${host}/api/salones`,
 }
 
