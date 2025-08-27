@@ -20,6 +20,7 @@ const urls = {
     produccion_areas: `${host}/api/produccion_areas`,
     receta_insumos: `${host}/api/receta_insumos`,
     salones: `${host}/api/salones`,
+    socios: `${host}/api/socios`,
 }
 
 async function get(url) {
