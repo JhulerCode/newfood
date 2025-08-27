@@ -33,6 +33,19 @@ export const useAuth = defineStore('auth', {
                 ]
             },
             {
+                id: 'ventas', label: 'Ventas', icon: 'fa-solid fa-store', children: [
+                    {
+                        label: 'Clientes', goto: 'vClientes', permisos: [
+                            { id: 'vClientes:listar', label: 'Listar' },
+                            { id: 'vClientes:crear', label: 'Crear' },
+                            { id: 'vClientes:ver', label: 'Ver' },
+                            { id: 'vClientes:editar', label: 'Editar' },
+                            { id: 'vClientes:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                ]
+            },
+            {
                 id: 'articulos', label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
                     {
                         label: 'Categorías', goto: 'vArticuloCategorias', permisos: [

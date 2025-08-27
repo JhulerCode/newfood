@@ -2,6 +2,8 @@
     <section class="main-center">
         <vProveedores v-if="useVistas.show.vProveedores" />
 
+        <vClientes v-if="useVistas.show.vClientes" />
+
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInsumos v-if="useVistas.show.vInsumos" />
         <vProductos v-if="useVistas.show.vProductos" />
@@ -24,6 +26,8 @@ import { useVistas } from '@/pinia/vistas.js'
 // ----- COMPRAS ----- //
 import vProveedores from '@/views/compras/proveedores/vProveedores.vue'
 
+// ----- VENTAS ----- //
+import vClientes from '@/views/ventas/clientes/vClientes.vue'
 
 // ----- ARTÍCULOS ----- //
 import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
@@ -44,6 +48,8 @@ import vSalones from '@/views/ajustes/salones/vSalones.vue'
 export default {
     components: {
         vProveedores,
+
+        vClientes,
 
         vArticuloCategorias,
         vInsumos,

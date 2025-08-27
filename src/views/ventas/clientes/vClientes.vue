@@ -1,13 +1,13 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Proveedores</strong>
+            <strong>Clientes</strong>
 
             <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vProveedores:crear')"
+                    v-if="useAuth.verifyPermiso('vClientes:crear')"
                 />
             </div>
         </div>
@@ -65,7 +65,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vProveedores',
+        tableName: 'vClientes',
         columns: [
             {
                 id: 'doc_tipo',
@@ -132,33 +132,33 @@ export default {
                 label: 'Ver',
                 icon: 'fa-regular fa-folder-open',
                 action: 'ver',
-                permiso: 'vProveedores:ver',
+                permiso: 'vClientes:ver',
             },
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vProveedores:editar',
+                permiso: 'vClientes:editar',
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                permiso: 'vProveedores:eliminar',
+                permiso: 'vClientes:eliminar',
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vProveedores
+        this.vista = this.useVistas.vClientes
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
-        if (this.useAuth.verifyPermiso('vProveedores:listar') == true) this.loadSocios()
+        if (this.useAuth.verifyPermiso('vClientes:listar') == true) this.loadSocios()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: { tipo: { op: 'Es', val: 2 } },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -179,12 +179,12 @@ export default {
 
         nuevo() {
             const item = {
-                tipo: 1,
-                doc_tipo: 6,
+                tipo: 2,
+                doc_tipo: 1,
                 activo: true,
             }
 
-            this.useModals.setModal('mSocio', 'Nuevo proveedor', 1, item)
+            this.useModals.setModal('mSocio', 'Nuevo cliente', 1, item)
         },
 
         async openConfigFiltros() {
@@ -213,12 +213,7 @@ export default {
 
             if (res.code != 0) return
 
-            const send = {
-                item: res.data,
-                precio_listas: [{ ...res.data.precio_lista1 }],
-            }
-
-            this.useModals.setModal('mSocio', 'Ver proveedor', 3, send, true)
+            this.useModals.setModal('mSocio', 'Ver cliente', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -227,7 +222,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mSocio', 'Editar proveedor', 2, res.data)
+            this.useModals.setModal('mSocio', 'Editar cliente', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -239,7 +234,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vProveedores', 'socios', item)
+            this.useVistas.removeItem('vClientes', 'socios', item)
         },
 
         async loadDatosSistema() {
