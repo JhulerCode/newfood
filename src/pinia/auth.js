@@ -11,31 +11,31 @@ export const useAuth = defineStore('auth', {
 
         menu: [
             {
-                label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
-                    { label: 'Categorías', goto: 'vArticuloCategorias' },
-                    { label: 'Insumos', goto: 'vInsumos' },
-                    { label: 'Productos', goto: 'vProductos' },
-                    { label: 'Combos', goto: 'vCombos' },
-                ]
-            },
-            {
-                label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
-                    { label: 'Empresa', goto: 'vEmpresa' },
-                    { label: 'Colaboradores', goto: 'vColaboradores' },
-                    { label: 'Comprobantes de pago', goto: 'vPagoComprobantes' },
-                    { label: 'Métodos de pago', goto: 'vPagoMetodos' },
-                    // { label: 'Impresoras', goto: 'vImpresoras' },
-                    { label: 'Cajas', goto: 'vCajas' },
-                    { label: 'Áreas de producción', goto: 'vProduccionAreas' },
-                    { label: 'Salones y mesas', goto: 'vSalones' },
-                ]
-            },
-        ],
-        listaPermisos: [
-            {
-                id: 'articulos', label: 'Artículos', vistas: [
+                id: 'compras', label: 'Compras', icon: 'fa-solid fa-cart-shopping', children: [
                     {
-                        id: 'vArticuloCategorias', label: 'Categorías', permisos: [
+                        label: 'Proveedores', goto: 'vProveedores', permisos: [
+                            { id: 'vProveedores:listar', label: 'Listar' },
+                            { id: 'vProveedores:crear', label: 'Crear' },
+                            { id: 'vProveedores:ver', label: 'Ver' },
+                            { id: 'vProveedores:editar', label: 'Editar' },
+                            { id: 'vProveedores:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                    {
+                        label: 'Compras', goto: 'vCompras', permisos: [
+                            { id: 'vCompras:listar', label: 'Listar' },
+                            { id: 'vCompras:crear', label: 'Crear' },
+                            { id: 'vCompras:ver', label: 'Ver' },
+                            { id: 'vCompras:editar', label: 'Editar' },
+                            { id: 'vCompras:eliminar', label: 'Eliminar' },
+                        ]
+                    },
+                ]
+            },
+            {
+                id: 'articulos', label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
+                    {
+                        label: 'Categorías', goto: 'vArticuloCategorias', permisos: [
                             { id: 'vArticuloCategorias:listar', label: 'Listar' },
                             { id: 'vArticuloCategorias:crear', label: 'Crear' },
                             { id: 'vArticuloCategorias:editar', label: 'Editar' },
@@ -43,7 +43,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vInsumos', label: 'Insumos', permisos: [
+                        label: 'Insumos', goto: 'vInsumos', permisos: [
                             { id: 'vInsumos:listar', label: 'Listar' },
                             { id: 'vInsumos:crear', label: 'Crear' },
                             { id: 'vInsumos:editar', label: 'Editar' },
@@ -59,7 +59,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vProductos', label: 'Productos', permisos: [
+                        label: 'Productos', goto: 'vProductos', permisos: [
                             { id: 'vProductos:listar', label: 'Listar' },
                             { id: 'vProductos:crear', label: 'Crear' },
                             { id: 'vProductos:editar', label: 'Editar' },
@@ -80,7 +80,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vCombos', label: 'Combos', permisos: [
+                        label: 'Combos', goto: 'vCombos', permisos: [
                             { id: 'vCombos:listar', label: 'Listar' },
                             { id: 'vCombos:crear', label: 'Crear' },
                             { id: 'vCombos:editar', label: 'Editar' },
@@ -90,15 +90,15 @@ export const useAuth = defineStore('auth', {
                 ]
             },
             {
-                id: 'ajustes', label: 'Ajustes', vistas: [
+                id: 'ajustes', label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
                     {
-                        id: 'vEmpresa', label: 'Empresa', permisos: [
+                        label: 'Empresa', goto: 'vEmpresa', permisos: [
                             { id: 'vEmpresa:ver', label: 'Ver' },
                             { id: 'vEmpresa:editar', label: 'Editar' },
                         ]
                     },
                     {
-                        id: 'vColaboradores', label: 'Colaboradores', permisos: [
+                        label: 'Colaboradores', goto: 'vColaboradores', permisos: [
                             { id: 'vColaboradores:listar', label: 'Listar' },
                             { id: 'vColaboradores:crear', label: 'Crear' },
                             { id: 'vColaboradores:ver', label: 'Ver' },
@@ -107,29 +107,22 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vPagoComprobantes', label: 'Comprobantes de pago', permisos: [
+                        label: 'Comprobantes de pago', goto: 'vPagoComprobantes', permisos: [
                             { id: 'vPagoComprobantes:listar', label: 'Listar' },
                             { id: 'vPagoComprobantes:editar', label: 'Editar' },
                         ]
                     },
                     {
-                        id: 'vPagoMetodos', label: 'Métodos de pago', permisos: [
+                        label: 'Métodos de pago', goto: 'vPagoMetodos', permisos: [
                             { id: 'vPagoMetodos:listar', label: 'Listar' },
                             { id: 'vPagoMetodos:crear', label: 'Crear' },
                             { id: 'vPagoMetodos:editar', label: 'Editar' },
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
-                    // {
-                    //     id: 'vImpresoras', label: 'Impresoras', permisos: [
-                    //         { id: 'vImpresoras:listar', label: 'Listar' },
-                    //         { id: 'vImpresoras:crear', label: 'Crear' },
-                    //         { id: 'vImpresoras:editar', label: 'Editar' },
-                    //         { id: 'vImpresoras:eliminar', label: 'Eliminar' },
-                    //     ]
-                    // },
+                    // { label: 'Impresoras', goto: 'vImpresoras' },
                     {
-                        id: 'vCajas', label: 'Cajas', permisos: [
+                        label: 'Cajas', goto: 'vCajas', permisos: [
                             { id: 'vCajas:listar', label: 'Listar' },
                             { id: 'vCajas:crear', label: 'Crear' },
                             { id: 'vCajas:editar', label: 'Editar' },
@@ -137,7 +130,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vProduccionAreas', label: 'Áreas de producción', permisos: [
+                        label: 'Áreas de producción', goto: 'vProduccionAreas', permisos: [
                             { id: 'vProduccionAreas:listar', label: 'Listar' },
                             { id: 'vProduccionAreas:crear', label: 'Crear' },
                             { id: 'vProduccionAreas:editar', label: 'Editar' },
@@ -145,7 +138,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        id: 'vSalones', label: 'Salones y mesas', permisos: [
+                        label: 'Salones y mesas', goto: 'vSalones', permisos: [
                             { id: 'vSalones:listar', label: 'Listar' },
                             { id: 'vSalones:crear', label: 'Crear' },
                             { id: 'vSalones:editar', label: 'Editar' },

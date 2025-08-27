@@ -146,10 +146,10 @@ export default {
         this.modal = this.useModals.mArticuloReceta
         this.receta = this.useModals.mArticuloReceta.item
 
-        this.loadReceta()
-
         if (this.useAuth.verifyPermiso('vProductos:editarReceta') == false)
             this.columns[0].show = false
+
+        this.loadReceta()
     },
     methods: {
         async searchArticulos(txtBuscar) {

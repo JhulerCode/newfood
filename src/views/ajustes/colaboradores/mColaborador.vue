@@ -105,7 +105,7 @@
                         <strong>--- Permisos ---</strong>
                     </div>
 
-                    <div v-for="a in useAuth.listaPermisos || []" :key="a.id">
+                    <div v-for="a in useAuth.menu || []" :key="a.id">
                         <div class="grupo-header" @click="toggleGrupo(a.id)">
                             {{ a.label }}
 
@@ -118,15 +118,15 @@
                             </span>
                         </div>
 
-                        <div v-if="a.vistas && modal.grupoExpandido === a.id">
-                            <div v-for="b in a.vistas" :key="b.id" class="vistas">
-                                <div class="vista-header" @click="toggleVista(b.id)">
+                        <div v-if="a.children && modal.grupoExpandido === a.id">
+                            <div v-for="b in a.children" :key="b.id" class="vistas">
+                                <div class="vista-header" @click="toggleVista(b.goto)">
                                     {{ b.label }}
 
                                     <span class="icono-expand">
                                         <i
                                             class="fa-solid fa-caret-down"
-                                            v-if="modal.vistaExpandida === b.id"
+                                            v-if="modal.vistaExpandida === b.goto"
                                         ></i>
                                         <i class="fa-solid fa-caret-right" v-else></i>
                                     </span>
@@ -134,18 +134,18 @@
 
                                 <div
                                     class="permisos"
-                                    v-if="b.permisos && modal.vistaExpandida === b.id"
+                                    v-if="b.permisos && modal.vistaExpandida === b.goto"
                                 >
                                     <div class="permisos-acciones">
                                         <JdButton
                                             text="Sel. todo"
                                             tipo="3"
-                                            @click="selectAll(b.id)"
+                                            @click="selectAll(b.goto)"
                                         />
                                         <JdButton
                                             text="Sel. ninguno"
                                             tipo="3"
-                                            @click="selectNone(b.id)"
+                                            @click="selectNone(b.goto)"
                                         />
                                     </div>
 
@@ -312,9 +312,9 @@ export default {
         sincronizarChecksConPermisos() {
             const permisos = this.colaborador.permisos || []
 
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
                         if (b.permisos) {
                             for (const c of b.permisos) {
                                 c.val = permisos.includes(c.id)
@@ -327,9 +327,9 @@ export default {
         recolectarPermisosSeleccionados() {
             const permisos = []
 
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
                         if (b.permisos) {
                             for (const c of b.permisos) {
                                 if (c.val) permisos.push(c.id)
@@ -348,10 +348,10 @@ export default {
         },
 
         selectAll(id) {
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
-                        if (b.id == id) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
+                        if (b.goto == id) {
                             for (const c of b.permisos) {
                                 c.val = true
                             }
@@ -361,10 +361,10 @@ export default {
             }
         },
         selectNone(id) {
-            for (const a of this.useAuth.listaPermisos) {
-                if (a.vistas) {
-                    for (const b of a.vistas) {
-                        if (b.id == id) {
+            for (const a of this.useAuth.menu) {
+                if (a.children) {
+                    for (const b of a.children) {
+                        if (b.goto == id) {
                             for (const c of b.permisos) {
                                 c.val = false
                             }
@@ -381,7 +381,7 @@ export default {
 .container-todo {
     display: flex;
     flex-wrap: wrap;
-    gap: 1rem 2rem;
+    gap: 1rem 3rem;
 }
 
 .container-datos {
@@ -438,6 +438,12 @@ export default {
                 }
             }
         }
+    }
+}
+
+@media (max-width: 540px) {
+    .container-datos, .right .container-accesos {
+        grid-template-columns: minmax(100%, 33.5rem) !important;
     }
 }
 </style>

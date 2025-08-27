@@ -59,13 +59,6 @@ export default {
             },
         ],
     }),
-    computed: {
-        vistas() {
-            return this.useAuth.menu
-                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label })))
-                .flat()
-        },
-    },
     created() {
         this.modal = this.useModals.mPagoComprobante
     },
