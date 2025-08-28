@@ -157,7 +157,8 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? '1' : '2' },
+                    // tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? '1' : '2' },
+                    has_receta: { op: 'No es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },

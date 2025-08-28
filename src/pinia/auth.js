@@ -80,8 +80,8 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductos:eliminar', label: 'Eliminar' },
 
                             { id: 'vProductos:clonar', label: 'Clonar' },
-                            { id: 'vInsumos:kardex', label: 'Ver kardex' },
-                            { id: 'vInsumos:ajusteStock', label: 'Ajuste stock' },
+                            { id: 'vProductos:kardex', label: 'Ver kardex' },
+                            { id: 'vProductos:ajusteStock', label: 'Ajuste stock' },
 
                             { id: 'vProductos:crearBulk', label: 'Crear masivo' },
                             { id: 'vProductos:editarBulk', label: 'Editar masivo' },

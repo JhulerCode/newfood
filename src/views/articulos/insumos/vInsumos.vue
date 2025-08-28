@@ -132,9 +132,8 @@ export default {
             {
                 id: 'stock',
                 title: 'Stock',
-                type: 'number',
                 toRight: true,
-                width: '5rem',
+                width: '8rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -162,38 +161,6 @@ export default {
                 seek: true,
                 sort: true,
             },
-            // {
-            //     id: 'stock',
-            //     title: 'Stock',
-            //     format: 'decimal',
-            //     toRight: true,
-            //     width: '10rem',
-            //     show: false,
-            //     seek: true,
-            //     sort: true,
-            // },
-            // {
-            //     id: 'valor',
-            //     title: 'Valor',
-            //     format: 'decimal',
-            //     toRight: true,
-            //     width: '10rem',
-            //     show: false,
-            //     seek: true,
-            //     sort: true,
-            // },
-            // {
-            //     id: 'has_fv',
-            //     title: 'Tiene fecha de vencimiento?',
-            //     prop: 'has_fv1.nombre',
-            //     type: 'select',
-            //     editable: true,
-            //     format: 'yesno',
-            //     width: '8rem',
-            //     show: true,
-            //     seek: false,
-            //     sort: true,
-            // },
             {
                 id: 'igv_afectacion',
                 title: 'Tributo',
@@ -296,8 +263,7 @@ export default {
                 tipo: '1',
                 igv_afectacion: 10,
 
-                // has_fv: false,
-                // vende: false,
+                has_receta: false,
                 activo: true,
 
                 is_combo: false,
@@ -472,17 +438,17 @@ export default {
 
             this.useModals.setModal('mArticulo', 'Nuevo insumo', 1, send)
         },
-        // async verKardex(item) {
-        //     const send = {
-        //         articulo: {
-        //             id: item.id,
-        //             nombre: item.nombre,
-        //             unidad: item.unidad,
-        //         },
-        //     }
+        async verKardex(item) {
+            const send = {
+                articulo: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    unidad: item.unidad,
+                },
+            }
 
-        //     this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
-        // },
+            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+        },
         // async ajusteStock(item) {
         //     const send = {
         //         transaccion: {

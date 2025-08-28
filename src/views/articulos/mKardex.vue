@@ -9,10 +9,10 @@
                     {{ redondear(modal.stock) }}
                 </p>
 
-                <p>
+                <!-- <p>
                     <small>Valor:</small>
                     {{ redondear(modal.valor) }}
-                </p>
+                </p> -->
             </div>
         </div>
 
@@ -26,9 +26,10 @@
             @rowOptionSelected="runMethod"
         >
             <template v-slot:cMoreInfo="{ item }">
+                {{ item.transaccion1?.pago_comprobante_serie }}-{{
+                    item.transaccion1?.pago_comprobante_correlativo
+                }}
                 {{ item.transaccion1?.socio1?.nombres }}
-                {{ item.produccion_orden1?.maquina1?.nombre }}
-                {{ item.maquina1?.nombre }}
                 {{ item.observacion }}
             </template>
         </JdTable>
@@ -80,47 +81,20 @@ export default {
                 id: 'tipo',
                 title: 'Operación',
                 prop: 'tipo1.nombre',
-                // slot: 'cTipo',
-                width: '15rem',
+                width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
-            {
-                id: 'lote',
-                title: 'Lote',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'fv',
-                title: 'Fecha vencimiento',
-                format: 'date',
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'vu_real',
-                title: 'Valor unitario',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
-            {
-                id: 'pu',
-                title: 'Precio unitario',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
+            // {
+            //     id: 'pu',
+            //     title: 'Precio unitario',
+            //     toRight: true,
+            //     width: '8rem',
+            //     show: true,
+            //     seek: true,
+            //     sort: true,
+            // },
             {
                 id: 'cantidad',
                 title: 'Cantidad',
@@ -130,6 +104,15 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
+            },
+            {
+                id: 'articulo_unidad',
+                title: 'Unidad',
+                prop: 'articulo1.unidad',
+                width: '5rem',
+                show: true,
+                seek: false,
+                sort: false,
             },
             {
                 id: 'more_info',
@@ -146,7 +129,7 @@ export default {
                 label: 'Eliminar',
                 icon: 'fa-regular fa-trash-can',
                 action: 'eliminar',
-                permiso: 'vArticulos:kardexDelete',
+                // permiso: ['vInsumos:kardexDelete', 'vProductos:kardexDelete'],
             },
         ],
     }),
@@ -156,34 +139,23 @@ export default {
         await this.loadKardex()
     },
     methods: {
-        async loadKardex() {
-            const qry = {
+        setQuery() {
+            this.modal.qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
-                cols: [
-                    'fecha',
-                    'tipo',
-                    'cantidad',
-                    'moneda',
-                    'tipo_cambio',
-                    'pu',
-                    'igv_afectacion',
-                    'igv_porcentaje',
-                    'lote',
-                    'fv',
-                    'stock',
-                    'lote_padre',
-                    'is_lote_padre',
-                ],
-                incl: ['lote_padre1', 'transaccion1', 'produccion_orden1', 'maquina1'],
+                incl: ['transaccion1', 'articulo1'],
             }
 
-            qry.cols.push('observacion')
+            this.useAuth.updateQuery(this.columns, this.modal.qry)
+            this.modal.qry.cols.push('observacion')
+        },
+        async loadKardex() {
+            this.setQuery()
 
             this.modal.kardex = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.kardex}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.kardex}?qry=${JSON.stringify(this.modal.qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -196,11 +168,8 @@ export default {
             this.modal.valor = 0
 
             for (const a of this.modal.kardex) {
-                // if (a.is_lote_padre && a.transaccion1.estado != 0) {
-                if (a.is_lote_padre) {
-                    this.modal.stock += a.stock
-                    this.modal.valor += a.stock * a.vu_real
-                }
+                this.modal.stock += a.cantidad
+                this.modal.valor += a.cantidad * a.pu
             }
         },
 
@@ -214,7 +183,7 @@ export default {
             const send = {
                 id: item.id,
                 tipo: item.tipo,
-                lote_padre: item.lote_padre,
+                articulo: this.modal.articulo.id,
                 cantidad: Math.abs(item.cantidad),
             }
 

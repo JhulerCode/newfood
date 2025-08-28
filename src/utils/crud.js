@@ -15,6 +15,7 @@ const urls = {
     empresa: `${host}/api/empresa`,
     impresoras: `${host}/api/impresoras`,
     mesas: `${host}/api/mesas`,
+    kardex: `${host}/api/kardex`,
     pago_comprobantes: `${host}/api/pago_comprobantes`,
     pago_metodos: `${host}/api/pago_metodos`,
     produccion_areas: `${host}/api/produccion_areas`,

@@ -210,6 +210,7 @@ export default {
                 igv_afectacion: 10,
                 unidad: 'NIU',
 
+                // has_receta: false,
                 activo: true,
 
                 is_combo: true,

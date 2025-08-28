@@ -79,6 +79,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
+import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -129,9 +130,18 @@ export default {
                 editable: true,
                 format: 'decimal',
                 toRight: true,
-                width: '8rem',
+                width: '5rem',
                 show: true,
                 seek: false,
+                sort: true,
+            },
+            {
+                id: 'stock',
+                title: 'Stock',
+                toRight: true,
+                width: '8rem',
+                show: true,
+                seek: true,
                 sort: true,
             },
             {
@@ -168,16 +178,6 @@ export default {
                 seek: true,
                 sort: true,
             },
-            // {
-            //     id: 'stock',
-            //     title: 'Stock',
-            //     format: 'decimal',
-            //     toRight: true,
-            //     width: '10rem',
-            //     show: false,
-            //     seek: true,
-            //     sort: true,
-            // },
             // {
             //     id: 'valor',
             //     title: 'Valor',
@@ -257,12 +257,14 @@ export default {
                 icon: 'fa-solid fa-table-list',
                 action: 'verKardex',
                 permiso: 'vProductos:kardex',
+                ocultar: { has_receta: true },
             },
             {
                 label: 'Ajuste stock',
                 icon: 'fa-solid fa-wrench',
                 action: 'ajusteStock',
                 permiso: 'vProductos:ajusteStock',
+                ocultar: { has_receta: true },
             },
         ],
     }),
@@ -496,34 +498,35 @@ export default {
 
             this.useModals.setModal('mArticuloReceta', `Receta - ${item.nombre}`, null, send)
         },
-        // async verKardex(item) {
-        //     const send = {
-        //         articulo: {
-        //             id: item.id,
-        //             nombre: item.nombre,
-        //             unidad: item.unidad,
-        //         },
-        //     }
+        async verKardex(item) {
+            const send = {
+                articulo: {
+                    id: item.id,
+                    nombre: item.nombre,
+                    unidad: item.unidad,
+                },
+            }
 
-        //     this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
-        // },
-        // async ajusteStock(item) {
-        //     const send = {
-        //         transaccion: {
-        //             fecha: dayjs().format('YYYY-MM-DD'),
-        //             articulo: item.id,
-        //         },
-        //         articulo1: {
-        //             igv_afectacion: item.igv_afectacion,
-        //             has_fv: item.has_fv,
-        //         },
-        //         articulos: [{ id: item.id, nombre: item.nombre }],
-        //         articulo_tipo: 1,
-        //         is_nuevo_lote: false,
-        //     }
+            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+        },
+        async ajusteStock(item) {
+            const send = {
+                transaccion: {
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    articulo: item.id,
+                    estado: 1,
+                },
+                articulo1: {
+                    igv_afectacion: item.igv_afectacion,
+                    has_fv: item.has_fv,
+                },
+                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulo_tipo: 1,
+                // is_nuevo_lote: false,
+            }
 
-        //     this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        // },
+            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+        },
 
         async loadCategorias() {
             const qry = {
