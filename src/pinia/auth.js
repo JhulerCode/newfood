@@ -26,6 +26,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
+                            { id: 'vCompras:anular', label: 'Anular' },
                             { id: 'vCompras:editar', label: 'Editar' },
                             { id: 'vCompras:eliminar', label: 'Eliminar' },
                         ]

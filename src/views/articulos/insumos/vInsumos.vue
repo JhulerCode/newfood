@@ -130,6 +130,16 @@ export default {
                 sort: true,
             },
             {
+                id: 'stock',
+                title: 'Stock',
+                type: 'number',
+                toRight: true,
+                width: '5rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
                 id: 'activo',
                 title: 'Estado',
                 prop: 'activo1.nombre',

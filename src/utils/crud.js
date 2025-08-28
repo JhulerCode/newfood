@@ -21,6 +21,8 @@ const urls = {
     receta_insumos: `${host}/api/receta_insumos`,
     salones: `${host}/api/salones`,
     socios: `${host}/api/socios`,
+    transacciones: `${host}/api/transacciones`,
+    transaccion_items: `${host}/api/transaccion_items`,
 }
 
 async function get(url) {
