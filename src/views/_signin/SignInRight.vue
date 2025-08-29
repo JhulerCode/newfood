@@ -32,6 +32,7 @@ import JdInputPassword from '@/components/inputs/JdInputPassword.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 
 import { useAuth } from '@/pinia/auth'
+import { useVistas } from '@/pinia/vistas'
 
 import { urls, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
@@ -44,6 +45,7 @@ export default {
     },
     data: () => ({
         useAuth: useAuth(),
+        useVistas: useVistas(),
 
         usuario: '',
         contrasena: '',

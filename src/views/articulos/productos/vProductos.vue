@@ -548,7 +548,7 @@ export default {
                 cols: ['nombre'],
             }
 
-            this.vista.articulo_categorias = []
+            this.vista.produccion_areas = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.produccion_areas}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)

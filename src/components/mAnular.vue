@@ -3,6 +3,7 @@
         <div class="container-datos">
             <JdTextArea :nec="true" label="Motivo" v-model="modal.motivo" />
         </div>
+        <!-- {{ modal.item }} -->
     </JdModal>
 </template>
 
@@ -53,7 +54,7 @@ export default {
 
             // this.modal.item.estado = 0
             // this.modal.item.estado1 = { id: 0, nombre: 'ANULADO' }
-            
+
             if (this.useVistas[this.modal.vista] && this.useVistas[this.modal.vista][this.modal.array]) {
                 const toMod = this.useVistas[this.modal.vista][this.modal.array].find(a => a.id == this.modal.item.id)
                 if (toMod) {
@@ -62,6 +63,7 @@ export default {
                 }
             }
 
+            this.$emit('anulado', send.item)
             this.useModals.show.mAnular = false
         }
     },

@@ -23,8 +23,8 @@
             maxHeight="30rem"
             width="60rem"
             :inputsDisabled="modal.mode == 3"
-            @onInput="(action, a) => this[action](a)"
-            @onChange="(action, a) => this[action](a)"
+            @onInput="runMethod"
+            @onChange="runMethod"
             class="jdTable"
         >
             <template v-slot:cAction="{ item }">
@@ -188,7 +188,6 @@ export default {
                 articulo1: {
                     nombre: item.nombre,
                     unidad: item.unidad,
-                    has_fv: item.has_fv,
                 },
 
                 cantidad: null,
@@ -221,14 +220,6 @@ export default {
         },
 
         calcularUno(item) {
-            if (item.lote_padre) {
-                if (item.cantidad > item.stock) {
-                    jmsg('warning', 'La cantidad ingresada es mayor al stock del lote')
-                    item.cantidad = item.stock
-                    return
-                }
-            }
-
             item.vu =
                 item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
 
@@ -313,6 +304,10 @@ export default {
             if (res.code != 0) return
 
             this.modal.empresa = res.data
+        },
+
+        runMethod(method, item) {
+            this[method](item)
         },
     },
 }

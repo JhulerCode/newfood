@@ -4,6 +4,8 @@
         <vCompras v-if="useVistas.show.vCompras" />
 
         <vClientes v-if="useVistas.show.vClientes" />
+        <vPedidos v-if="useVistas.show.vPedidos" />
+        <vComanda v-if="useVistas.show.vComanda" />
 
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInsumos v-if="useVistas.show.vInsumos" />
@@ -30,6 +32,8 @@ import vCompras from '@/views/compras/compras/vCompras.vue'
 
 // ----- VENTAS ----- //
 import vClientes from '@/views/ventas/clientes/vClientes.vue'
+import vPedidos from '@/views/ventas/pedidos/vPedidos.vue'
+import vComanda from '@/views/ventas/pedidos/vComanda.vue'
 
 // ----- ARTÍCULOS ----- //
 import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
@@ -53,6 +57,8 @@ export default {
         vCompras,
 
         vClientes,
+        vPedidos,
+        vComanda,
 
         vArticuloCategorias,
         vInsumos,

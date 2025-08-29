@@ -26,7 +26,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
-                            { id: 'vCompras:anular', label: 'Anular' },
+                            // { id: 'vCompras:anular', label: 'Anular' },
                             { id: 'vCompras:editar', label: 'Editar' },
                             { id: 'vCompras:eliminar', label: 'Eliminar' },
                         ]
@@ -44,6 +44,25 @@ export const useAuth = defineStore('auth', {
                             { id: 'vClientes:eliminar', label: 'Eliminar' },
                         ]
                     },
+                    {
+                        label: 'Pedidos', goto: 'vPedidos', permisos: [
+                            { id: 'vPedidos:listar', label: 'Listar' },
+                            { id: 'vPedidos:crear', label: 'Crear' },
+                            { id: 'vPedidos:ver', label: 'Ver' },
+                            { id: 'vPedidos:anular', label: 'Anular' },
+                            { id: 'vPedidos:editar', label: 'Editar' },
+                            { id: 'vPedidos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vPedidos:imprimirComanda', label: 'Imprimir comanda' },
+                            { id: 'vPedidos:imprimirPrecuenta', label: 'Imprimir precuenta' },
+                            { id: 'vPedidos:generarComprobante', label: 'Generar comprobante' },
+                            { id: 'vPedidos:verComprobantes', label: 'Ver comprobantes' },
+                            { id: 'vPedidos:entregar', label: 'Confirmar entrega' },
+
+                            { id: 'vPedidos:unirMesas', label: 'Unir mesas' },
+                            { id: 'vPedidos:cambiarMesa', label: 'Cambiar mesa' },
+                        ]
+                    }
                 ]
             },
             {
