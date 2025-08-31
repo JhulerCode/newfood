@@ -91,7 +91,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'pago_comprobante_serie',
+                id: 'compra_comprobante_serie',
                 title: 'Serie',
                 type: 'text',
                 width: '5rem',
@@ -100,7 +100,7 @@ export default {
                 sort: false,
             },
             {
-                id: 'pago_comprobante_correlativo',
+                id: 'compra_comprobante_correlativo',
                 title: 'Correlativo',
                 type: 'text',
                 width: '7rem',

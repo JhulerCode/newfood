@@ -28,7 +28,7 @@
                 <JdSelect
                     label="Comprobante"
                     :nec="true"
-                    v-model="modal.transaccion.pago_comprobante"
+                    v-model="modal.transaccion.compra_comprobante"
                     :lista="modal.pago_comprobantes || []"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/4"
@@ -38,7 +38,7 @@
                 <JdInput
                     label="Serie"
                     :nec="true"
-                    v-model="modal.transaccion.pago_comprobante_serie"
+                    v-model="modal.transaccion.compra_comprobante_serie"
                     style="grid-column: 1/3"
                     :disabled="modal.mode == 3"
                 />
@@ -46,7 +46,7 @@
                 <JdInput
                     label="Correlativo"
                     :nec="true"
-                    v-model="modal.transaccion.pago_comprobante_correlativo"
+                    v-model="modal.transaccion.compra_comprobante_correlativo"
                     style="grid-column: 3/5"
                     :disabled="modal.mode == 3"
                 />
@@ -234,9 +234,9 @@ export default {
                 'tipo',
                 'fecha',
                 'socio',
-                'pago_comprobante',
-                'pago_comprobante_serie',
-                'pago_comprobante_correlativo',
+                'compra_comprobante',
+                'compra_comprobante_serie',
+                'compra_comprobante_correlativo',
                 'pago_condicion',
             ]
 

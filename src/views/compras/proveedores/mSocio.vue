@@ -137,6 +137,8 @@ export default {
             const vista = this.socio.tipo == 1 ? 'vProveedores' : 'vClientes'
             this.useVistas.addItem(vista, 'socios', res.data)
             this.useModals.show.mSocio = false
+
+            this.$emit('created', res.data)
         },
         async modificar() {
             if (this.checkDatos()) return

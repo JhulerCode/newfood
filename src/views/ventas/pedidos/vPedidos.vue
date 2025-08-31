@@ -161,7 +161,7 @@
             @click.stop
             :id="'options-case-' + this.tableName"
         >
-            <template v-for="(b, i) in tableRowOptions" :key="i">
+            <template v-for="(b, i) in tableRowOptions1" :key="i">
                 <li @click="selectOption(b)" v-if="verifyPermiso(optionsCaseItem, b)">
                     <i :class="b.icon"></i>
                     <span>{{ b.label }}</span>
@@ -228,9 +228,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'socio_datos',
+                id: 'venta_socio_datos',
                 title: 'Cliente',
-                prop: 'socio_datos.nombres',
+                prop: 'venta_socio_datos.nombres',
                 width: '15rem',
                 show: true,
                 seek: true,
@@ -328,12 +328,49 @@ export default {
                 permiso: 'vPedidos:entregar',
                 ocultar: { estado: 0 },
             },
+        ],
+
+        tableRowOptions1: [
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vPedidos:editar',
+                ocultar: { estado: 0 },
+            },
+            {
+                label: 'Anular',
+                icon: 'fa-solid fa-ban',
+                action: 'anular',
+                permiso: 'vPedidos:anular',
+                ocultar: { estado: 0 },
+            },
+            {
+                label: 'Imprimir comanda',
+                icon: 'fa-solid fa-print',
+                action: 'imprimir',
+                permiso: 'vPedidos:imprimirComanda',
+            },
+            {
+                label: 'Imprimir precuenta',
+                icon: 'fa-solid fa-print',
+                action: 'imprimir',
+                permiso: 'vPedidos:imprimirPrecuenta',
+                ocultar: { estado: 0 },
+            },
+            {
+                label: 'Generar comprobante',
+                icon: 'fa-solid fa-file-invoice',
+                action: 'generarComprobante',
+                permiso: 'vPedidos:generarComprobante',
+                ocultar: { estado: 0 },
+            },
             {
                 label: 'Cambiar mesa',
                 icon: 'fa-solid fa-arrows-up-down-left-right',
                 action: 'openCambiarMesa',
                 permiso: 'vPedidos:cambiarMesa',
-                ocultar: { estado: 0, venta_canal: 1 },
+                ocultar: { estado: 0 },
             },
         ],
 
@@ -351,7 +388,7 @@ export default {
     async created() {
         this.vista = this.useVistas.vPedidos
 
-        this.loadPendientesCantidad()
+        // this.loadPendientesCantidad()
 
         if (this.vista.loaded) {
             if (this.vista.reload) {
@@ -390,6 +427,7 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('createdAt')
+            this.vista.qry.cols.push('venta_entregado')
 
             if (this.vista.venta_canal == 1) {
                 this.vista.qry.cols.push('venta_mesa')
@@ -410,6 +448,7 @@ export default {
             this.vista.pedidos = res.data
 
             this.setIntervalTimeAgo()
+            this.loadPendientesCantidad()
         },
         setQuery1() {
             this.vista.qry1 = {
@@ -535,7 +574,7 @@ export default {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
                 socio: 1,
-                socio_datos: { nombres: 'CLIENTES VARIOS' },
+                venta_socio_datos: { nombres: 'CLIENTES VARIOS' },
                 pago_condicion: 1,
                 estado: 1,
                 venta_entregado: false,
@@ -556,21 +595,25 @@ export default {
         runMethod(method, item, item2) {
             this[method](item, item2)
         },
-        async editar(item) {
+        async editar(item, mesa) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
+            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
+            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+
             this.useVistas.showVista('vComanda', 'Editar comanda')
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 2
             vistaComanda.pedido = res.data
+            vistaComanda.pedido.salon1 = salon1
             vistaComanda.socios = [
                 {
                     id: res.data.socio,
-                    ...res.data.socio_datos,
+                    ...res.data.venta_socio_datos,
                 },
             ]
         },
@@ -608,7 +651,7 @@ export default {
         imprimir(item) {
             console.log(item)
         },
-        async generarComprobante(item) {
+        async generarComprobante(item, mesa) {
             // this.useAuth.setLoading(true, 'Cargando...')
             // const resCaja = await get(`${urls.cajas}?filtros=${JSON.stringify({ abierto: true })}`)
             // this.useAuth.setLoading(false)
@@ -628,81 +671,58 @@ export default {
             // }
             // else {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante')
-            const vistaEmitirComprobante = this.useVistas.getVista('vEmitirComprobante')
+            const vistaEmitirComprobante = this.useVistas.vEmitirComprobante
 
-            const transaccion_items = res.data.socio_pedido_items
-                .filter((a) => a.cantidad > a.entregado)
+            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
+            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+
+            const comprobante_items = res.data.transaccion_items
+                .filter((a) => a.cantidad > a.venta_entregado)
                 .map((a) => ({
                     articulo: a.articulo,
-                    nombre: a.nombre,
-                    unidad: a.unidad,
-                    cantidad: a.cantidad - a.entregado,
-                    cantidadMax: a.cantidad - a.entregado,
+                    has_receta: a.has_receta,
+                    receta_insumos: a.receta_insumos,
+                    is_combo: a.is_combo,
+                    combo_articulos: a.combo_articulos,
+                    cantidadMax: a.cantidad - a.venta_entregado,
+
+                    nombre: a.articulo1.nombre,
+                    unidad: a.articulo1.unidad,
+                    cantidad: a.cantidad - a.venta_entregado,
                     pu: a.pu,
                     igv_afectacion: a.igv_afectacion,
                     igv_porcentaje: a.igv_porcentaje,
-
-                    produce: a.produce,
-                    insumos: a.insumos,
-
-                    is_combo: a.is_combo,
-                    combo_articulos: a.combo_articulos,
-
-                    guarda: a.guarda,
                 }))
 
-            vistaEmitirComprobante.transaccion = {
-                tipo: 2,
-                fecha: null,
-                is_registrado: true,
+            vistaEmitirComprobante.comprobante = {
                 socio: res.data.socio,
-
-                moneda: res.data.moneda,
-                tipo_cambio: res.data.tipo_cambio, //modificar el tipo de cambio
                 pago_condicion: res.data.pago_condicion,
-                monto: res.data.monto,
+                estado: 1,
+                fecha: dayjs().format('YYYY-MM-DD'),
 
-                observacion: null,
-                estado: 2,
+                comprobante_items,
 
-                transaccion_items,
-
-                pedido: {
+                transaccion: {
                     id: res.data.id,
-                    codigo: res.data.codigo,
-                    tipo: res.data.tipo,
+                    venta_codigo: res.data.venta_codigo,
+                    venta_canal: res.data.venta_canal,
+                    venta_mesa1: res.data.venta_mesa1,
+                    salon1,
                 },
-                comprobante: {
-                    doc_tipo: '07',
-                    credito: false,
-                    moneda: res.data.moneda,
-                },
-                pagos: [],
-                caja: this.useAuth.usuario.caja1.id,
-
-                ambiente1: res.data.ambiente1,
-                venta_mesa1: res.data.venta_mesa1,
             }
 
-            if (res.data.is_registrado == true) {
-                vistaEmitirComprobante.socio = {
+            vistaEmitirComprobante.socios = [
+                {
                     id: res.data.socio,
-                    ...res.data.socio_datos,
-                }
-
-                vistaEmitirComprobante.socios = [vistaEmitirComprobante.socio]
-            } else {
-                vistaEmitirComprobante.socios = []
-            }
-
-            // vistaEmitirComprobante.cajas = resCaja.data
-            // }
+                    ...res.data.venta_socio_datos,
+                },
+            ]
         },
         async verComprobantes(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -738,9 +758,15 @@ export default {
             if (mesa.pedido) {
                 // this.editar(mesa.pedido)
             } else {
+                const salon_find = this.vista.salones.find((a) =>
+                    a.mesas.some((b) => b.id === mesa.id),
+                )
+                const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+
                 this.nuevo({
                     venta_mesa: mesa.id,
                     venta_mesa1: { nombre: mesa.nombre },
+                    salon1,
                 })
             }
         },
@@ -765,17 +791,8 @@ export default {
             this.loadSalones()
         },
         openCambiarMesa(item, mesa) {
-            let salon1
-            for (const a of this.vista.salones) {
-                for (const b of a.mesas) {
-                    if (b.id == mesa.id) {
-                        salon1 = {
-                            id: a.id,
-                            nombre: a.nombre,
-                        }
-                    }
-                }
-            }
+            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
+            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
 
             const send = {
                 pedido: item,

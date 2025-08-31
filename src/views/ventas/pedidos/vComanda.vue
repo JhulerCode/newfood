@@ -3,15 +3,12 @@
         <div class="head">
             <strong>
                 {{ vista.mode == 1 ? 'Nueva comanda' : 'Editar comanda N°' }}
+                {{ vista.pedido.venta_codigo }}
                 <template v-if="vista.pedido.venta_canal == 1">
-                    {{ vista.pedido.venta_codigo }} ({{ vista.pedido.venta_mesa1.nombre }})
+                    ({{ vista.pedido.salon1.nombre }} - {{ vista.pedido.venta_mesa1.nombre }})
                 </template>
-                <template v-else-if="vista.pedido.venta_canal == 2"
-                    >{{ vista.pedido.venta_codigo }} (PARA LLEVAR)</template
-                >
-                <template v-else-if="vista.pedido.venta_canal == 3"
-                    >{{ vista.pedido.venta_codigo }} (DELIVERY)</template
-                >
+                <template v-else-if="vista.pedido.venta_canal == 2">(PARA LLEVAR)</template>
+                <template v-else-if="vista.pedido.venta_canal == 3">(DELIVERY)</template>
             </strong>
 
             <div class="buttons">
@@ -183,12 +180,12 @@
                         <JdInput
                             label="Teléfono"
                             :nec="true"
-                            v-model="vista.pedido.socio_datos.telefono"
+                            v-model="vista.pedido.venta_socio_datos.telefono"
                         />
                         <JdInput
                             label="Dirección"
                             :nec="true"
-                            v-model="vista.pedido.socio_datos.direccion"
+                            v-model="vista.pedido.venta_socio_datos.direccion"
                         />
                         <JdSelect
                             label="Repartidor"
@@ -199,7 +196,7 @@
                         <JdSelect
                             label="Método de pago"
                             :nec="true"
-                            v-model="vista.pedido.pago_metodo"
+                            v-model="vista.pedido.venta_pago_metodo"
                             :lista="vista.pago_metodos || []"
                         />
                     </template>
@@ -213,11 +210,13 @@
                         <p>{{ redondear(vista.mtoImpVenta) }}</p>
                     </div>
 
-                    <template v-if="vista.pedido.venta_canal == 3 && vista.pedido.pago_metodo == 1">
+                    <template
+                        v-if="vista.pedido.venta_canal == 3 && vista.pedido.venta_pago_metodo == 1"
+                    >
                         <div class="pedido-paga">
                             <span>Paga con</span>
                             <JdInput
-                                v-model="vista.pedido.pago_con"
+                                v-model="vista.pedido.venta_pago_con"
                                 type="number"
                                 class="input-paga"
                                 :toRight="true"
@@ -226,7 +225,13 @@
 
                         <div class="pedido-total">
                             <span>Vuelto</span>
-                            <p>{{ redondear((vista.pedido.pago_con || 0) - vista.mtoImpVenta) }}</p>
+                            <p>
+                                {{
+                                    redondear(
+                                        (vista.pedido.venta_pago_con || 0) - vista.mtoImpVenta,
+                                    )
+                                }}
+                            </p>
                         </div>
                     </template>
                 </div>
@@ -366,14 +371,8 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     activo: { op: 'Es', val: true },
                 },
-                cols: [
-                    'nombre',
-                    'precio_venta',
-                    'has_receta',
-                    'is_combo',
-                    'combo_articulos',
-                    'igv_afectacion',
-                ],
+                cols: ['nombre', 'precio_venta', 'has_receta', 'is_combo', 'igv_afectacion'],
+                incl: ['receta_insumos', 'combo_articulos'],
             }
 
             if (this.vista.categoria) {
@@ -414,14 +413,14 @@ export default {
         },
         setSocio(item) {
             if (item) {
-                this.vista.pedido.socio_datos = {
+                this.vista.pedido.venta_socio_datos = {
                     nombres: item.nombres,
                     telefono: item.telefono,
                     direccion: item.direccion,
                     referencia: item.referencia,
                 }
             } else {
-                this.vista.pedido.socio_datos = {}
+                this.vista.pedido.venta_socio_datos = {}
             }
         },
         async loadEmpresa() {
@@ -440,27 +439,6 @@ export default {
         },
 
         async addArticulo(item) {
-            // if (item.is_combo) {
-            //     this.useAuth.setLoading(true, 'Cargando...')
-            //     const res = await get(`${urls.combos}/uno/${item.id}`)
-            //     this.useAuth.setLoading(false)
-
-            //     if (res.code != 0) return
-
-            //     // ----- PONER LA OPCIÓN PRINCIPAL ENTRE LAS OPCIONES ----- //
-            //     for (const a of res.data.combo_articulos) {
-            //         if (a.cambios.length > 0) {
-            //             a.cambios.unshift({
-            //                 ...a,
-            //                 cambios: [],
-            //             })
-            //         }
-
-            //         a.elegido = a.articulo
-            //     }
-
-            //     this.useModals.setModal('mComandaCombo', `Variantes del combo`, true, 1, res.data)
-            // } else {
             const i = this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.id)
 
             if (i === -1) {
@@ -481,7 +459,7 @@ export default {
                     observacion: '',
 
                     has_receta: item.has_receta,
-                    // insumos: item.receta_insumos,
+                    receta_insumos: item.receta_insumos,
                     is_combo: item.is_combo,
                     combo_articulos: item.combo_articulos,
 
@@ -492,7 +470,6 @@ export default {
             } else {
                 this.sumarRestar(1, this.vista.pedido.transaccion_items[i])
             }
-            // }
         },
         calcularUno(item) {
             item.vu =
@@ -547,12 +524,9 @@ export default {
             this.sumarUno(item)
         },
         quitar(item) {
-            const i = item.is_combo
-                ? this.vista.pedido.transaccion_items.findIndex(
-                      (a) => a.articulo == item.articulo && a.random == item.random,
-                  )
-                : this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.articulo)
-
+            const i = this.vista.pedido.transaccion_items.findIndex(
+                (a) => a.articulo == item.articulo,
+            )
             this.vista.pedido.transaccion_items.splice(i, 1)
 
             this.sumarItems()
@@ -565,26 +539,28 @@ export default {
             }
 
             if (this.vista.pedido.venta_canal == 2 || this.vista.pedido.venta_canal == 3) {
-                if (incompleteData(this.vista.pedido.socio_datos, ['nombres'])) {
+                if (incompleteData(this.vista.pedido.venta_socio_datos, ['nombres'])) {
                     jmsg('warning', 'Ingrese los datos necesarios en Detalles')
                     return true
                 }
             }
 
             if (this.vista.pedido.venta_canal == 3) {
-                if (incompleteData(this.vista.pedido.socio_datos, ['direccion', 'telefono'])) {
-                    jmsg('warning', 'Ingrese los datos necesarios en Detalles')
+                if (
+                    incompleteData(this.vista.pedido.venta_socio_datos, ['direccion', 'telefono'])
+                ) {
+                    jmsg('warning', 'Ingrese los datos del cliente en Detalles')
                     return true
                 }
 
-                if (incompleteData(this.vista.pedido, ['pago_metodo'])) {
-                    jmsg('warning', 'Ingrese los datos necesarios en Detalles')
+                if (incompleteData(this.vista.pedido, ['venta_pago_metodo'])) {
+                    jmsg('warning', 'Ingrese el método de pago en Detalles')
                     return true
                 }
 
                 if (
-                    this.vista.pedido.pago_metodo == 1 &&
-                    this.vista.pedido.pago_con < this.vista.pedido.monto
+                    this.vista.pedido.venta_pago_metodo == 1 &&
+                    this.vista.pedido.venta_pago_con < this.vista.pedido.monto
                 ) {
                     jmsg('warning', 'Monto de pago no es suficiente')
                     return true

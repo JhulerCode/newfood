@@ -135,7 +135,14 @@ export default {
                 id: 'articulo',
                 title: 'Artículo',
                 prop: 'articulo1.nombre',
-                width: '25rem',
+                width: '23rem',
+                show: true,
+            },
+            {
+                id: 'unidad',
+                title: 'Unidad',
+                prop: 'articulo1.unidad',
+                width: '5rem',
                 show: true,
             },
             {

@@ -2,169 +2,213 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                Emitir comprobante - Pedido N° {{ transaccion.pedido.codigo }}
-                <template v-if="transaccion.pedido.tipo == 1">
-                    ({{ transaccion.ambiente1.nombre }} - {{ transaccion.mesa1.nombre }})
+                Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion.venta_codigo }}
+                <template v-if="vista.comprobante.transaccion.venta_canal == 1">
+                    ({{ vista.comprobante.transaccion.salon1.nombre }} -
+                    {{ vista.comprobante.transaccion.venta_mesa1.nombre }})
                 </template>
-                <template v-else-if="transaccion.pedido.tipo == 2"> (PARA LLEVAR)</template>
-                <template v-else-if="transaccion.pedido.tipo == 3"> (DELIVERY)</template>
+                <template v-else-if="vista.comprobante.transaccion.venta_canal == 2">
+                    (PARA LLEVAR)</template
+                >
+                <template v-else-if="vista.comprobante.transaccion.venta_canal == 3">
+                    (DELIVERY)</template
+                >
             </strong>
 
             <div class="buttons">
-                <JdButton text="Grabar" title="Grabar" @click="grabar()" />
-                <JdButton text="Grabar e imprimir" title="Grabar e imprimir" backColor="primary-color"
-                    color="text-color3" />
+                <JdButton
+                    text="Regresar"
+                    icon="fa-solid fa-arrow-left"
+                    tipo="2"
+                    @click="regresar()"
+                />
+                <JdButton
+                    text="Grabar"
+                    @click="grabar()"
+                    tipo="2"
+                    v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
+                />
+                <JdButton
+                    text="Grabar e imprimir"
+                    v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
+                />
             </div>
         </div>
 
         <div class="container">
             <div class="left">
-                <div class="datos" v-if="transaccion.comprobante">
-                    <JdSelect label="Tipo comprobante" :nec="true" v-model="transaccion.comprobante.doc_tipo"
-                        :lista="documentos_tributarios_venta" style="grid-column: 1/4;" />
+                <div class="datos">
+                    <JdInput
+                        label="Fecha"
+                        type="date"
+                        :nec="true"
+                        v-model="vista.comprobante.fecha"
+                        :disabled="true"
+                        style="grid-column: 1/3"
+                    />
 
-                    <div style="grid-column: 1/5;" class="dato-cliente">
-                        <JdSelectQuery label="Cliente" :nec="true" v-model="transaccion.socio" :spin="spinSocios"
-                            :lista="vista.socios || []" mostrar="nombre_completo" @search="loadSocios" @elegir="setSocio"
-                            style="grid-column: 1/5;" v-if="reloadSocio == false" />
+                    <JdSelect
+                        label="Tipo comprobante"
+                        :nec="true"
+                        v-model="vista.comprobante.doc_tipo"
+                        :lista="vista.pago_comprobantes"
+                        style="grid-column: 1/4"
+                    />
 
-                        <JdButton icon="fa-solid fa-user-plus" backColor="morado" color="text-color3" title="Crear cliente"
-                            @click="nuevoSocio()" />
+                    <div style="grid-column: 1/5" class="dato-cliente">
+                        <JdSelectQuery
+                            label="Cliente"
+                            :nec="true"
+                            v-model="vista.comprobante.socio"
+                            :spin="vista.spinSocios"
+                            :lista="vista.socios || []"
+                            mostrar="nombres"
+                            @search="loadSocios"
+                            style="grid-column: 1/5"
+                        />
+
+                        <JdButton
+                            icon="fa-solid fa-user-plus"
+                            title="Nuevo socio"
+                            tipo="2"
+                            :small="true"
+                            @click="nuevoSocio()"
+                        />
                     </div>
 
-                    <JdSelect label="Moneda" v-model="transaccion.moneda" :lista="monedas || []" @elegir="setTipoCambio"
-                        :disabled="true" style="grid-column: 1/4;" />
-
-                    <div style="grid-column: 4/5;">
-                        <small>TC: {{ transaccion.tipo_cambio }}</small>
-                    </div>
-
-                    <JdSelect label="Caja" v-model="transaccion.caja" :lista="[{ ...useAuth.usuario.caja1 }]"
-                        :disabled="true" style="grid-column: 1/4;" />
+                    <JdSelect
+                        label="Condicion de pago"
+                        :nec="true"
+                        :lista="vista.pago_condiciones"
+                        v-model="vista.comprobante.pago_condicion"
+                        style="grid-column: 1/4"
+                        @elegir="setPagoCondicion"
+                    />
                 </div>
 
                 <div class="totales">
                     <span>Ope. gravadas:</span>
-                    <p>{{ redondear(mtoOperGravadas) }}</p>
+                    <p>{{ redondear(vista.mtoOperGravadas) }}</p>
 
                     <span>Ope. exoneradas:</span>
-                    <p>{{ redondear(mtoOperExoneradas) }}</p>
+                    <p>{{ redondear(vista.mtoOperExoneradas) }}</p>
 
                     <span>Ope. inafectas:</span>
-                    <p>{{ redondear(mtoOperInafectas) }}</p>
+                    <p>{{ redondear(vista.mtoOperInafectas) }}</p>
 
                     <span>Subtotal:</span>
-                    <p>{{ redondear(valorVenta) }}</p>
+                    <p>{{ redondear(vista.valorVenta) }}</p>
 
                     <span>Impuesto:</span>
-                    <p>{{ redondear(mtoIGV) }}</p>
+                    <p>{{ redondear(vista.mtoIGV) }}</p>
 
                     <strong>Total</strong>
                     <strong class="total">
-                        {{ getItemFromArray(transaccion.moneda, monedas, 'simbolo') }} {{ redondear(mtoImpVenta) }}
+                        {{ redondear(vista.mtoImpVenta) }}
                     </strong>
                 </div>
             </div>
 
             <div class="right">
-                <JdTable :columns="columnsArticulos" :datos="transaccion.transaccion_items || []" height="100%"
-                    :columnsResizable="true" class="pedido-items" @onInput="(action, a) => this[action](a)">
+                <JdTable
+                    :columns="columnsArticulos"
+                    :datos="vista.comprobante.comprobante_items || []"
+                    height="100%"
+                    class="pedido-items"
+                    :seeker="false"
+                    :download="false"
+                    :colAct="true"
+                    colActWidth="4.5rem"
+                    @onInput="runMethod"
+                >
+                    <template v-slot:cAction="{ item }">
+                        <JdButton
+                            icon="fa-regular fa-handshake"
+                            :small="true"
+                            tipo="2"
+                            :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'"
+                            @click="setCortesia(item)"
+                        />
 
-                    <template v-slot:colNombre="{ item }">
-                        <div>
-                            {{ item.nombre }}
-
-                            <ul v-if="item.is_combo" class="combo_items">
-                                <li v-for="(a, i) in item.combo_articulos" :key="i">
-                                    <small>- ({{ a.cantidad }}) {{ a.nombre }}</small>
-                                </li>
-                            </ul>
-                        </div>
-                    </template>
-
-                    <template v-slot:colPrecio="{ item }">
-                        {{ redondear(item.pu) }}
+                        <JdButton
+                            icon="fa-solid fa-trash-can"
+                            :small="true"
+                            tipo="2"
+                            title="Quitar"
+                            @click="quitarArticulo(item)"
+                        />
                     </template>
 
                     <template v-slot:colDescuento="{ item }">
                         <div class="item_descuento">
-                            <JdSelect v-model="item.descuento_tipo" :lista="descuento_tipos" mostrar="codigo"
-                                @elegir="setDescuentoTipo(item)" />
-                            <JdInputText tipo="number" :toRight="true" v-model="item.descuento_valor"
-                                @input="setDescuentoValor(item)" />
+                            <JdSelect
+                                v-model="item.descuento_tipo"
+                                :lista="descuento_tipos"
+                                mostrar="codigo"
+                                @elegir="setDescuentoTipo(item)"
+                            />
+                            <JdInput
+                                tipo="number"
+                                :toRight="true"
+                                v-model="item.descuento_valor"
+                                @input="setDescuentoValor(item)"
+                            />
                         </div>
                     </template>
-
-                    <template v-slot:colSubtotal="{ item }">
-                        {{ redondear(item.mtoValorVenta) }}
-                    </template>
-
-                    <template v-slot:colTotal="{ item }">
-                        {{ redondear(item.total) }}
-                    </template>
-
-                    <template v-slot:colActions="{ item }">
-                        <div class="botones">
-                            <JdButton :small="true" icon="fa-regular fa-handshake" backColor="celeste" color="text-color3"
-                                :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'" @click="setCortesia(item)" />
-
-                            <JdButton :small="true" icon="fa-solid fa-trash-can" backColor="rojo" color="text-color3"
-                                title="Quitar" @click="quitarArticulo(item)" />
-                        </div>
-                    </template>
-
                 </JdTable>
 
-                <div class="pago">
+                <div class="container-pagos">
                     <div class="head">
-                        Pago
+                        Métodos de pago
+
+                        <p>
+                            <small>Por pagar:</small>
+                            {{ redondear(vista.porPagar) }}
+                        </p>
+
+                        <p>
+                            <small>Vuelto:</small>
+                            {{ redondear(vista.vuelto) }}
+                        </p>
                     </div>
 
-                    <div class="cuerpo" v-if="transaccion.comprobante">
-                        <div>
-                            <JdToogleSwitch label="¿El cliente pagará luego?" v-model="transaccion.comprobante.credito"
-                                class="mrg-btm1" />
+                    <ul class="container-pago-metodos" v-if="vista.comprobante.pago_condicion == 1">
+                        <li
+                            v-for="(a, i) in vista.pago_metodos"
+                            :key="i"
+                            :style="{ 'border-color': a.color }"
+                        >
+                            <p>{{ a.nombre }}</p>
 
-                            <div class="agregar" v-if="!transaccion.comprobante.credito">
-                                <JdSelect label="Método" :nec="true" v-model="newPago.id" :lista="vista.pago_metodos" />
+                            <div style="display: flex">
+                                <JdInput
+                                    type="number"
+                                    v-model="a.monto"
+                                    @input="calcularPorPagar(a)"
+                                />
 
-                                <div class="txt-monto">
-                                    <JdInputText label="Monto" :nec="true" tipo="number" v-model="newPago.monto" />
-
-                                    <JdButton :small="true" icon="fa-regular fa-hand-point-left" title="Exacto"
-                                        backColor="verde" color="text-color3" @click="pagoExacto()" />
-                                </div>
-
-                                <div class="botones">
-                                    <JdButton text="Agregar" @click="agregarPago()" />
-                                </div>
+                                <JdButton
+                                    icon="fa-regular fa-hand-point-left"
+                                    title="Exacto"
+                                    :small="true"
+                                    :tipo="2"
+                                    @click="pagoExacto(a)"
+                                />
                             </div>
-                        </div>
+                        </li>
+                    </ul>
 
-                        <div class="right">
-                            <div class="por_pagar">
-                                <span>Por pagar:</span>
-                                <p>{{ redondear(porPagar) }}</p>
-                                <span>Vuelto:</span>
-                                <p>{{ redondear(vuelto) }}</p>
-                            </div>
-
-                            <JdTable :columns="columnsPagos" :datos="transaccion.pagos || []" height="100%"
-                                :columnsResizable="true" class="pedido-items" v-if="!transaccion.comprobante.credito">
-
-                                <template v-slot:colActions="{ item }">
-                                    <JdButton :small="true" icon="fa-solid fa-trash-can" backColor="rojo"
-                                        color="text-color3" title="Eliminar" @click="quitarPago(item)" />
-                                </template>
-                            </JdTable>
-                        </div>
+                    <div class="container-credito" v-else>
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <p>Venta a crédito</p>
+                        <span>Tendrá que agregar los pagos más adelante</span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <mSocio v-if="useModals.show.mSocio" />
+    <mSocio @created="setSocioCreated" v-if="useModals.show.mSocio" />
 </template>
 
 <script>
@@ -172,193 +216,150 @@ import JdButton from '@/components/inputs/JdButton.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdTable from '@/components/JdTable.vue'
-import JdInputText from '@/components/inputs/JdInputText.vue'
-import JdToogleSwitch from '@/components/inputs/JdToogleSwitch.vue'
+import JdInput from '@/components/inputs/JdInput.vue'
 
-import mSocio from '@/views/u/compras/proveedores/mSocio.vue'
+import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, post } from '@/utils/crud'
-import { redondear, getItemFromArray, incompleteData, numeroATexto } from '@/utils/mine'
+import { redondear, getItemFromArray, incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
-import { monedas } from '@/data/monedas'
-
-import { documentos_tributarios_venta } from '@/data/documentos_tributarios'
-import { pago_condiciones } from '@/data/pago_condiciones'
-import { ubigeo } from '@/data/ubigeo'
 
 export default {
     components: {
         JdButton,
-        JdInputText,
+        JdInput,
         JdSelect,
         JdSelectQuery,
         JdTable,
-        JdToogleSwitch,
         mSocio,
     },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
-        documentos_tributarios_venta,
         redondear,
         getItemFromArray,
-        monedas,
-        pago_condiciones,
 
         vista: {},
-        transaccion: {},
-        spinSocios: false,
 
         newPago: {},
-        porPagar: 0,
-        vuelto: 0,
 
         descuento_tipos: [
-            { 'id': 1, 'nombre': 'MONTO', codigo: 'M' },
-            { 'id': 2, 'nombre': 'PORCENTAJE', codigo: '%' },
+            { id: 1, nombre: 'MONTO', codigo: 'M' },
+            { id: 2, nombre: 'PORCENTAJE', codigo: '%' },
         ],
-
-        mtoOperGravadas: 0,
-        mtoOperExoneradas: 0,
-        mtoOperInafectas: 0,
-        mtoIGV: 0,
-        valorVenta: 0,
-        mtoImpVenta: 0,
 
         reloadSocio: false,
 
         columnsArticulos: [
-            { width: '100%', title: 'Artículo', slot: 'colNombre' },
-            { width: '5rem', title: 'Cantidad', prop: 'cantidad', inputType: 'number', oninput: 'sumarDirecto', toRight: true },
-            { width: '5rem', title: 'Precio', slot: 'colPrecio', toRight: true },
-            { width: '10rem', title: 'Descuento', slot: 'colDescuento', toRight: true },
-            { width: '7rem', title: 'Subtotal', slot: 'colSubtotal', toRight: true },
-            { width: '5rem', title: 'Importe', slot: 'colTotal', toRight: true },
-            { width: '5rem', title: '', slot: 'colActions' },
-        ],
-
-        columnsPagos: [
-            { width: '100%', title: 'Método de pago', prop: 'nombre' },
-            { width: '5rem', title: 'Monto', prop: 'monto', toRight: true },
-            { width: '3rem', title: '', slot: 'colActions' },
+            { id: 'nombre', width: '15rem', title: 'Producto', show: true },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
+                width: '5rem',
+                // prop: 'cantidad',
+                input: true,
+                type: 'number',
+                oninput: 'sumarUno',
+                toRight: true,
+                show: true,
+            },
+            {
+                id: 'pu',
+                title: 'Precio',
+                format: 'decimal',
+                width: '5rem',
+                toRight: true,
+                show: true,
+            },
+            {
+                id: 'descuento',
+                width: '10rem',
+                title: 'Descuento',
+                slot: 'colDescuento',
+                toRight: true,
+                show: true,
+            },
+            {
+                id: 'mtoValorVenta',
+                title: 'Subtotal',
+                format: 'decimal',
+                width: '6rem',
+                show: true,
+                toRight: true,
+            },
+            {
+                id: 'igv',
+                title: 'Impuesto',
+                format: 'decimal',
+                width: '6rem',
+                show: true,
+                toRight: true,
+            },
+            {
+                id: 'total',
+                title: 'Importe',
+                format: 'decimal',
+                width: '6rem',
+                show: true,
+                toRight: true,
+            },
         ],
     }),
     async created() {
-        this.vista = this.useVistas.getVista('vEmitirComprobante')
-
-        this.transaccion = this.vista.transaccion
+        this.vista = this.useVistas.vEmitirComprobante
 
         this.sumarItems()
+
+        await this.loadDatosSistema()
+
+        await this.loadPagoComprobantes()
+        const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
+        this.vista.comprobante.doc_tipo = asd.id
+
+        await this.loadPagoMetodos()
         this.calcularPorPagar()
-
-        if (!this.vista.pagoMetodosLoaded) {
-            await this.loadPagoMetodos()
-        }
-
-        if (this.vista.socio && this.vista.socio.id) {
-            this.vista.socios = [this.vista.socio]
-        }
-
-        if (this.transaccion.socio == null) {
-            this.setSocioGeneral()
-        }
-        else {
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.socios}/uno/${this.transaccion.socio}`)
-            this.useAuth.loading = { show: false, text: '' }
-
-            if (res.code !== 0) jmsg('warning', 'Selecciona un cliente registrado')
-
-            this.setSocio(res.data)
-
-            this.reloadSocio = true
-            this.transaccion.socio = res.data.id
-            this.$nextTick(() => this.reloadSocio = false)
-            this.vista.socio = res.data
-        }
     },
     methods: {
-        setTipoCambio(item) {
-            this.transaccion.tipo_cambio = getItemFromArray(item.id, monedas, 'tipo_cambio')
-        },
+        async loadDatosSistema() {
+            const qry = ['pago_condiciones']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
-        quitarArticulo(item) {
-            const i = this.transaccion.transaccion_items.findIndex(a => a.articulo == item.articulo)
-            this.transaccion.transaccion_items.splice(i, 1)
+            if (res.code != 0) return
 
-            this.sumarItems()
-            this.calcularPorPagar()
+            Object.assign(this.vista, res.data)
         },
-        sumarItems() {
-            for (const a of this.transaccion.transaccion_items) this.sumar(a)
-        },
-        sumarDirecto(item) {
-            if (item.cantidad > item.cantidadMax) {
-                jmsg('warning', 'La cantidad no puede ser mayor a lo que fue pedido')
-                item.cantidad = item.cantidadMax
+        async loadPagoComprobantes() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre', 'estandar'],
             }
 
-            this.sumar(item)
-            this.calcularPorPagar()
-        },
-        sumar(item) {
-            item.vu = item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje) : item.pu
-
-            if (item.descuento_tipo != null && item.descuento_valor != null && item.descuento_valor != 0) {
-                if (item.descuento_tipo == 1) {
-                    item.desc = item.igv_afectacion == '10' ?
-                        item.descuento_valor / (1 + item.igv_porcentaje) :
-                        item.descuento_valor
-                }
-                else if (item.descuento_tipo == 2) {
-                    item.desc = item.igv_afectacion == '10' ?
-                        (item.cantidad * item.pu) * (item.descuento_valor / 100) / (1 + item.igv_porcentaje) :
-                        (item.cantidad * item.pu) * (item.descuento_valor / 100)
-                }
-            }
-            else {
-                item.desc = 0
-            }
-
-            item.mtoValorVenta = (item.cantidad * item.vu) - item.desc
-            item.igv = item.igv_afectacion == '10' ? item.mtoValorVenta * item.igv_porcentaje : 0
-            item.total = item.mtoValorVenta + item.igv
-
-            this.sumarTodo()
-        },
-        sumarTodo() {
-            this.mtoOperGravadas = 0
-            this.mtoOperExoneradas = 0
-            this.mtoOperInafectas = 0
-            this.mtoIGV = 0
-
-            for (const a of this.transaccion.transaccion_items) {
-                if (a.igv_afectacion == '10') {
-                    this.mtoOperGravadas += a.mtoValorVenta
-                    this.mtoIGV += a.igv
-                }
-                else if (a.igv_afectacion == '20') {
-                    this.mtoOperExoneradas += a.mtoValorVenta
-                }
-                else if (a.igv_afectacion == '30') {
-                    this.mtoOperInafectas += a.mtoValorVenta
-                }
-            }
-
-            this.valorVenta = this.mtoOperGravadas + this.mtoOperExoneradas + this.mtoOperInafectas
-            this.mtoImpVenta = this.valorVenta + this.mtoIGV
-        },
-
-
-        async loadPagoMetodos() {
-            const filtros = { activo: true }
+            this.vista.pago_comprobantes = []
+            this.vista.pagoComprobantesLoaded = false
             this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.pago_metodos}?filtros=${JSON.stringify(filtros)}`)
+            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.loading = { show: false, text: '' }
+            this.vista.pagoComprobantesLoaded = true
+
+            if (res.code != 0) return
+
+            this.vista.pago_comprobantes = res.data
+        },
+        async loadPagoMetodos() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre', 'color'],
+            }
+
+            this.vista.pago_metodos = []
+            this.vista.pagoMetodosLoaded = false
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
             this.useAuth.loading = { show: false, text: '' }
             this.vista.pagoMetodosLoaded = true
 
@@ -366,172 +367,211 @@ export default {
 
             this.vista.pago_metodos = res.data
         },
-        agregarPago() {
-            if (this.newPago.id == null) return jmsg('warning', 'Selecciona el método de pago')
-            if (this.newPago.monto == null || this.newPago.monto == 0) return jmsg('warning', 'Ingrese el monto')
-
-            const i = this.transaccion.pagos.findIndex(a => a.id == this.newPago.id)
-
-            if (i !== -1) return jmsg('warning', 'El método de pago ya está agregado')
-
-            this.transaccion.pagos.push({
-                ...this.newPago,
-                nombre: getItemFromArray(this.newPago.id, this.vista.pago_metodos),
-                moneda: 1,
-                operacion: this.useAuth.usuario.empresa1.caja_operaciones[0].id
-            })
-
-            this.newPago.id = null
-            this.newPago.monto = null
-            this.calcularPorPagar()
-        },
-        pagoExacto() {
-            this.newPago.monto = redondear(this.mtoImpVenta, 2)
-        },
-        quitarPago(item) {
-            const i = this.transaccion.pagos.findIndex(a => a.id == item.id)
-            this.transaccion.pagos.splice(i, 1)
-
-            this.calcularPorPagar()
-        },
-        calcularPorPagar() {
-            let pagos_monto = 0
-
-            for (const a of this.transaccion.pagos) {
-                pagos_monto += a.monto
-            }
-
-            if (pagos_monto == 0) {
-                this.porPagar = this.mtoImpVenta
-                this.vuelto = 0
-            }
-            else if (pagos_monto <= this.mtoImpVenta) {
-                this.porPagar = this.mtoImpVenta - pagos_monto
-                this.vuelto = 0
-            }
-            else {
-                this.porPagar = 0
-                this.vuelto = pagos_monto - this.mtoImpVenta
-            }
-        },
-
-
-        setDescuentoTipo(item) {
-            item.descuento_valor = null
-
-            this.sumar(item)
-        },
-        setDescuentoValor(item) {
-            if (item.descuento_tipo == 1) {
-                if (item.descuento_valor > (item.pu * item.cantidad)) {
-                    jmsg('warning', 'El descuento no puede ser mayor al importe')
-                    item.descuento_valor = null
-                }
-            }
-            else if (item.descuento_tipo == 2) {
-                if (item.descuento_valor > 100) {
-                    jmsg('warning', 'El descuento no puede ser mayor a 100%')
-                    item.descuento_valor = null
-                }
-            }
-
-            this.sumar(item)
-        },
-        setCortesia(item) {
-            item.cortesia = !item.cortesia
-
-            if (item.cortesia == true) {
-                item.descuento_tipo = 1
-                item.descuento_valor = item.total
-            }
-            else {
-                item.descuento_tipo = null
-                item.descuento_valor = null
-            }
-
-            this.sumar(item)
-            this.calcularPorPagar()
-        },
-
-
         async loadSocios(txtBuscar) {
             if (!txtBuscar) {
                 this.vista.socios.length = 0
                 return
             }
 
-            const filtros = {
-                tipo: 2,
-                activo: true,
-                nombre: txtBuscar,
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: 2 },
+                    activo: { op: 'Es', val: true },
+                    nombres: { op: 'Contiene', val: txtBuscar },
+                },
+                cols: ['nombres', 'telefono', 'direccion', 'referencia'],
             }
 
-            this.spinSocios = true
-            const res = await get(`${urls.socios}?filtros=${JSON.stringify(filtros)}`)
-            this.spinSocios = false
+            this.vista.spinSocios = true
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+            this.vista.spinSocios = false
 
             if (res.code !== 0) return
 
             this.vista.socios = res.data
         },
-        setSocio(item) {
-            this.vista.socio = item
-        },
-        async setSocioGeneral() {
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            await this.loadSocios('00000000')
-            this.useAuth.loading = { show: false, text: '' }
 
-            this.reloadSocio = true
-            this.transaccion.socio = this.vista.socios[0].id
-            this.$nextTick(() => this.reloadSocio = false)
-            this.vista.socio = this.vista.socios[0]
-        },
+        calcularUno(item) {
+            item.vu =
+                item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
 
-
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-
-            console.log(this.transaccion)
-        },
-        async grabar() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-
-            this.useAuth.loading = { show: true, text: 'Grabando...' }
-            const res = await post(`${urls.transacciones}/vender`, this.transaccion)
-            this.useAuth.loading = { show: false, text: '' }
-
-            if (res.code != 0) return
-
-            const vistaPedidos = this.useVistas.getVista('vClientePedidos')
-
-            if (vistaPedidos) {
-                vistaPedidos.reload = true
+            ///// ----- DESCUENTO ----- /////
+            if (
+                item.descuento_tipo != null &&
+                item.descuento_valor != null &&
+                item.descuento_valor != 0
+            ) {
+                if (item.descuento_tipo == 1) {
+                    item.desc =
+                        item.igv_afectacion == '10'
+                            ? item.descuento_valor / (1 + item.igv_porcentaje / 100)
+                            : item.descuento_valor
+                } else if (item.descuento_tipo == 2) {
+                    item.desc =
+                        item.igv_afectacion == '10'
+                            ? (item.cantidad * item.pu * (item.descuento_valor / 100)) /
+                              (1 + item.igv_porcentaje / 100)
+                            : item.cantidad * item.pu * (item.descuento_valor / 100)
+                }
+            } else {
+                item.desc = 0
             }
 
-            this.useVistas.closePestana('vEmitirComprobante', 'vClientePedidos')
+            item.mtoValorVenta = item.cantidad * item.vu - item.desc
+            item.igv =
+                item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
+            item.total = item.mtoValorVenta + item.igv
         },
-        checkDatos() {
-            const props = [
-                'tipo', 'socio', 'moneda', 'tipo_cambio', 'pago_condicion',
-            ]
+        calcularTotales() {
+            this.vista.mtoOperGravadas = 0
+            this.vista.mtoOperExoneradas = 0
+            this.vista.mtoOperInafectas = 0
+            this.vista.mtoIGV = 0
 
-            if (incompleteData(this.transaccion, props)) {
+            for (const a of this.vista.comprobante.comprobante_items) {
+                if (a.igv_afectacion == '10') {
+                    this.vista.mtoOperGravadas += a.mtoValorVenta
+                    this.vista.mtoIGV += a.igv
+                } else if (a.igv_afectacion == '20') {
+                    this.vista.mtoOperExoneradas += a.mtoValorVenta
+                } else if (a.igv_afectacion == '30') {
+                    this.vista.mtoOperInafectas += a.mtoValorVenta
+                }
+            }
+
+            this.vista.valorVenta =
+                this.vista.mtoOperGravadas +
+                this.vista.mtoOperExoneradas +
+                this.vista.mtoOperInafectas
+            this.vista.mtoImpVenta = this.vista.valorVenta + this.vista.mtoIGV
+        },
+        sumarUno(item) {
+            this.calcularUno(item)
+
+            this.calcularTotales()
+        },
+        sumarItems() {
+            for (const a of this.vista.comprobante.comprobante_items) this.calcularUno(a)
+
+            this.calcularTotales()
+        },
+
+        setDescuentoTipo(item) {
+            item.descuento_valor = null
+
+            this.sumarUno(item)
+        },
+        setDescuentoValor(item) {
+            if (item.descuento_tipo == 1) {
+                if (item.descuento_valor > item.pu * item.cantidad) {
+                    jmsg('warning', 'El descuento no puede ser mayor al importe')
+                    item.descuento_valor = null
+                }
+            } else if (item.descuento_tipo == 2) {
+                if (item.descuento_valor > 100) {
+                    jmsg('warning', 'El descuento no puede ser mayor a 100%')
+                    item.descuento_valor = null
+                }
+            }
+
+            this.sumarUno(item)
+        },
+        setCortesia(item) {
+            const i = this.vista.comprobante.comprobante_items.findIndex(
+                (a) => a.articulo == item.articulo,
+            )
+
+            this.vista.comprobante.comprobante_items[i].cortesia =
+                !this.vista.comprobante.comprobante_items[i].cortesia
+
+            if (this.vista.comprobante.comprobante_items[i].cortesia == true) {
+                this.vista.comprobante.comprobante_items[i].descuento_tipo = 1
+                this.vista.comprobante.comprobante_items[i].descuento_valor = redondear(item.total)
+            } else {
+                this.vista.comprobante.comprobante_items[i].descuento_tipo = null
+                this.vista.comprobante.comprobante_items[i].descuento_valor = null
+            }
+
+            this.sumarUno(this.vista.comprobante.comprobante_items[i])
+            this.calcularPorPagar()
+        },
+        quitarArticulo(item) {
+            const i = this.vista.comprobante.comprobante_items.findIndex(
+                (a) => a.articulo == item.articulo,
+            )
+            this.vista.comprobante.comprobante_items.splice(i, 1)
+
+            this.sumarItems()
+            this.calcularPorPagar()
+        },
+
+        setPagoCondicion() {
+            for (const a of this.vista.pago_metodos) {
+                a.monto = null
+            }
+
+            this.calcularPorPagar()
+        },
+        pagoExacto(item) {
+            if (item.monto > 0) {
+                item.monto = null
+            } else {
+                item.monto = redondear(this.vista.mtoImpVenta, 2)
+            }
+
+            this.calcularPorPagar()
+        },
+        calcularPorPagar() {
+            let pagos_monto = 0
+
+            for (const a of this.vista.pago_metodos) {
+                if (a.monto) pagos_monto += Number(a.monto)
+            }
+
+            if (pagos_monto == 0) {
+                this.vista.porPagar = this.vista.mtoImpVenta
+                this.vista.vuelto = 0
+            } else if (pagos_monto <= this.vista.mtoImpVenta) {
+                this.vista.porPagar = this.vista.mtoImpVenta - pagos_monto
+                this.vista.vuelto = 0
+            } else {
+                this.vista.porPagar = 0
+                this.vista.vuelto = pagos_monto - this.vista.mtoImpVenta
+            }
+        },
+
+        nuevoSocio() {
+            const send = { tipo: 2, activo: true }
+
+            this.useModals.setModal('mSocio', 'Nuevo cliente', 1, send)
+        },
+        setSocioCreated(item) {
+            this.vista.socios = [item]
+            this.vista.comprobante.socio = item.id
+        },
+
+        checkDatos() {
+            const props = ['fecha', 'doc_tipo', 'socio', 'pago_condicion']
+
+            if (incompleteData(this.vista.comprobante, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
 
-            if (this.transaccion.transaccion_items.length == 0) {
+            if (this.vista.comprobante.comprobante_items.length == 0) {
                 jmsg('warning', 'Debe agregar al menos un artículo')
                 return true
             }
 
-            for (const a of this.transaccion.transaccion_items) {
+            for (const a of this.vista.comprobante.comprobante_items) {
                 const props1 = [
-                    'articulo', 'cantidad', 'pu',
-                    'unidad', 'nombre', 'igv', 'igv_afectacion',
+                    'articulo',
+                    'nombre',
+                    'unidad',
+                    'cantidad',
+                    'pu',
+                    'igv',
+                    'igv_afectacion',
                 ]
 
                 if (incompleteData(a, props1)) {
@@ -539,14 +579,14 @@ export default {
                     return true
                 }
 
-                if (a.cantidad == 0) {
+                if (a.cantidad < 1) {
                     jmsg('warning', 'Lo cantidad en cada articulo no puede ser cero')
                     return true
                 }
             }
 
-            if (this.transaccion.comprobante.credito == false) {
-                if (this.porPagar > 0) {
+            if (this.vista.comprobante.pago_condicion == 1) {
+                if (redondear(this.vista.porPagar) > 0) {
                     jmsg('warning', 'Importes de pago insuficientes')
 
                     return true
@@ -556,133 +596,57 @@ export default {
             return false
         },
         shapeDatos() {
-            this.transaccion.fecha = new Date()
-            this.transaccion.monto = redondear(this.mtoImpVenta, 2)
-            // this.transaccion.almacen = this.useAuth.usuario.almacen
-            // this.transaccion.caja = this.useAuth.usuario.caja
-            // this.transaccion.caja_apertura = this.vista.cajas.find(a => a.id == this.transaccion.caja).caja_aperturas[0].id
-
-            for (const a of this.transaccion.transaccion_items) {
-                if (a.desc != 0) {
-                    a.descuentos = [{
-                        codTipo: '00',
-                        montoBase: a.desc,
-                        factor: 1,
-                        monto: a.desc,
-                    }]
-                }
-                else {
-                    a.descuentos = null
-                }
+            if (this.vista.comprobante.pago_condicion == 1) {
+                this.vista.comprobante.pagos = []
+            } else {
+                this.vista.comprobante.pago_metodos = this.vista.pago_metodos
             }
 
-            if (this.transaccion.comprobante.credito == true) {
-                this.transaccion.pagos = []
+            this.vista.comprobante.total_gravada = redondear(this.vista.mtoOperGravadas, 2)
+            this.vista.comprobante.total_exonerada = redondear(this.vista.mtoOperExoneradas, 2)
+            this.vista.comprobante.total_inafecta = redondear(this.vista.mtoOperInafectas, 2)
+            this.vista.comprobante.total_igv = redondear(this.vista.mtoIGV, 2)
+            this.vista.comprobante.monto = redondear(this.vista.mtoImpVenta, 2)
+        },
+        async grabar1() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            console.log(this.vista.comprobante)
+        },
+        async grabar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.useAuth.setLoading(true, 'Grabando...')
+            const res = await post(urls.comprobantes, this.vista.comprobante)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const vistaPedidos = this.useVistas.getVista('vPedidos')
+
+            if (vistaPedidos) {
+                vistaPedidos.reload = true
             }
 
-
-            // ----- PARA COMPROBANTE ----- //
-            const details = this.transaccion.transaccion_items.map(a => ({
-                codProducto: a.articulo,
-                unidad: a.unidad,
-                descripcion: a.nombre,
-                cantidad: a.cantidad,
-
-                mtoValorUnitario: ['10', '20', '30'].includes(a.igv_afectacion) ? a.vu : 0,
-                mtoValorGratuito: ['10', '20', '30'].includes(a.igv_afectacion) ? 0 : a.vu,
-                mtoValorVenta: a.mtoValorVenta,
-                mtoBaseIgv: a.cantidad * a.vu,
-
-                porcentajeIgv: a.igv_porcentaje * 100,
-                igv: a.igv,
-                tipAfeIgv: a.igv_afectacion,
-
-                totalImpuestos: a.igv_porcentaje * 100 * a.cantidad,
-                mtoPrecioUnitario: ['10', '20', '30'].includes(a.igv_afectacion) ? a.pu : 0,
-
-                descuentos: a.descuentos,
-            }))
-
-            this.transaccion.comprobante = {
-                ublVersion: '2.1',
-                tipoOperacion: '0101',
-                tipoDoc: this.transaccion.comprobante.doc_tipo,
-                serie: '',
-                correlativo: '',
-                fechaEmision: this.transaccion.fecha,
-
-                formaPago: {
-                    moneda: getItemFromArray(this.transaccion.moneda, monedas, 'codigo'),
-                    tipo: getItemFromArray(this.transaccion.pago_condicion, pago_condiciones)
-                },
-                tipoMoneda: getItemFromArray(this.transaccion.moneda, monedas, 'codigo'),
-                company: {
-                    ruc: this.useAuth.usuario.empresa1.ruc,
-                    razonSocial: this.useAuth.usuario.empresa1.razon_social,
-                    nombreComercial: this.useAuth.usuario.empresa1.nombre_comercial,
-                    address: {
-                        direccion: this.useAuth.usuario.empresa1.direccion_fiscal,
-                        departamento: getItemFromArray(this.useAuth.usuario.empresa1.ubigeo, ubigeo, 'departamento'),
-                        provincia: getItemFromArray(this.useAuth.usuario.empresa1.ubigeo, ubigeo, 'provincia'),
-                        distrito: getItemFromArray(this.useAuth.usuario.empresa1.ubigeo, ubigeo, 'distrito'),
-                        ubigueo: this.useAuth.usuario.empresa1.ubigeo
-                    }
-                },
-
-                mtoOperGravadas: this.mtoOperGravadas,
-                mtoOperExoneradas: this.mtoOperExoneradas,
-                mtoOperInafectas: this.mtoOperInafectas,
-                mtoOperGratuitas: this.mtoOperGratuitas,
-
-                mtoIGV: this.mtoIGV,
-                mtoIGVGratuitas: this.mtoIGVGratuitas,
-
-                totalImpuestos: this.mtoIGV,
-
-                valorVenta: this.valorVenta,
-                subTotal: this.mtoImpVenta,
-                mtoImpVenta: this.mtoImpVenta,
-
-                details,
-                legends: [
-                    {
-                        code: "1000",
-                        value: numeroATexto(this.mtoImpVenta)
-                    },
-                ],
-
-                ...this.transaccion.comprobante,
-                pagado: !this.transaccion.comprobante.credito,
-                estado: 1,
-            }
-
-            // ----- ASIGNAR DATOS DEL CLIENTE ----- //
-            this.transaccion.comprobante.client = {
-                tipoDoc: this.vista.socio.doc_tipo,
-                numDoc: this.vista.socio.doc_numero,
-                rznSocial: this.vista.socio.doc_tipo == 1 ? `${this.vista.socio.nombres} ${this.vista.socio.apellidos}` : this.vista.socio.nombres,
-                address: {
-                    direccion: this.vista.socio.direccion,
-                    departamento: getItemFromArray(this.vista.socio.ubigeo, ubigeo, 'departamento'),
-                    provincia: getItemFromArray(this.vista.socio.ubigeo, ubigeo, 'provincia'),
-                    distrito: getItemFromArray(this.vista.socio.ubigeo, ubigeo, 'distrito'),
-                    ubigueo: this.vista.socio.ubigeo
-                }
-            }
+            this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
 
-        nuevoSocio() {
-            const item = { tipo: 2, doc_tipo: 1, activo: true }
-
-            this.useModals.setModal('mSocio', 'Nuevo cliente', true, 1, item)
+        runMethod(method, item) {
+            this[method](item)
         },
-    }
+        regresar() {
+            this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
+        },
+    },
 }
 </script>
 
 <style lang="scss" scoped>
 .container {
     height: 100%;
+    overflow: hidden;
     display: grid;
     grid-template-columns: auto 1fr;
     gap: 2rem;
@@ -724,7 +688,7 @@ export default {
         }
     }
 
-    >.right {
+    > .right {
         display: grid;
         grid-template-rows: 1fr auto;
         gap: 2rem;
@@ -735,10 +699,10 @@ export default {
             }
         }
 
-        .pago {
-            height: 14rem;
+        .container-pagos {
+            // height: 14rem;
             overflow-y: hidden;
-            border: var(--border);
+            // border: var(--border);
             display: grid;
             grid-template-rows: auto 1fr;
             border-radius: 0.3rem;
@@ -746,45 +710,76 @@ export default {
             .head {
                 background-color: var(--bg-color2);
                 padding: 0.5rem;
+                display: flex;
+                gap: 1rem;
             }
 
-            .cuerpo {
-                padding: 1rem;
+            .container-pago-metodos {
+                padding: 0.5rem;
                 display: grid;
-                grid-template-columns: 50% 50%;
-                overflow-y: hidden;
+                grid-template-columns: 1fr 1fr 1fr;
+                gap: 1rem;
+                max-height: 10rem;
+                overflow-y: auto;
 
-                .agregar {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    margin-right: 2rem;
-
-                    .txt-monto {
-                        display: flex;
-                        gap: 0.5rem;
-                    }
-                }
-
-                .right {
+                li {
+                    border: 2px solid;
                     display: grid;
-                    grid-template-rows: auto 1fr;
-                    gap: 1rem;
-                    overflow-y: hidden;
-
-                    .por_pagar {
-                        display: grid;
-                        grid-template-columns: repeat(4, 1fr);
-                        align-items: center;
-                        padding: 0.5rem;
-                        background-color: var(--bg-color2);
-                        border-radius: 0.3rem;
-
-                        p {
-                            font-size: 1.5rem;
-                        }
-                    }
+                    grid-template-columns: 7rem 1fr;
+                    padding: 0.5rem;
+                    border-radius: 0.5rem;
                 }
+            }
+
+            // .cuerpo {
+            //     padding: 1rem;
+            //     display: grid;
+            //     grid-template-columns: 50% 50%;
+            //     overflow-y: hidden;
+
+            //     .agregar {
+            //         display: flex;
+            //         flex-direction: column;
+            //         gap: 0.5rem;
+            //         margin-right: 2rem;
+
+            //         .txt-monto {
+            //             display: flex;
+            //             gap: 0.5rem;
+            //         }
+            //     }
+
+            //     .right {
+            //         display: grid;
+            //         grid-template-rows: auto 1fr;
+            //         gap: 1rem;
+            //         overflow-y: hidden;
+
+            //         .por_pagar {
+            //             display: grid;
+            //             grid-template-columns: repeat(4, 1fr);
+            //             align-items: center;
+            //             padding: 0.5rem;
+            //             background-color: var(--bg-color2);
+            //             border-radius: 0.3rem;
+
+            //             p {
+            //                 font-size: 1.5rem;
+            //             }
+            //         }
+            //     }
+            // }
+        }
+
+        .container-credito {
+            text-align: center;
+
+            p {
+                font-size: 1.3rem;
+            }
+
+            span {
+                color: var(--text-color2);
             }
         }
     }

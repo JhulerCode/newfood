@@ -6,6 +6,7 @@
         <vClientes v-if="useVistas.show.vClientes" />
         <vPedidos v-if="useVistas.show.vPedidos" />
         <vComanda v-if="useVistas.show.vComanda" />
+        <vEmitirComprobante v-if="useVistas.show.vEmitirComprobante" />
 
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInsumos v-if="useVistas.show.vInsumos" />
@@ -29,6 +30,7 @@ import { useVistas } from '@/pinia/vistas.js'
 // ----- COMPRAS ----- //
 import vProveedores from '@/views/compras/proveedores/vProveedores.vue'
 import vCompras from '@/views/compras/compras/vCompras.vue'
+import vEmitirComprobante from '@/views/ventas/pedidos/vEmitirComprobante.vue'
 
 // ----- VENTAS ----- //
 import vClientes from '@/views/ventas/clientes/vClientes.vue'
@@ -59,6 +61,7 @@ export default {
         vClientes,
         vPedidos,
         vComanda,
+        vEmitirComprobante,
 
         vArticuloCategorias,
         vInsumos,

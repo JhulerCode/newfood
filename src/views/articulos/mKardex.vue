@@ -26,8 +26,8 @@
             @rowOptionSelected="runMethod"
         >
             <template v-slot:cMoreInfo="{ item }">
-                {{ item.transaccion1?.pago_comprobante_serie }}-{{
-                    item.transaccion1?.pago_comprobante_correlativo
+                {{ item.transaccion1?.compra_comprobante_serie }}-{{
+                    item.transaccion1?.compra_comprobante_correlativo
                 }}
                 {{ item.transaccion1?.socio1?.nombres }}
                 {{ item.observacion }}
