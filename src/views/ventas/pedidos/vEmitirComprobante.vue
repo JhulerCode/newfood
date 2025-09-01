@@ -644,13 +644,13 @@ export default {
             this.vista.comprobante.total_igv = redondear(this.vista.mtoIGV, 2)
             this.vista.comprobante.monto = redondear(this.vista.mtoImpVenta, 2)
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.comprobante)
         },
-        async grabar1() {
+        async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 

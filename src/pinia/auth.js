@@ -68,8 +68,10 @@ export const useAuth = defineStore('auth', {
             {
                 id: 'caja', label: 'Caja', icon: 'fa-solid fa-cash-register', children: [
                     {
-                        label: 'Resumen', goto: 'vCajaResumen', permisos: [
-                            { id: 'vCajaResumen:ver', label: 'Ver resumen de caja' },
+                        label: 'Caja resumen', goto: 'vCajaResumen', permisos: [
+                            { id: 'vCajaResumen:ver', label: 'Ver resumen' },
+                            { id: 'vCajaResumen:aperturar', label: 'Aperturar caja' },
+                            { id: 'vCajaResumen:cerrar', label: 'Cerrar caja' },
                         ],
                     },
                     {

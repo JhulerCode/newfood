@@ -8,6 +8,9 @@
         <vComanda v-if="useVistas.show.vComanda" />
         <vEmitirComprobante v-if="useVistas.show.vEmitirComprobante" />
 
+        <vCajaResumen v-if="useVistas.show.vCajaResumen"/>
+        <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
+
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInsumos v-if="useVistas.show.vInsumos" />
         <vProductos v-if="useVistas.show.vProductos" />
@@ -37,6 +40,10 @@ import vClientes from '@/views/ventas/clientes/vClientes.vue'
 import vPedidos from '@/views/ventas/pedidos/vPedidos.vue'
 import vComanda from '@/views/ventas/pedidos/vComanda.vue'
 
+// ----- CAJA ----- //
+import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
+import vCajaMovimientos from '@/views/caja/movimientos/vCajaMovimientos.vue'
+
 // ----- ARTÍCULOS ----- //
 import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
 import vInsumos from '@/views/articulos/insumos/vInsumos.vue'
@@ -62,6 +69,9 @@ export default {
         vPedidos,
         vComanda,
         vEmitirComprobante,
+
+        vCajaResumen,
+        vCajaMovimientos,
 
         vArticuloCategorias,
         vInsumos,
