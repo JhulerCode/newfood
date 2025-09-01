@@ -56,14 +56,16 @@
                     />
 
                     <div style="grid-column: 1/5" class="dato-cliente">
+                        <!-- {{ vista.socio }} -->
                         <JdSelectQuery
                             label="Cliente"
                             :nec="true"
                             v-model="vista.comprobante.socio"
                             :spin="vista.spinSocios"
                             :lista="vista.socios || []"
-                            mostrar="nombres"
+                            mostrar="doc_nombres"
                             @search="loadSocios"
+                            @elegir="setSocio"
                             style="grid-column: 1/5"
                         />
 
@@ -147,12 +149,14 @@
                                 mostrar="codigo"
                                 @elegir="setDescuentoTipo(item)"
                             />
+
                             <JdInput
                                 tipo="number"
                                 :toRight="true"
                                 v-model="item.descuento_valor"
                                 @input="setDescuentoValor(item)"
                             />
+                            <!-- {{ item.vu_desc }} -->
                         </div>
                     </template>
                 </JdTable>
@@ -278,7 +282,7 @@ export default {
             },
             {
                 id: 'descuento',
-                width: '10rem',
+                width: '15rem',
                 title: 'Descuento',
                 slot: 'colDescuento',
                 toRight: true,
@@ -379,7 +383,15 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombres: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['nombres', 'telefono', 'direccion', 'referencia'],
+                cols: [
+                    'nombres',
+                    'doc_tipo',
+                    'doc_numero',
+                    'doc_nombres',
+                    'telefono',
+                    'direccion',
+                    'referencia',
+                ],
             }
 
             this.vista.spinSocios = true
@@ -402,22 +414,22 @@ export default {
                 item.descuento_valor != 0
             ) {
                 if (item.descuento_tipo == 1) {
-                    item.desc =
+                    item.vu_desc =
                         item.igv_afectacion == '10'
                             ? item.descuento_valor / (1 + item.igv_porcentaje / 100)
                             : item.descuento_valor
                 } else if (item.descuento_tipo == 2) {
-                    item.desc =
+                    item.vu_desc =
                         item.igv_afectacion == '10'
                             ? (item.cantidad * item.pu * (item.descuento_valor / 100)) /
                               (1 + item.igv_porcentaje / 100)
                             : item.cantidad * item.pu * (item.descuento_valor / 100)
                 }
             } else {
-                item.desc = 0
+                item.vu_desc = 0
             }
 
-            item.mtoValorVenta = item.cantidad * item.vu - item.desc
+            item.mtoValorVenta = item.cantidad * item.vu - item.vu_desc
             item.igv =
                 item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
             item.total = item.mtoValorVenta + item.igv
@@ -446,6 +458,11 @@ export default {
             this.vista.mtoImpVenta = this.vista.valorVenta + this.vista.mtoIGV
         },
         sumarUno(item) {
+            if (item.cantidad > item.cantidadMax) {
+                item.cantidad = item.cantidadMax
+                return jmsg('warning', 'Cantidad no disponible')
+            }
+
             this.calcularUno(item)
 
             this.calcularTotales()
@@ -540,6 +557,9 @@ export default {
             }
         },
 
+        setSocio(item) {
+            this.vista.socio = item
+        },
         nuevoSocio() {
             const send = { tipo: 2, activo: true }
 
@@ -556,6 +576,22 @@ export default {
             if (incompleteData(this.vista.comprobante, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
+            }
+
+            if (this.vista.comprobante.doc_tipo == '01') {
+                if (['1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
+                    return jmsg('error', 'El cliente debe tener RUC')
+                }
+            }
+
+            if (this.vista.comprobante.doc_tipo == '03') {
+                if (this.vista.socio.doc_numero == '00000000') {
+                    return jmsg('error', 'El cliente debe tener un DNI válido')
+                }
+
+                if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
+                    return jmsg('error', 'El cliente debe tener DNI')
+                }
             }
 
             if (this.vista.comprobante.comprobante_items.length == 0) {
@@ -580,7 +616,7 @@ export default {
                 }
 
                 if (a.cantidad < 1) {
-                    jmsg('warning', 'Lo cantidad en cada articulo no puede ser cero')
+                    jmsg('warning', 'Lo cantidad en cada articulo no puede ser menor a 1')
                     return true
                 }
             }
@@ -596,8 +632,8 @@ export default {
             return false
         },
         shapeDatos() {
-            if (this.vista.comprobante.pago_condicion == 1) {
-                this.vista.comprobante.pagos = []
+            if (this.vista.comprobante.pago_condicion == 2) {
+                this.vista.comprobante.pago_metodos = []
             } else {
                 this.vista.comprobante.pago_metodos = this.vista.pago_metodos
             }
@@ -608,13 +644,13 @@ export default {
             this.vista.comprobante.total_igv = redondear(this.vista.mtoIGV, 2)
             this.vista.comprobante.monto = redondear(this.vista.mtoImpVenta, 2)
         },
-        async grabar1() {
+        async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.comprobante)
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
@@ -624,12 +660,10 @@ export default {
 
             if (res.code != 0) return
 
-            const vistaPedidos = this.useVistas.getVista('vPedidos')
-
+            const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) {
                 vistaPedidos.reload = true
             }
-
             this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
 

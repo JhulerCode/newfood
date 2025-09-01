@@ -724,16 +724,22 @@ export default {
             // Si existe 'ocultar', evaluar condiciones para ocultar
             if (b.ocultar) {
                 for (const prop in b.ocultar) {
-                    const valorOcultar = b.ocultar[prop]
+                    const condicion = b.ocultar[prop]
                     const valorFila = a[prop]
 
                     if (valorFila === undefined) continue
 
-                    // Si el valor en ocultar es un array
-                    if (Array.isArray(valorOcultar)) {
-                        if (valorOcultar.includes(valorFila)) return false // se oculta
-                    } else {
-                        if (valorOcultar == valorFila) return false // se oculta
+                    // Caso 1: array
+                    if (Array.isArray(condicion)) {
+                        if (condicion.includes(valorFila)) return false // se oculta
+                    }
+                    // Caso 2: objeto con operador
+                    else if (typeof condicion === 'object' && condicion.op && 'val' in condicion) {
+                        if (this.comparar(valorFila, condicion.op, condicion.val)) return false
+                    }
+                    // Caso 3: valor simple
+                    else {
+                        if (condicion == valorFila) return false // se oculta
                     }
                 }
             }
@@ -744,6 +750,48 @@ export default {
             // Evaluar permiso si existe
             return this.useAuth.verifyPermiso(b.permiso)
         },
+        comparar(a, op, b) {
+            switch (op) {
+                case '>':
+                    return a > b
+                case '<':
+                    return a < b
+                case '>=':
+                    return a >= b
+                case '<=':
+                    return a <= b
+                case '==':
+                    return a == b
+                case '!=':
+                    return a != b
+                default:
+                    return false
+            }
+        },
+        // verifyPermiso(a, b) {
+        //     // Si existe 'ocultar', evaluar condiciones para ocultar
+        //     if (b.ocultar) {
+        //         for (const prop in b.ocultar) {
+        //             const valorOcultar = b.ocultar[prop]
+        //             const valorFila = a[prop]
+
+        //             if (valorFila === undefined) continue
+
+        //             // Si el valor en ocultar es un array
+        //             if (Array.isArray(valorOcultar)) {
+        //                 if (valorOcultar.includes(valorFila)) return false // se oculta
+        //             } else {
+        //                 if (valorOcultar == valorFila) return false // se oculta
+        //             }
+        //         }
+        //     }
+
+        //     // Si no hay permiso definido, solo dependerá de 'ocultar'
+        //     if (!b.permiso) return true
+
+        //     // Evaluar permiso si existe
+        //     return this.useAuth.verifyPermiso(b.permiso)
+        // },
     },
 }
 </script>

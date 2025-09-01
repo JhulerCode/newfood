@@ -81,6 +81,7 @@
                     </p>
 
                     <div class="mesa-actions">
+                        <!-- {{ a }} -->
                         <JdButton
                             icon="fa-solid fa-ellipsis"
                             title="Acciones"
@@ -113,43 +114,15 @@
                 :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
             >
-                <template v-slot:colNotas="{ item }">
-                    <small>
-                        Comprobante:
-                        {{
-                            item.transacciones.length == 0
-                                ? 'NO'
-                                : `${item.socio_pedido_items.some((a) => a.cantidad > a.entregado) ? 'PARCIAL' : 'SI'}`
-                        }}
-                        <br />
-                    </small>
-
-                    <small>
-                        Pagado:
-                        {{
-                            item.transacciones.length == 0
-                                ? 'NO'
-                                : `${
-                                      item.transacciones.some(
-                                          (a) =>
-                                              a.transaccion1.comprobantes[0].comprobante1.pagado ==
-                                              false,
-                                      )
-                                          ? 'NO'
-                                          : 'SI'
-                                  }`
-                        }}
-                        <br />
-                    </small>
-                </template>
+                <!-- <template v-slot:colMoreInfo="{ item }">
+                </template> -->
             </JdTable>
         </template>
     </div>
 
     <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
     <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
-
-    <!-- <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" /> -->
+    <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
     <!--<mPagarCuenta v-if="useModals.show.mPagarCuenta" /> -->
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
@@ -161,8 +134,9 @@
             @click.stop
             :id="'options-case-' + this.tableName"
         >
-            <template v-for="(b, i) in tableRowOptions1" :key="i">
-                <li @click="selectOption(b)" v-if="verifyPermiso(optionsCaseItem, b)">
+            <template v-for="(b, i) in tableRowOptions" :key="i">
+                <!-- {{ optionsCaseItem.pedido }} -->
+                <li @click="selectOption(b)" v-if="verifyPermiso(optionsCaseItem.pedido, b)">
                     <i :class="b.icon"></i>
                     <span>{{ b.label }}</span>
                 </li>
@@ -178,7 +152,7 @@ import mAnular from '@/components/mAnular.vue'
 
 import mMesasUnir from '@/views/ventas/pedidos/mMesasUnir.vue'
 import mCambiarMesa from '@/views/ventas/pedidos/mCambiarMesa.vue'
-// import mPedidoComprobantes from '@/views/u/ventas/clientePedidos/mPedidoComprobantes.vue'
+import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
 // import mPagarCuenta from '@/views/u/ventas/clientePedidos/mPagarCuenta.vue'
 
 import { useModals } from '@/pinia/modals'
@@ -198,7 +172,7 @@ export default {
         JdTable,
         mMesasUnir,
         mCambiarMesa,
-        // mPedidoComprobantes,
+        mPedidoComprobantes,
         // mPagarCuenta,
         mAnular,
     },
@@ -256,28 +230,52 @@ export default {
             {
                 id: 'monto',
                 title: 'Importe',
-                width: '10rem',
+                toRight: true,
+                width: '7rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'estado',
-                width: '10rem',
-                title: 'Estado',
+                id: 'venta_facturado',
+                title: 'Facturado?',
+                prop: 'venta_facturado1.nombre',
+                format: 'yesno',
+                width: '7rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'venta_entregado',
+                title: 'Entregado?',
+                prop: 'venta_entregado1.nombre',
+                format: 'yesno',
+                width: '7rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             // {
-            //     id: '',
-            //     width: '17rem',
-            //     title: 'Seguimiento',
-            //     slot: 'colNotas',
+            //     id: 'pagado',
+            //     title: 'Pagado?',
+            //     prop: 'pagado1.nombre',
+            //     format: 'yesno',
+            //     width: '6rem',
             //     show: true,
             //     seek: true,
             //     sort: true,
             // },
+            {
+                id: 'estado',
+                title: 'Estado',
+                prop: 'estado1.nombre',
+                format: 'estado',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         tableRowOptions: [
             {
@@ -285,14 +283,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPedidos:editar',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Anular',
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
                 permiso: 'vPedidos:anular',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Imprimir comanda',
@@ -312,7 +310,7 @@ export default {
                 icon: 'fa-solid fa-file-invoice',
                 action: 'generarComprobante',
                 permiso: 'vPedidos:generarComprobante',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_facturado: true },
             },
             {
                 label: 'Ver comprobantes',
@@ -326,53 +324,67 @@ export default {
                 icon: 'fa-solid fa-flag-checkered',
                 action: 'entregar',
                 permiso: 'vPedidos:entregar',
-                ocultar: { estado: 0 },
-            },
-        ],
-
-        tableRowOptions1: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vPedidos:editar',
-                ocultar: { estado: 0 },
-            },
-            {
-                label: 'Anular',
-                icon: 'fa-solid fa-ban',
-                action: 'anular',
-                permiso: 'vPedidos:anular',
-                ocultar: { estado: 0 },
-            },
-            {
-                label: 'Imprimir comanda',
-                icon: 'fa-solid fa-print',
-                action: 'imprimir',
-                permiso: 'vPedidos:imprimirComanda',
-            },
-            {
-                label: 'Imprimir precuenta',
-                icon: 'fa-solid fa-print',
-                action: 'imprimir',
-                permiso: 'vPedidos:imprimirPrecuenta',
-                ocultar: { estado: 0 },
-            },
-            {
-                label: 'Generar comprobante',
-                icon: 'fa-solid fa-file-invoice',
-                action: 'generarComprobante',
-                permiso: 'vPedidos:generarComprobante',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_canal: 1, venta_facturado: false, venta_entregado: true },
             },
             {
                 label: 'Cambiar mesa',
                 icon: 'fa-solid fa-arrows-up-down-left-right',
                 action: 'openCambiarMesa',
                 permiso: 'vPedidos:cambiarMesa',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_canal: ['2', '3'] },
             },
         ],
+
+        // tableRowOptions1: [
+        //     {
+        //         label: 'Editar',
+        //         icon: 'fa-solid fa-pen-to-square',
+        //         action: 'editar',
+        //         permiso: 'vPedidos:editar',
+        //         ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+        //     },
+        //     {
+        //         label: 'Anular',
+        //         icon: 'fa-solid fa-ban',
+        //         action: 'anular',
+        //         permiso: 'vPedidos:anular',
+        //         ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+        //     },
+        //     {
+        //         label: 'Imprimir comanda',
+        //         icon: 'fa-solid fa-print',
+        //         action: 'imprimir',
+        //         permiso: 'vPedidos:imprimirComanda',
+        //     },
+        //     {
+        //         label: 'Imprimir precuenta',
+        //         icon: 'fa-solid fa-print',
+        //         action: 'imprimir',
+        //         permiso: 'vPedidos:imprimirPrecuenta',
+        //         ocultar: { estado: 0 },
+        //     },
+        //     {
+        //         label: 'Generar comprobante',
+        //         icon: 'fa-solid fa-file-invoice',
+        //         action: 'generarComprobante',
+        //         permiso: 'vPedidos:generarComprobante',
+        //         ocultar: { estado: 0, venta_facturado: true },
+        //     },
+        //     {
+        //         label: 'Ver comprobantes',
+        //         icon: 'fa-solid fa-up-right-from-square',
+        //         action: 'verComprobantes',
+        //         permiso: 'vPedidos:verComprobantes',
+        //         ocultar: { estado: 0 },
+        //     },
+        //     {
+        //         label: 'Cambiar mesa',
+        //         icon: 'fa-solid fa-arrows-up-down-left-right',
+        //         action: 'openCambiarMesa',
+        //         permiso: 'vPedidos:cambiarMesa',
+        //         ocultar: { estado: 0 },
+        //     },
+        // ],
 
         optionsCaseItem: {},
     }),
@@ -393,7 +405,11 @@ export default {
         if (this.vista.loaded) {
             if (this.vista.reload) {
                 // ESTO LO MANDA ACTUALIZAR COMANDA
-                this.loadPedidos()
+                if (this.vista.venta_canal == 1) {
+                    this.loadSalones()
+                } else {
+                    this.loadPedidos()
+                }
             }
         } else {
             this.vista.mesaPendientes = 0
@@ -423,16 +439,18 @@ export default {
                 },
                 cols: [],
                 incl: ['createdBy1'],
+                sqls: ['comprobantes_monto', 'pagos_monto'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('createdAt')
-            this.vista.qry.cols.push('venta_entregado')
+            this.vista.qry.cols.push('createdAt', 'venta_entregado', 'venta_canal')
 
             if (this.vista.venta_canal == 1) {
-                this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.fltr.estado = { op: 'Es', val: '1' }
+                this.vista.qry.fltr.venta_entregado = { op: 'Es', val: false }
+                this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.incl.push('venta_mesa1')
+                // } else {
             }
         },
         async loadPedidos() {
@@ -447,10 +465,10 @@ export default {
 
             this.vista.pedidos = res.data
 
-            this.setIntervalTimeAgo()
+            if (this.vista.venta_canal != 1) this.setIntervalTimeAgo()
             this.loadPendientesCantidad()
         },
-        setQuery1() {
+        setQuerySalones() {
             this.vista.qry1 = {
                 fltr: {
                     activo: { op: 'Es', val: true },
@@ -460,7 +478,7 @@ export default {
             }
         },
         async loadSalones() {
-            this.setQuery1()
+            this.setQuerySalones()
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.salones}?qry=${JSON.stringify(this.vista.qry1)}`)
@@ -495,7 +513,6 @@ export default {
 
         setIntervalTimeAgo() {
             this.setTimeAgo()
-
             clearInterval(this.vista.intervalAgo)
 
             this.vista.intervalAgo = setInterval(() => {
@@ -574,7 +591,12 @@ export default {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
                 socio: 1,
-                venta_socio_datos: { nombres: 'CLIENTES VARIOS' },
+                venta_socio_datos: {
+                    doc_tipo: '1',
+                    doc_numero: '00000000',
+                    doc_nombres: '00000000 - CLIENTES VARIOS',
+                    nombres: 'CLIENTES VARIOS',
+                },
                 pago_condicion: 1,
                 estado: 1,
                 venta_entregado: false,
@@ -589,7 +611,7 @@ export default {
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 1
             vistaComanda.pedido = send
-            vistaComanda.socios = [{ id: 1, nombres: 'CLIENTES VARIOS' }]
+            vistaComanda.socios = [{ id: send.socio, ...send.venta_socio_datos }]
         },
 
         runMethod(method, item, item2) {
@@ -602,8 +624,13 @@ export default {
 
             if (res.code != 0) return
 
-            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
-            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+            let salon1
+            if (mesa) {
+                const salon_find = this.vista.salones.find((a) =>
+                    a.mesas.some((b) => b.id === mesa.id),
+                )
+                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+            }
 
             this.useVistas.showVista('vComanda', 'Editar comanda')
             const vistaComanda = this.useVistas.vComanda
@@ -652,6 +679,9 @@ export default {
             console.log(item)
         },
         async generarComprobante(item, mesa) {
+            // if (item.monto <= item.comprobantes_monto)
+            //     return jmsg('error', 'El pedido ya fue procesado')
+
             // this.useAuth.setLoading(true, 'Cargando...')
             // const resCaja = await get(`${urls.cajas}?filtros=${JSON.stringify({ abierto: true })}`)
             // this.useAuth.setLoading(false)
@@ -679,8 +709,13 @@ export default {
             this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante')
             const vistaEmitirComprobante = this.useVistas.vEmitirComprobante
 
-            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
-            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+            let salon1
+            if (mesa) {
+                const salon_find = this.vista.salones.find((a) =>
+                    a.mesas.some((b) => b.id === mesa.id),
+                )
+                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+            }
 
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)
@@ -690,6 +725,7 @@ export default {
                     receta_insumos: a.receta_insumos,
                     is_combo: a.is_combo,
                     combo_articulos: a.combo_articulos,
+                    venta_entregado: a.venta_entregado,
                     cantidadMax: a.cantidad - a.venta_entregado,
 
                     nombre: a.articulo1.nombre,
@@ -717,32 +753,30 @@ export default {
                 },
             }
 
-            vistaEmitirComprobante.socios = [
-                {
-                    id: res.data.socio,
-                    ...res.data.venta_socio_datos,
-                },
-            ]
+            vistaEmitirComprobante.socio = { id: res.data.socio, ...res.data.venta_socio_datos }
+            vistaEmitirComprobante.socios = [vistaEmitirComprobante.socio]
         },
         async verComprobantes(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socio_pedidos}/comprobantes/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const send = {
+                transaccion: item,
+                comprobantes: [],
+            }
 
             this.useModals.setModal(
                 'mPedidoComprobantes',
-                `Comprobantes - Pedido N° ${item.codigo}`,
+                `Comprobantes - Pedido N° ${item.venta_codigo}`,
+                null,
+                send,
                 true,
-                1,
-                res.data,
             )
         },
         async entregar(item) {
+            const resQst = await jqst('¿Está seguro de entregar el pedido?')
+            if (resQst.isConfirmed == false) return
+
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await patch(
-                `${urls.socio_pedidos}/entregar`,
+                `${urls.transacciones}/entregar`,
                 item,
                 'Pedido entregado con éxito',
             )
@@ -750,8 +784,7 @@ export default {
 
             if (res.code != 0) return
 
-            item.entregado = true
-            item.estado = 2
+            this.vista.pedidos.splice(item.i, 1, res.data)
         },
 
         async abrirComandaMesa(mesa) {
@@ -861,16 +894,22 @@ export default {
             // Si existe 'ocultar', evaluar condiciones para ocultar
             if (b.ocultar) {
                 for (const prop in b.ocultar) {
-                    const valorOcultar = b.ocultar[prop]
+                    const condicion = b.ocultar[prop]
                     const valorFila = a[prop]
 
                     if (valorFila === undefined) continue
 
-                    // Si el valor en ocultar es un array
-                    if (Array.isArray(valorOcultar)) {
-                        if (valorOcultar.includes(valorFila)) return false // se oculta
-                    } else {
-                        if (valorOcultar == valorFila) return false // se oculta
+                    // Caso 1: array
+                    if (Array.isArray(condicion)) {
+                        if (condicion.includes(valorFila)) return false // se oculta
+                    }
+                    // Caso 2: objeto con operador
+                    else if (typeof condicion === 'object' && condicion.op && 'val' in condicion) {
+                        if (this.comparar(valorFila, condicion.op, condicion.val)) return false
+                    }
+                    // Caso 3: valor simple
+                    else {
+                        if (condicion == valorFila) return false // se oculta
                     }
                 }
             }
@@ -880,6 +919,24 @@ export default {
 
             // Evaluar permiso si existe
             return this.useAuth.verifyPermiso(b.permiso)
+        },
+        comparar(a, op, b) {
+            switch (op) {
+                case '>':
+                    return a > b
+                case '<':
+                    return a < b
+                case '>=':
+                    return a >= b
+                case '<=':
+                    return a <= b
+                case '==':
+                    return a == b
+                case '!=':
+                    return a != b
+                default:
+                    return false
+            }
         },
     },
 }

@@ -170,7 +170,7 @@
                             v-model="vista.pedido.socio"
                             :spin="vista.spinSocios"
                             :lista="vista.socios || []"
-                            mostrar="nombres"
+                            mostrar="doc_nombres"
                             @search="loadSocios"
                             @elegir="setSocio"
                         />
@@ -202,6 +202,8 @@
                     </template>
 
                     <JdInput label="Observación" v-model="vista.pedido.observacion" />
+
+                    {{ vista.pedido.venta_socio_datos }}
                 </div>
 
                 <div class="pedido-foot">
@@ -400,7 +402,15 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombres: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['nombres', 'telefono', 'direccion', 'referencia'],
+                cols: [
+                    'nombres',
+                    'doc_tipo',
+                    'doc_numero',
+                    'doc_nombres',
+                    'telefono',
+                    'direccion',
+                    'referencia',
+                ],
             }
 
             this.vista.spinSocios = true
@@ -414,6 +424,9 @@ export default {
         setSocio(item) {
             if (item) {
                 this.vista.pedido.venta_socio_datos = {
+                    doc_tipo: item.doc_tipo,
+                    doc_numero: item.doc_numero,
+                    doc_nombres: item.doc_nombres,
                     nombres: item.nombres,
                     telefono: item.telefono,
                     direccion: item.direccion,
@@ -583,32 +596,33 @@ export default {
             if (res.code != 0) return
 
             const vistaPedidos = this.useVistas.vPedidos
+            if (vistaPedidos) vistaPedidos.reload = true
 
-            if (vistaPedidos) {
-                if (this.vista.pedido.venta_canal == 1) {
-                    const salon = vistaPedidos.salones.find((a) => a.id == vistaPedidos.salon)
-                    const mesa = salon.mesas.find((a) => a.id == this.vista.pedido.venta_mesa)
-                    mesa.pedido = res.data
+            // if (vistaPedidos) {
+            //     if (this.vista.pedido.venta_canal == 1) {
+            //         const salon = vistaPedidos.salones.find((a) => a.id == vistaPedidos.salon)
+            //         const mesa = salon.mesas.find((a) => a.id == this.vista.pedido.venta_mesa)
+            //         mesa.pedido = res.data
 
-                    vistaPedidos.mesaPendientes += 1
-                }
+            //         vistaPedidos.mesaPendientes += 1
+            //     }
 
-                if (this.vista.pedido.venta_canal == 2) {
-                    if (vistaPedidos.venta_canal == 2) {
-                        this.useVistas.addItem('vPedidos', 'pedidos', res.data)
-                    }
+            //     if (this.vista.pedido.venta_canal == 2) {
+            //         if (vistaPedidos.venta_canal == 2) {
+            //             this.useVistas.addItem('vPedidos', 'pedidos', res.data)
+            //         }
 
-                    vistaPedidos.llevarPendientes += 1
-                }
+            //         vistaPedidos.llevarPendientes += 1
+            //     }
 
-                if (this.vista.pedido.venta_canal == 3) {
-                    if (vistaPedidos.venta_canal == 3) {
-                        this.useVistas.addItem('vPedidos', 'pedidos', res.data)
-                    }
+            //     if (this.vista.pedido.venta_canal == 3) {
+            //         if (vistaPedidos.venta_canal == 3) {
+            //             this.useVistas.addItem('vPedidos', 'pedidos', res.data)
+            //         }
 
-                    vistaPedidos.deliveryPendientes += 1
-                }
-            }
+            //         vistaPedidos.deliveryPendientes += 1
+            //     }
+            // }
 
             // this.useVistas.vPedidos.reload = true
             this.useVistas.closePestana('vComanda', 'vPedidos')
@@ -631,9 +645,7 @@ export default {
 
             const vistaPedidos = this.useVistas.vPedidos
 
-            if (vistaPedidos) {
-                vistaPedidos.reload = true
-            }
+            if (vistaPedidos) vistaPedidos.reload = true
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },

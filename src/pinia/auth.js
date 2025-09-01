@@ -66,6 +66,23 @@ export const useAuth = defineStore('auth', {
                 ]
             },
             {
+                id: 'caja', label: 'Caja', icon: 'fa-solid fa-cash-register', children: [
+                    {
+                        label: 'Resumen', goto: 'vCajaResumen', permisos: [
+                            { id: 'vCajaResumen:ver', label: 'Ver resumen de caja' },
+                        ],
+                    },
+                    {
+                        label: 'Ingresos y egresos', goto: 'vCajaMovimientos', permisos: [
+                            { id: 'vCajaMovimientos:listar', label: 'Listar' },
+                            { id: 'vCajaMovimientos:crear', label: 'Crear' },
+                            { id: 'vCajaMovimientos:editar', label: 'Editar' },
+                            { id: 'vCajaMovimientos:eliminar', label: 'Eliminar' },
+                        ]
+                    }
+                ]
+            },
+            {
                 id: 'articulos', label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
                     {
                         label: 'Categorías', goto: 'vArticuloCategorias', permisos: [
