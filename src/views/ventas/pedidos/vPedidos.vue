@@ -1086,7 +1086,7 @@ export default {
     opacity: 0;
 }
 
-@media (max-width: 450px) {
+@media (max-width: 540px) {
     .container-mesas {
         gap: 1rem;
 

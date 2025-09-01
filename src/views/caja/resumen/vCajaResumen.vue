@@ -5,13 +5,6 @@
 
             <div class="buttons">
                 <JdButton
-                    text="Recuperar guardado"
-                    tipo="2"
-                    @click="recuperarGuardado()"
-                    v-if="useAuth.avances.mCompra && useAuth.verifyPermiso('vCajaResumen:crear')"
-                />
-
-                <JdButton
                     text="Aperturar caja"
                     @click="aperturar()"
                     v-if="useAuth.verifyPermiso('vCajaResumen:aperturar') && vista.caja_apertura == null"

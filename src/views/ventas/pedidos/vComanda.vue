@@ -35,10 +35,20 @@
                 <div class="container-categorias">
                     <div>
                         <strong>Categorias:</strong>
-                        <!-- <JdButton icon="fa-solid fa-arrows-rotate" @click="loadCategorias()" /> -->
                     </div>
+                    <select
+                        v-model="vista.categoria"
+                        @change="loadArticulos()"
+                        class="select-categoria"
+                        v-if="isSmallScreen"
+                    >
+                        <option :value="null">TODOS</option>
+                        <option v-for="(a, i) in vista.categorias" :key="i" :value="a.id">
+                            {{ a.nombre }}
+                        </option>
+                    </select>
 
-                    <ul class="categorias">
+                    <ul class="categorias" v-else>
                         <li
                             class="categoria max-1line"
                             :class="{ 'categoria-selected': vista.categoria == null }"
@@ -202,8 +212,7 @@
                     </template>
 
                     <JdInput label="Observación" v-model="vista.pedido.observacion" />
-
-                    {{ vista.pedido.venta_socio_datos }}
+                    <!-- {{ vista.pedido.venta_socio_datos }} -->
                 </div>
 
                 <div class="pedido-foot">
@@ -300,10 +309,16 @@ export default {
             const term = this.vista.txtBuscarArticulo.toLowerCase()
             return this.vista.articulos.filter((a) => a.nombre.toLowerCase().includes(term))
         },
+        isSmallScreen() {
+            if (this.vista.screenWidth == null) return false
+            return this.vista.screenWidth < 1000
+        },
     },
     async created() {
         this.vista = this.useVistas.vComanda
         this.vista.detalle = 1
+        this.handleResize()
+        // this.vista.screenWidth = window.innerWidth
 
         this.sumarItems()
         await this.loadEmpresa()
@@ -315,6 +330,12 @@ export default {
 
         await this.loadCategorias()
         this.loadArticulos()
+    },
+    mounted() {
+        window.addEventListener('resize', this.handleResize)
+    },
+    beforeUnmount() {
+        window.removeEventListener('resize', this.handleResize)
     },
     methods: {
         async loadColaboradores() {
@@ -376,8 +397,8 @@ export default {
                 cols: ['nombre', 'precio_venta', 'has_receta', 'is_combo', 'igv_afectacion'],
                 incl: ['receta_insumos', 'combo_articulos'],
             }
-
-            if (this.vista.categoria) {
+            console.log(this.vista.categoria)
+            if (this.vista.categoria != null) {
                 qry.fltr.categoria = { op: 'Es', val: this.vista.categoria }
             }
 
@@ -656,6 +677,10 @@ export default {
         regresar() {
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
+
+        handleResize() {
+            this.vista.screenWidth = window.innerWidth
+        },
     },
 }
 </script>
@@ -680,6 +705,11 @@ export default {
             grid-template-rows: auto 1fr;
             overflow: hidden;
             gap: 0.5rem;
+
+            select {
+                border-radius: 0.2rem;
+                border: var(--border);
+            }
 
             .categorias {
                 overflow-y: auto;
@@ -846,6 +876,7 @@ export default {
             grid-template-columns: 1fr;
             gap: 0.5rem;
             height: fit-content;
+            overflow-y: auto;
         }
 
         .pedido-foot {
@@ -875,6 +906,34 @@ export default {
                 .input-paga {
                     grid-column: 4/5;
                 }
+            }
+        }
+    }
+}
+
+@media (max-width: 1016px) {
+    .comanda {
+        .left {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+
+            .container-categorias {
+                height: fit-content;
+            }
+        }
+    }
+}
+
+@media (max-width: 540px) {
+    .comanda {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: 1fr 1fr;
+
+        .right {
+            .pedido-detalles {
+                height: auto;
+                overflow-y: auto;
             }
         }
     }

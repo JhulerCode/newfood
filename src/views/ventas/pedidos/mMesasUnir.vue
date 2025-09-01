@@ -254,7 +254,7 @@ export default {
     }
 }
 
-@media (max-width: 450px) {
+@media (max-width: 540px) {
     .body {
         grid-template-columns: minmax(100%, 33.5rem) !important;
     }

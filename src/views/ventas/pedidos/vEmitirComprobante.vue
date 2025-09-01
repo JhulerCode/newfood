@@ -35,7 +35,7 @@
             </div>
         </div>
 
-        <div class="container">
+        <div class="comanda">
             <div class="left">
                 <div class="datos">
                     <JdInput
@@ -678,7 +678,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.container {
+.comanda {
     height: 100%;
     overflow: hidden;
     display: grid;
