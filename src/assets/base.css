@@ -3,8 +3,10 @@
 :root {
     --primary-color: #2492c2;
     --primary-color-dark: #2083ae;
-    --verde: #3b973b;
-    --amarillo: #f0f046;
+    /* --verde: #3b973b; */
+    --verde: #34d16e;
+    /* --amarillo: #f0f046; */
+    --amarillo: #ffb22b;
     --rojo: #e94343;
 
     --bg-color: #ffffff;
@@ -17,7 +19,7 @@
     --text-color: black;
     /* --text-color2: #828282; */
     --text-color2: rgba(60, 60, 60, 0.66);
-    --text-color3: white;
+    --text-color3: #ffffff;
 
     --border: solid 1px #dfdfdf;
     --shadow-color: #d1d0d0;
@@ -35,6 +37,7 @@ body.dark-mode {
 
     --text-color: #ffffff;
     --text-color2: rgba(235, 235, 235, 0.64);
+    --text-color3: black;
 
     --border: solid 1px #333;
     --shadow-color: #333;

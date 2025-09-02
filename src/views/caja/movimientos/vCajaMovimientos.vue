@@ -149,7 +149,9 @@ export default {
     methods: {
         async loadCajaApertura() {
             const qry = {
-                fltr: { estado: { op: 'Es', val: '1' } },
+                fltr: {
+                    estado: { op: 'Es', val: '1' },
+                },
                 cols: ['fecha_apertura', 'monto_apertura'],
             }
 
@@ -165,6 +167,7 @@ export default {
             this.vista.qry = {
                 fltr: {
                     caja_apertura: { op: 'Es', val: this.vista.caja_apertura.id },
+                    operacion: { op: 'No es', val: '1' },
                 },
                 incl: ['pago_metodo1', 'comprobante1'],
             }

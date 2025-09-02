@@ -109,7 +109,6 @@ export default {
             margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
-            // align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
             border-bottom: var(--border);

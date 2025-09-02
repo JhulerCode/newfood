@@ -24,14 +24,16 @@
                 </li>
             </ul>
 
-            <JdButton
-                text="Nuevo"
-                backColor="primary-color"
-                color="text-color3"
-                @click="nuevo()"
-                v-if="useAuth.verifyPermiso('vPedidos:crear')"
-                style="margin-right: 1rem"
-            />
+            <div class="buttons">
+                <JdButton
+                    text="Nuevo"
+                    backColor="primary-color"
+                    color="text-color3"
+                    @click="nuevo()"
+                    style="margin-right: 1rem"
+                    v-if="useAuth.verifyPermiso('vPedidos:crear') && vista.venta_canal != 1"
+                />
+            </div>
         </div>
 
         <template v-if="vista.venta_canal == 1">

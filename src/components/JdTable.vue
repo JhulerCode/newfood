@@ -270,21 +270,25 @@
                             </template>
 
                             <template v-else-if="column.format">
-                                <div
-                                    class="estado"
-                                    :class="`${a[column.id] ? 'si' : 'no'}`"
-                                    v-if="column.format == 'yesno' && a[column.id] != null"
-                                >
-                                    {{ getNestedProp(a, column.prop) }}
-                                </div>
+                                <template v-if="column.format == 'yesno'">
+                                    <div
+                                        class="estado"
+                                        :class="`${a[column.id] ? 'si' : 'no'}`"
+                                        v-if="a[column.id] != null"
+                                    >
+                                        {{ getNestedProp(a, column.prop) }}
+                                    </div>
+                                </template>
 
-                                <div
-                                    class="estado"
-                                    :class="`${a[column.id] < 1 ? 'anulado' : a[column.id] < 2 ? 'abierto' : 'cerrado'}`"
-                                    v-if="column.format == 'estado' && a[column.id] != null"
-                                >
-                                    {{ getNestedProp(a, column.prop) }}
-                                </div>
+                                <template v-if="column.format == 'estado'">
+                                    <div
+                                        class="estado"
+                                        :class="`${a[column.id] < 1 ? 'anulado' : a[column.id] < 2 ? 'abierto' : 'cerrado'}`"
+                                        v-if="a[column.id] != null"
+                                    >
+                                        {{ getNestedProp(a, column.prop) }}
+                                    </div>
+                                </template>
 
                                 <template v-if="column.format == 'date'">
                                     <template v-if="column.prop">
@@ -351,6 +355,24 @@
                                         class="color-box"
                                         :style="{ background: a[column.id] }"
                                     ></div>
+                                </template>
+
+                                <template v-if="column.format == 'currency'">
+                                    <template v-if="column.prop">
+                                        <div
+                                            class="currency-box"
+                                            v-if="getNestedProp(a, column.prop)"
+                                        >
+                                            {{ column.moneda }}
+                                            {{ redondear(getNestedProp(a, column.prop)) }}
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div class="currency-box" v-if="a[column.id]">
+                                            <span>{{ column.moneda }}</span>
+                                            <span>{{ redondear(a[column.id]) }}</span>
+                                        </div>
+                                    </template>
                                 </template>
                             </template>
 
@@ -1009,6 +1031,11 @@ export default {
                     .color-box {
                         width: 2rem;
                         height: 1rem;
+                    }
+
+                    .currency-box {
+                        display: flex;
+                        justify-content: space-between;
                     }
                 }
 

@@ -54,7 +54,7 @@ export default {
         backgroundColor: { type: String, default: 'var(--bg-color)' },
         padding: { type: String, default: '1rem 1rem' },
         borderRadius: { type: String, default: '0.5rem' },
-        zIndex: { type: Number, default: 2 },
+        zIndex: { type: Number, default: 3 },
         buttons: Array,
 
         closeOnTimeOut: { type: Boolean, default: false },
