@@ -3,14 +3,7 @@
         <div class="head">
             <strong>Ingresos y egresos</strong>
 
-            <div class="buttons">
-                <JdButton
-                    text="Nuevo"
-                    title="Crear nuevo"
-                    @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaMovimientos:crear')"
-                />
-            </div>
+            <div class="buttons"></div>
         </div>
 
         <JdTable
@@ -18,6 +11,7 @@
             :columns="columns"
             :datos="vista.dinero_movimientos || []"
             :colAct="true"
+            :configFiltros="openConfigFiltros"
             :reload="loadMovimientos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
@@ -29,45 +23,40 @@
         </JdTable>
     </div>
 
-    <mCajaMovimiento v-if="useModals.show.mCajaMovimiento" />
+    <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
 import JdTable from '@/components/JdTable.vue'
-
-import mCajaMovimiento from './mCajaMovimiento.vue'
+import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
-import { redondear } from '@/utils/mine'
+import { urls, get } from '@/utils/crud'
+
 import dayjs from 'dayjs'
 
 export default {
     components: {
-        JdButton,
         JdTable,
-
-        mCajaMovimiento,
+        mConfigFiltros,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
-        redondear,
 
         vista: {},
 
-        tableName: 'vCajaMovimientos',
+        tableName: 'vDineroMovimientos',
         columns: [
             {
                 id: 'fecha',
                 title: 'Fecha',
                 format: 'date',
+                type: 'date',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -77,6 +66,7 @@ export default {
                 id: 'tipo',
                 title: 'Tipo',
                 prop: 'tipo1.nombre',
+                type: 'select',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -86,6 +76,7 @@ export default {
                 id: 'operacion',
                 title: 'Operación',
                 prop: 'operacion1.nombre',
+                type: 'select',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -95,6 +86,7 @@ export default {
                 id: 'pago_metodo',
                 title: 'Método de pago',
                 prop: 'pago_metodo1.nombre',
+                type: 'select',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -104,6 +96,7 @@ export default {
                 id: 'monto',
                 title: 'Monto',
                 format: 'decimal',
+                type: 'number',
                 toRight: true,
                 width: '10rem',
                 show: true,
@@ -115,64 +108,39 @@ export default {
                 title: 'Detalle',
                 slot: 'cDetalle',
                 width: '15rem',
+                filtrable: false,
                 show: true,
                 seek: false,
                 sort: false,
             },
         ],
-        tableRowOptions: [
-            // {
-            //     label: 'Editar',
-            //     icon: 'fa-solid fa-pen-to-square',
-            //     action: 'editar',
-            //     permiso: 'vCajaMovimientos:editar',
-            // },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vCajaMovimientos:eliminar',
-            },
-        ],
+        tableRowOptions: [],
     }),
     async created() {
-        this.vista = this.useVistas.vCajaMovimientos
+        this.vista = this.useVistas.vDineroMovimientos
+        this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        await this.loadCajaApertura()
-        if (this.useAuth.verifyPermiso('vCajaMovimientos:listar') == true) {
-            if (this.vista.caja_apertura) this.loadMovimientos()
-        }
+        if (this.useAuth.verifyPermiso('vDineroMovimientos:listar') == true) this.loadMovimientos()
     },
     methods: {
-        async loadCajaApertura() {
-            const qry = {
-                fltr: {
-                    estado: { op: 'Es', val: '1' },
-                },
-                cols: ['fecha_apertura', 'monto_apertura'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.caja_apertura = res.data[0]
+        initFiltros() {
+            this.columns[0].op = 'Está dentro de'
+            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD')
+            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
         },
         setQuery() {
             this.vista.qry = {
                 fltr: {
-                    caja_apertura: { op: 'Es', val: this.vista.caja_apertura.id },
-                    operacion: { op: 'No es', val: '1' },
+                    // operacion: { op: 'No es', val: '1' },
                 },
                 incl: ['pago_metodo1', 'comprobante1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            // this.vista.qry.cols.push('monto')
         },
         async loadMovimientos() {
             this.setQuery()
@@ -190,30 +158,52 @@ export default {
             this.vista.dinero_movimientos = res.data
         },
 
-        nuevo() {
-            const item = {
-                fecha: dayjs().format('YYYY-MM-DD'),
-                caja_apertura: this.vista.caja_apertura.id,
-                pago_metodo: 1,
+        async openConfigFiltros() {
+            await this.loadDatosSistema()
+            await this.loadPagoMetodos()
+
+            const cols = this.columns
+            cols.find((a) => a.id == 'tipo').lista = this.vista.caja_operacion_tipos
+            cols.find((a) => a.id == 'operacion').lista = this.vista.caja_operaciones
+            cols.find((a) => a.id == 'pago_metodo').lista = this.vista.pago_metodos
+
+            const send = {
+                table: this.tableName,
+                cols,
+                reload: this.loadMovimientos,
             }
 
-            this.useModals.setModal('mCajaMovimiento', 'Nueva categoría', 1, item)
+            this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
+        async loadDatosSistema() {
+            const qry = ['caja_operacion_tipos', 'caja_operaciones']
 
-        runMethod(method, item) {
-            this[method](item)
-        },
-        async eliminar(item) {
-            const resQst = await jqst('¿Está seguro de eliminar?')
-            if (resQst.isConfirmed == false) return
-
-            this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.dinero_movimientos, item)
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vCajaMovimientos', 'dinero_movimientos', item)
+            Object.assign(this.vista, res.data)
+        },
+        async loadPagoMetodos() {
+            const qry = {
+                fltr: {},
+                cols: ['nombre'],
+            }
+
+            this.vista.socios = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code !== 0) return
+
+            this.vista.pago_metodos = res.data
+        },
+
+        runMethod(method, item) {
+            this[method](item)
         },
     },
 }

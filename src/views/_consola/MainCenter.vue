@@ -20,6 +20,7 @@
         <vReporteComprobantes v-if="useVistas.show.vReporteComprobantes" />
         <VComprobantesDetallado v-if="useVistas.show.vComprobantesDetallado" />
         <vCajaAperturas v-if="useVistas.show.vCajaAperturas" />
+        <vDineroMovimientos v-if="useVistas.show.vDineroMovimientos" />
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
@@ -60,6 +61,7 @@ import vReportePedidos from '@/views/reportes/pedidos/vReportePedidos.vue'
 import vReporteComprobantes from '@/views/reportes/comprobantes/vReporteComprobantes.vue'
 import VComprobantesDetallado from '../reportes/comprobantes_detallado/vComprobantesDetallado.vue'
 import vCajaAperturas from '@/views/reportes/caja_aperturas/vCajaAperturas.vue'
+import vDineroMovimientos from '@/views/reportes/dinero_movimientos/vDineroMovimientos.vue'
 
 // ----- AJSUTES ----- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
@@ -93,6 +95,7 @@ export default {
         vReporteComprobantes,
         VComprobantesDetallado,
         vCajaAperturas,
+        vDineroMovimientos,
 
         vEmpresa,
         vColaboradores,

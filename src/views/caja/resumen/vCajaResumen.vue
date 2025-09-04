@@ -1,27 +1,39 @@
 <template>
     <div class="tablero">
         <div class="tablero-head">
-            <strong>Apertura y cierre</strong>
+            <strong>{{ vista.pasado == true ? 'Caja resumen' : 'Apertura y cierre' }}</strong>
 
-            <div class="buttons" v-if="vista.pasado != true">
-                <JdButton text="Reload" tipo="2" @click="loadCajaApertura()" />
+            <div class="buttons">
+                <template v-if="vista.pasado == true">
+                    <JdButton
+                        text="Regresar"
+                        icon="fa-solid fa-arrow-left"
+                        tipo="2"
+                        @click="regresar()"
+                    />
+                </template>
 
-                <JdButton
-                    text="Aperturar caja"
-                    @click="aperturar()"
-                    v-if="
-                        useAuth.verifyPermiso('vCajaResumen:aperturar') &&
-                        vista.caja_apertura == null
-                    "
-                />
+                <template v-else>
+                    <JdButton text="Reload" tipo="2" @click="loadCajaApertura()" />
 
-                <JdButton
-                    text="Cerrar caja"
-                    @click="cerrar()"
-                    v-if="
-                        useAuth.verifyPermiso('vCajaResumen:cerrar') && vista.caja_apertura != null
-                    "
-                />
+                    <JdButton
+                        text="Aperturar caja"
+                        @click="aperturar()"
+                        v-if="
+                            useAuth.verifyPermiso('vCajaResumen:aperturar') &&
+                            vista.caja_apertura == null
+                        "
+                    />
+
+                    <JdButton
+                        text="Cerrar caja"
+                        @click="cerrar()"
+                        v-if="
+                            useAuth.verifyPermiso('vCajaResumen:cerrar') &&
+                            vista.caja_apertura != null
+                        "
+                    />
+                </template>
             </div>
         </div>
 
@@ -162,7 +174,7 @@
             <div class="second" v-if="vista.resumen">
                 <div class="card">
                     <div class="card-head">
-                        <p>Ingresos</p>
+                        <p>Otros ingresos</p>
 
                         <div class="monto-resumen">
                             <span
@@ -234,13 +246,13 @@
                 </div>
 
                 <div class="card">
-                    <!-- <div class="icon" style="background-color: var(--verde);">
-                        <i class="fa-solid fa-coins"></i>
+                    <div class="icon" style="background-color: var(--verde)">
+                        <i class="fa-solid fa-note-sticky"></i>
                     </div>
                     <div>
-                        <span>S/ {{ redondear(vista.resumen.ventas_total) }}</span>
-                        <p>Anulaciones</p>
-                    </div> -->
+                        <span>S/ {{ redondear(vista.resumen.venta_canales_total) }}</span>
+                        <p>Pedidos</p>
+                    </div>
                 </div>
             </div>
 
@@ -261,11 +273,11 @@
 
                 <div class="card">
                     <div class="card-head">
-                        <p>Canales</p>
+                        <p>Tipos de comprobante</p>
                     </div>
 
                     <JdTable
-                        :datos="vista.resumen.venta_canales || []"
+                        :datos="vista.resumen.venta_comprobantes || []"
                         :columns="columnsPagoMetodos"
                         :seeker="false"
                         :download="false"
@@ -275,11 +287,11 @@
 
                 <div class="card">
                     <div class="card-head">
-                        <p>Tipos de comprobante</p>
+                        <p>Canales</p>
                     </div>
 
                     <JdTable
-                        :datos="vista.resumen.venta_comprobantes || []"
+                        :datos="vista.resumen.venta_canales || []"
                         :columns="columnsPagoMetodos"
                         :seeker="false"
                         :download="false"
@@ -342,6 +354,27 @@
                         :seeker="false"
                         :download="false"
                         height="20rem"
+                    />
+                </div>
+            </div>
+
+            <div class="second" v-if="vista.resumen">
+                <div class="card">
+                    <div class="card-head">
+                        <p>Pedidos anulados</p>
+
+                        <div class="monto-resumen">
+                            <span>S/ {{ redondear(vista.resumen.pedidos_anulados_total) }}</span>
+                            <p>Total</p>
+                        </div>
+                    </div>
+
+                    <JdTable
+                        :datos="vista.resumen.pedidos_anulados || []"
+                        :columns="columnsPedidosAnulados"
+                        :seeker="false"
+                        :download="false"
+                        height="15rem"
                     />
                 </div>
             </div>
@@ -524,6 +557,33 @@ export default {
                 sort: true,
             },
         ],
+
+        columnsPedidosAnulados: [
+            {
+                id: 'venta_codigo',
+                title: 'Nro pedido',
+                width: '12rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'venta_canal',
+                title: 'Canal',
+                width: '10rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'monto',
+                title: 'Monto',
+                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+        ],
     }),
     async created() {
         this.vista = this.useVistas.vCajaResumen
@@ -580,9 +640,7 @@ export default {
         },
         async loadResumen() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(
-                `${urls.dinero_movimientos}/resumen/${this.vista.caja_apertura.id}`,
-            )
+            const res = await get(`${urls.caja_aperturas}/resumen/${this.vista.caja_apertura.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -592,6 +650,10 @@ export default {
         cajaAperturada(item) {
             this.vista.caja_apertura = item
             this.loadResumen()
+        },
+
+        regresar() {
+            this.useVistas.closePestana('vCajaResumen', 'vCajaAperturas')
         },
     },
 }
@@ -774,7 +836,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1.2fr;
     gap: 2rem;
-    // margin-bottom: 2rem;
+    margin-bottom: 2rem;
 }
 
 @media (max-width: 540px) {

@@ -29,16 +29,12 @@
 
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
 
-    <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
-    <mAnular v-if="useModals.show.mAnular" />
 </template>
 
 <script>
 import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
 
-import mConfigCols from '@/components/mConfigCols.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
 
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
@@ -54,8 +50,6 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdTable,
-        mAnular,
-        mConfigCols,
         mConfigFiltros,
 
         mPedidoComprobantes,

@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Caja chica</strong>
+            <strong>Aperturas de caja</strong>
 
             <div class="buttons"></div>
         </div>
@@ -35,6 +35,8 @@ import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
 
+import dayjs from 'dayjs'
+
 export default {
     components: {
         JdTable,
@@ -51,16 +53,6 @@ export default {
 
         tableName: 'vCajaAperturas',
         columns: [
-            {
-                id: 'createdBy',
-                title: 'Aperturado por',
-                prop: 'createdBy1.nombres_apellidos',
-                type: 'select',
-                width: '15rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
             {
                 id: 'fecha_apertura',
                 title: 'Fecha apertura',
@@ -81,6 +73,16 @@ export default {
                 show: true,
                 seek: false,
                 sort: false,
+            },
+            {
+                id: 'createdBy',
+                title: 'Aperturado por',
+                prop: 'createdBy1.nombres_apellidos',
+                type: 'select',
+                width: '15rem',
+                show: true,
+                seek: true,
+                sort: true,
             },
             {
                 id: 'fecha_cierre',
@@ -117,22 +119,32 @@ export default {
         ],
         tableRowOptions: [
             {
-                id: 1,
                 label: 'Ver resumen',
                 icon: 'fa-solid fa-up-right-from-square',
                 action: 'verResumen',
                 permiso: 'vCajaAperturas:verResumen',
             },
+            {
+                label: 'Imprimir resumen',
+                icon: 'fa-solid fa-print',
+                action: 'imprimirResumen',
+                permiso: 'vCajaAperturas:imprimirResumen',
+            }
         ],
     }),
     created() {
         this.vista = this.useVistas.vCajaAperturas
+        this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vCajaAperturas:listar') == true) this.loadCajaAperturas()
     },
     methods: {
+        initFiltros() {
+            this.columns[0].op = 'Es posterior a'
+            this.columns[0].val = dayjs().startOf('month').format('YYYY-MM-DD HH:mm:ss')
+        },
         setQuery() {
             this.vista.qry = {
                 fltr: {},
@@ -179,6 +191,9 @@ export default {
                 pasado: true,
             }
             this.useVistas.showVista('vCajaResumen', 'Caja resumen', send)
+        },
+        imprimirResumen(item) {
+            console.log(item)
         },
 
         async loadDatosSistema() {

@@ -146,8 +146,8 @@ export const useAuth = defineStore('auth', {
                     {
                         label: 'Pedidos', goto: 'vReportePedidos', permisos: [
                             { id: 'vReportePedidos:listar', label: 'Listar' },
-                            { id: 'vReportePedidos:imprimirComanda', label: 'Listar' },
-                            { id: 'vReportePedidos:verComprobantes', label: 'Listar' },
+                            { id: 'vReportePedidos:imprimirComanda', label: 'Imprimir comanda' },
+                            { id: 'vReportePedidos:verComprobantes', label: 'Ver comprobantes' },
                         ]
                     },
                     {
@@ -174,6 +174,12 @@ export const useAuth = defineStore('auth', {
                         label: 'Aperturas de caja', goto: 'vCajaAperturas', permisos: [
                             { id: 'vCajaAperturas:listar', label: 'Listar' },
                             { id: 'vCajaAperturas:verResumen', label: 'Ver resumen' },
+                            { id: 'vCajaAperturas:imprimirResumen', label: 'Imprimir resumen' },
+                        ]
+                    },
+                    {
+                        label: 'Ingresos y egresos', goto: 'vDineroMovimientos', permisos: [
+                            { id: 'vDineroMovimientos:listar', label: 'Listar' },
                         ]
                     }
                 ]
