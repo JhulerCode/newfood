@@ -35,7 +35,6 @@
             :datos="vista.articulos || []"
             :colAct="true"
             :configRowSelect="true"
-            :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
             :actions="tableActions"
@@ -45,6 +44,7 @@
             ref="jdtable"
         >
         </JdTable>
+        <!-- :configCols="true" -->
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
@@ -77,6 +77,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
+import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -320,13 +321,7 @@ export default {
                     tipo: 1,
                     articulos: res.data,
                 }
-                this.useModals.setModal(
-                    'mImportarArticulos',
-                    'Importar insumos',
-                    null,
-                    send,
-                    true,
-                )
+                this.useModals.setModal('mImportarArticulos', 'Importar insumos', null, send, true)
             }
             reader.readAsArrayBuffer(file)
         },
@@ -449,23 +444,23 @@ export default {
 
             this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
         },
-        // async ajusteStock(item) {
-        //     const send = {
-        //         transaccion: {
-        //             fecha: dayjs().format('YYYY-MM-DD'),
-        //             articulo: item.id,
-        //         },
-        //         articulo1: {
-        //             igv_afectacion: item.igv_afectacion,
-        //             has_fv: item.has_fv,
-        //         },
-        //         articulos: [{ id: item.id, nombre: item.nombre }],
-        //         articulo_tipo: 1,
-        //         is_nuevo_lote: false,
-        //     }
+        async ajusteStock(item) {
+            const send = {
+                transaccion: {
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    articulo: item.id,
+                },
+                articulo1: {
+                    igv_afectacion: item.igv_afectacion,
+                    has_fv: item.has_fv,
+                },
+                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulo_tipo: 1,
+                // is_nuevo_lote: false,
+            }
 
-        //     this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        // },
+            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+        },
 
         async loadCategorias() {
             const qry = {

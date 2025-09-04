@@ -734,9 +734,7 @@ export default {
         }
 
         .container-pagos {
-            // height: 14rem;
             overflow-y: hidden;
-            // border: var(--border);
             display: grid;
             grid-template-rows: auto 1fr;
             border-radius: 0.3rem;
@@ -764,45 +762,6 @@ export default {
                     border-radius: 0.5rem;
                 }
             }
-
-            // .cuerpo {
-            //     padding: 1rem;
-            //     display: grid;
-            //     grid-template-columns: 50% 50%;
-            //     overflow-y: hidden;
-
-            //     .agregar {
-            //         display: flex;
-            //         flex-direction: column;
-            //         gap: 0.5rem;
-            //         margin-right: 2rem;
-
-            //         .txt-monto {
-            //             display: flex;
-            //             gap: 0.5rem;
-            //         }
-            //     }
-
-            //     .right {
-            //         display: grid;
-            //         grid-template-rows: auto 1fr;
-            //         gap: 1rem;
-            //         overflow-y: hidden;
-
-            //         .por_pagar {
-            //             display: grid;
-            //             grid-template-columns: repeat(4, 1fr);
-            //             align-items: center;
-            //             padding: 0.5rem;
-            //             background-color: var(--bg-color2);
-            //             border-radius: 0.3rem;
-
-            //             p {
-            //                 font-size: 1.5rem;
-            //             }
-            //         }
-            //     }
-            // }
         }
 
         .container-credito {

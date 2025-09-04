@@ -80,6 +80,8 @@
                         :lista="vistas"
                         mostrar="label"
                         :disabled="modal.mode == 3"
+                        groupBy="menu"
+                        @elegir="asd"
                     />
 
                     <JdInput
@@ -213,7 +215,7 @@ export default {
     computed: {
         vistas() {
             return this.useAuth.menu
-                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label })))
+                .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
         },
     },
@@ -373,6 +375,9 @@ export default {
                 }
             }
         },
+        asd(item) {
+            console.log(item)
+        },
     },
 }
 </script>
@@ -442,7 +447,8 @@ export default {
 }
 
 @media (max-width: 540px) {
-    .container-datos, .right .container-accesos {
+    .container-datos,
+    .right .container-accesos {
         grid-template-columns: minmax(100%, 33.5rem) !important;
     }
 }

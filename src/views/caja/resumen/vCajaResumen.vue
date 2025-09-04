@@ -1,35 +1,10 @@
 <template>
-    <!-- <div class="vista">
-        <div class="card-head">
-            <strong>Caja resumen</strong>
-
-            <div class="buttons">
-                <JdButton
-                    text="Aperturar caja"
-                    @click="aperturar()"
-                    v-if="
-                        useAuth.verifyPermiso('vCajaResumen:aperturar') &&
-                        vista.caja_apertura == null
-                    "
-                />
-
-                <JdButton
-                    text="Cerrar caja"
-                    @click="cerrar()"
-                    v-if="
-                        useAuth.verifyPermiso('vCajaResumen:cerrar') && vista.caja_apertura != null
-                    "
-                />
-
-            </div>
-        </div>
-    </div> -->
     <div class="tablero">
         <div class="tablero-head">
-            <strong>Caja resumen</strong>
+            <strong>Apertura y cierre</strong>
 
-            <div class="buttons">
-                <JdButton text="Reload" tipo="2" @click="loadResumen()" />
+            <div class="buttons" v-if="vista.pasado != true">
+                <JdButton text="Reload" tipo="2" @click="loadCajaApertura()" />
 
                 <JdButton
                     text="Aperturar caja"
@@ -51,22 +26,30 @@
         </div>
 
         <div class="tablero-body">
+            <div class="first" v-if="vista.caja_apertura == null">
+                <div class="card caja">
+                    <div class="card-head" :style="{ 'background-color': 'var(--rojo)' }">
+                        CERRADO
+                    </div>
+                </div>
+
+                <div class="empty">
+                    <i class="fa-solid fa-ghost"></i>
+                    <p>Aperture la caja</p>
+                    <span> No podrá generar pedidos ni hacer cobranzas de las ventas </span>
+                </div>
+            </div>
+
             <div class="first" v-if="vista.resumen">
                 <div class="card caja">
-                    <div
-                        class="card-head"
-                        :style="{
-                            'background-color':
-                                vista.caja_apertura.estado == 1 ? 'var(--verde)' : 'var(--rojo)',
-                        }"
-                    >
+                    <div class="card-head" :style="{ 'background-color': 'var(--verde)' }">
                         <!-- <span>{{ caja }}</span> -->
-                        <p>{{ vista.caja_apertura.estado1.nombre }}</p>
+                        ABIERTO
                     </div>
 
                     <div class="dato">
                         <span>Usuario</span>
-                        <p>{{ vista.caja_apertura.createdBy1.nombres_apellidos }}</p>
+                        <p>{{ vista.caja_apertura.createdBy1?.nombres_apellidos }}</p>
                     </div>
 
                     <div class="dato">
@@ -365,7 +348,11 @@
         </div>
     </div>
 
-    <mCajaAperturar v-if="useModals.show.mCajaAperturar" />
+    <mCajaAperturar
+        v-if="useModals.show.mCajaAperturar"
+        @aperturado="cajaAperturada"
+        @cerrado="((vista.caja_apertura = null), (vista.resumen = null))"
+    />
 </template>
 
 <script>
@@ -540,25 +527,12 @@ export default {
     }),
     async created() {
         this.vista = this.useVistas.vCajaResumen
-        this.vista.ventas_totales = [
-            {
-                label: 'Ventas en efectivo',
-                value: 0,
-                info: 'No incluye apertura de caja',
-            },
-            {
-                label: 'Ventas OMP',
-                value: 0,
-                info: 'Incluye tarjetas y otros medio de pago',
-            },
-            {
-                label: 'Total de ventas',
-                value: 0,
-                // info: 'Incluye descuentos, comisión delivery',
-            },
-        ]
 
-        if (this.vista.loaded) return
+        if (this.vista.caja_apertura) {
+            this.loadResumen()
+            return
+        }
+
         if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true) await this.loadCajaApertura()
     },
     methods: {
@@ -596,6 +570,11 @@ export default {
                 id: this.vista.caja_apertura.id,
                 fecha_cierre: dayjs().format('YYYY-MM-DD HH:mm:ss'),
                 caja: 1,
+                caja_total: redondear(
+                    Number(this.vista.caja_apertura.monto_apertura) +
+                        this.vista.resumen.efectivo_ingresos_total -
+                        this.vista.resumen.efectivo_egresos_total,
+                ),
             }
             this.useModals.setModal('mCajaAperturar', 'Cerrar caja', 2, send)
         },
@@ -609,6 +588,10 @@ export default {
             if (res.code != 0) return
 
             this.vista.resumen = res.data
+        },
+        cajaAperturada(item) {
+            this.vista.caja_apertura = item
+            this.loadResumen()
         },
     },
 }
@@ -698,9 +681,9 @@ export default {
             align-items: center;
             border-radius: 0.5rem;
 
-            * {
-                color: var(--text-color3);
-            }
+            color: var(--text-color3);
+            // * {
+            // }
         }
 
         .dato {
@@ -731,6 +714,22 @@ export default {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             margin-top: 1.5rem;
+        }
+    }
+
+    .empty {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+
+        p {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        span {
+            color: var(--text-color2);
         }
     }
 }

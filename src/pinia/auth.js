@@ -68,7 +68,7 @@ export const useAuth = defineStore('auth', {
             {
                 id: 'caja', label: 'Caja', icon: 'fa-solid fa-cash-register', children: [
                     {
-                        label: 'Caja resumen', goto: 'vCajaResumen', permisos: [
+                        label: 'Apertura y cierre', goto: 'vCajaResumen', permisos: [
                             { id: 'vCajaResumen:ver', label: 'Ver resumen' },
                             { id: 'vCajaResumen:aperturar', label: 'Aperturar caja' },
                             { id: 'vCajaResumen:cerrar', label: 'Cerrar caja' },
@@ -142,6 +142,43 @@ export const useAuth = defineStore('auth', {
                 ]
             },
             {
+                id: 'reportes', label: 'Reportes', icon: 'fa-solid fa-chart-line', children: [
+                    {
+                        label: 'Pedidos', goto: 'vReportePedidos', permisos: [
+                            { id: 'vReportePedidos:listar', label: 'Listar' },
+                            { id: 'vReportePedidos:imprimirComanda', label: 'Listar' },
+                            { id: 'vReportePedidos:verComprobantes', label: 'Listar' },
+                        ]
+                    },
+                    {
+                        label: 'Comprobantes', goto: 'vReporteComprobantes', permisos: [
+                            { id: 'vReporteComprobantes:listar', label: 'Listar' },
+                            { id: 'vReporteComprobantes:anular', label: 'Anular' },
+                            { id: 'vReporteComprobantes:canjear', label: 'Canjear' },
+                            { id: 'vReporteComprobantes:verPagos', label: 'Ver pagos' },
+                            { id: 'vReporteComprobantes:agregarPagos', label: 'Agregar pagos' },
+                            { id: 'vReporteComprobantes:editarPagos', label: 'Editar pagos' },
+                            { id: 'vReporteComprobantes:enviarCorreo', label: 'Enviar por email' },
+                            { id: 'vReporteComprobantes:imprimir', label: 'Imprimir' },
+                            { id: 'vReporteComprobantes:descargarPdf', label: 'Descargar PDF' },
+                            { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },
+                            { id: 'vReporteComprobantes:descargarCdr', label: 'Descargar CDR' },
+                        ]
+                    },
+                    {
+                        label: 'Comprobantes detallado', goto: 'vComprobantesDetallado', permisos: [
+                            { id: 'vComprobantesDetallado:listar', label: 'Listar' },
+                        ]
+                    },
+                    {
+                        label: 'Aperturas de caja', goto: 'vCajaAperturas', permisos: [
+                            { id: 'vCajaAperturas:listar', label: 'Listar' },
+                            { id: 'vCajaAperturas:verResumen', label: 'Ver resumen' },
+                        ]
+                    }
+                ]
+            },
+            {
                 id: 'ajustes', label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
                     {
                         label: 'Empresa', goto: 'vEmpresa', permisos: [
@@ -172,15 +209,14 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
-                    // { label: 'Impresoras', goto: 'vImpresoras' },
-                    {
-                        label: 'Cajas', goto: 'vCajas', permisos: [
-                            { id: 'vCajas:listar', label: 'Listar' },
-                            { id: 'vCajas:crear', label: 'Crear' },
-                            { id: 'vCajas:editar', label: 'Editar' },
-                            { id: 'vCajas:eliminar', label: 'Eliminar' },
-                        ]
-                    },
+                    // {
+                    //     label: 'Cajas', goto: 'vCajas', permisos: [
+                    //         { id: 'vCajas:listar', label: 'Listar' },
+                    //         { id: 'vCajas:crear', label: 'Crear' },
+                    //         { id: 'vCajas:editar', label: 'Editar' },
+                    //         { id: 'vCajas:eliminar', label: 'Eliminar' },
+                    //     ]
+                    // },
                     {
                         label: 'Áreas de producción', goto: 'vProduccionAreas', permisos: [
                             { id: 'vProduccionAreas:listar', label: 'Listar' },
@@ -254,7 +290,7 @@ export const useAuth = defineStore('auth', {
             useModals().initVars()
         },
         verifyPermiso(...permisos) {
-            // return this.usuario?.permisos?.includes(permiso)
+            // console.log(permisos)
             return permisos.some(p => this.usuario?.permisos?.includes(p))
         },
 

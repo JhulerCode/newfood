@@ -8,13 +8,18 @@
         <vComanda v-if="useVistas.show.vComanda" />
         <vEmitirComprobante v-if="useVistas.show.vEmitirComprobante" />
 
-        <vCajaResumen v-if="useVistas.show.vCajaResumen"/>
+        <vCajaResumen v-if="useVistas.show.vCajaResumen" />
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
 
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInsumos v-if="useVistas.show.vInsumos" />
         <vProductos v-if="useVistas.show.vProductos" />
         <vCombos v-if="useVistas.show.vCombos" />
+
+        <vReportePedidos v-if="useVistas.show.vReportePedidos" />
+        <vReporteComprobantes v-if="useVistas.show.vReporteComprobantes" />
+        <VComprobantesDetallado v-if="useVistas.show.vComprobantesDetallado" />
+        <vCajaAperturas v-if="useVistas.show.vCajaAperturas" />
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
@@ -50,6 +55,12 @@ import vInsumos from '@/views/articulos/insumos/vInsumos.vue'
 import vProductos from '@/views/articulos/productos/vProductos.vue'
 import vCombos from '@/views/articulos/combos/vCombos.vue'
 
+// ----- REPORTES ----- //
+import vReportePedidos from '@/views/reportes/pedidos/vReportePedidos.vue'
+import vReporteComprobantes from '@/views/reportes/comprobantes/vReporteComprobantes.vue'
+import VComprobantesDetallado from '../reportes/comprobantes_detallado/vComprobantesDetallado.vue'
+import vCajaAperturas from '@/views/reportes/caja_aperturas/vCajaAperturas.vue'
+
 // ----- AJSUTES ----- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
@@ -77,6 +88,11 @@ export default {
         vInsumos,
         vProductos,
         vCombos,
+
+        vReportePedidos,
+        vReporteComprobantes,
+        VComprobantesDetallado,
+        vCajaAperturas,
 
         vEmpresa,
         vColaboradores,

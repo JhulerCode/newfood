@@ -158,7 +158,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mPagoMetodo', 'Editar metodo de pago', 2, res.data)
+            this.useModals.setModal('mPagoComprobante', 'Editar método de pago', 2, res.data)
         },
     },
 }

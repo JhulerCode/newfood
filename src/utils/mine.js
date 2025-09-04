@@ -229,14 +229,6 @@ async function downloadExcel(columns, datos = [], nombre = `${Date.now()}.xlsx`)
     saveAs(blob, nombre)
 }
 
-// function selectRow(item, many = true) {
-//     if (many == false) {
-//         console.log(1)
-//     }
-
-//     item.selected = !item.selected
-// }
-
 function obtenerNumeroJuliano(fecha = new Date()) {
     // Convert string date to Date object if needed
     if (typeof fecha === 'string') {
@@ -265,10 +257,6 @@ function getNestedProp(obj, prop) {
 
     return result === undefined || result === null ? '' : result
 }
-
-// function runMethod() {
-
-// }
 
 export {
     playAudio,

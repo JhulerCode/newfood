@@ -35,7 +35,6 @@
             :datos="vista.articulos || []"
             :colAct="true"
             :configRowSelect="true"
-            :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
             :actions="tableActions"
@@ -43,8 +42,9 @@
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
-        >
+            >
         </JdTable>
+        <!-- :configCols="true" -->
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
@@ -521,7 +521,7 @@ export default {
                     has_fv: item.has_fv,
                 },
                 articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 1,
+                articulo_tipo: 2,
                 // is_nuevo_lote: false,
             }
 

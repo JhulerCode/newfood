@@ -17,14 +17,13 @@
             :columns="columns"
             :datos="vista.socios || []"
             :colAct="true"
-            :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadSocios"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            ref="jdtable"
         >
         </JdTable>
+        <!-- :configCols="true" -->
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />

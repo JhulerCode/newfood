@@ -197,7 +197,7 @@ export default {
         columns: [
             {
                 id: 'venta_codigo',
-                title: 'Nro comanda',
+                title: 'Nro pedido',
                 width: '10rem',
                 show: true,
                 seek: true,
@@ -326,7 +326,12 @@ export default {
                 icon: 'fa-solid fa-flag-checkered',
                 action: 'entregar',
                 permiso: 'vPedidos:entregar',
-                ocultar: { estado: 0, venta_canal: 1, venta_facturado: false, venta_entregado: true },
+                ocultar: {
+                    estado: 0,
+                    venta_canal: 1,
+                    venta_facturado: false,
+                    venta_entregado: true,
+                },
             },
             {
                 label: 'Cambiar mesa',
@@ -336,58 +341,6 @@ export default {
                 ocultar: { estado: 0, venta_canal: ['2', '3'] },
             },
         ],
-
-        // tableRowOptions1: [
-        //     {
-        //         label: 'Editar',
-        //         icon: 'fa-solid fa-pen-to-square',
-        //         action: 'editar',
-        //         permiso: 'vPedidos:editar',
-        //         ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
-        //     },
-        //     {
-        //         label: 'Anular',
-        //         icon: 'fa-solid fa-ban',
-        //         action: 'anular',
-        //         permiso: 'vPedidos:anular',
-        //         ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
-        //     },
-        //     {
-        //         label: 'Imprimir comanda',
-        //         icon: 'fa-solid fa-print',
-        //         action: 'imprimir',
-        //         permiso: 'vPedidos:imprimirComanda',
-        //     },
-        //     {
-        //         label: 'Imprimir precuenta',
-        //         icon: 'fa-solid fa-print',
-        //         action: 'imprimir',
-        //         permiso: 'vPedidos:imprimirPrecuenta',
-        //         ocultar: { estado: 0 },
-        //     },
-        //     {
-        //         label: 'Generar comprobante',
-        //         icon: 'fa-solid fa-file-invoice',
-        //         action: 'generarComprobante',
-        //         permiso: 'vPedidos:generarComprobante',
-        //         ocultar: { estado: 0, venta_facturado: true },
-        //     },
-        //     {
-        //         label: 'Ver comprobantes',
-        //         icon: 'fa-solid fa-up-right-from-square',
-        //         action: 'verComprobantes',
-        //         permiso: 'vPedidos:verComprobantes',
-        //         ocultar: { estado: 0 },
-        //     },
-        //     {
-        //         label: 'Cambiar mesa',
-        //         icon: 'fa-solid fa-arrows-up-down-left-right',
-        //         action: 'openCambiarMesa',
-        //         permiso: 'vPedidos:cambiarMesa',
-        //         ocultar: { estado: 0 },
-        //     },
-        // ],
-
         optionsCaseItem: {},
     }),
     computed: {
@@ -434,6 +387,7 @@ export default {
             this.vista.qry = {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
+                    estado: { op: 'Es', val: '1' },
                     venta_canal: {
                         op: 'Es',
                         val: this.vista.venta_canal.toString(),
@@ -448,8 +402,8 @@ export default {
             this.vista.qry.cols.push('createdAt', 'venta_entregado', 'venta_canal')
 
             if (this.vista.venta_canal == 1) {
-                this.vista.qry.fltr.estado = { op: 'Es', val: '1' }
-                this.vista.qry.fltr.venta_entregado = { op: 'Es', val: false }
+                // this.vista.qry.fltr.estado = { op: 'Es', val: '1' }
+                // this.vista.qry.fltr.venta_entregado = { op: 'Es', val: false }
                 this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.incl.push('venta_mesa1')
                 // } else {
@@ -681,27 +635,6 @@ export default {
             console.log(item)
         },
         async generarComprobante(item, mesa) {
-            // if (item.monto <= item.comprobantes_monto)
-            //     return jmsg('error', 'El pedido ya fue procesado')
-
-            // this.useAuth.setLoading(true, 'Cargando...')
-            // const resCaja = await get(`${urls.cajas}?filtros=${JSON.stringify({ abierto: true })}`)
-            // this.useAuth.setLoading(false)
-
-            // if (resCaja.code != 0) return
-
-            // if (resCaja.data.length == 0) {
-            //     jmsg('warning', 'Ninguna caja aperturada')
-
-            //     const item = {
-            //         moneda: 1,
-            //         monto: null,
-            //         abierto: true,
-            //     }
-
-            //     this.useModals.setModal('AperturarCaja', `Aperturar caja`, true, 1, item)
-            // }
-            // else {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
             this.useAuth.setLoading(false)

@@ -109,11 +109,11 @@ export default {
 
             const qry = {
                 fltr: {
-                    tipo: { op: 'Es', val: this.modal.articulo_tipo },
+                    tipo: { op: 'Es', val: this.modal.articulo_tipo.toString() },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['unidad', 'igv_afectacion', 'has_fv'],
+                cols: ['nombre', 'unidad', 'igv_afectacion'],
             }
 
             this.modal.spinArticulos = true

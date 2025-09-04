@@ -18,14 +18,13 @@
             :columns="columns"
             :datos="vista.articulos || []"
             :colAct="true"
-            :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            ref="jdtable"
         >
         </JdTable>
+        <!-- :configCols="true" -->
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />

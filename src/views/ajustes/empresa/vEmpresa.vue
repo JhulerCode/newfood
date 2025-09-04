@@ -12,35 +12,90 @@
             </div>
         </div>
 
-        <div class="containder-datos">
-            <JdInput label="RUC" :nec="true" v-model="vista.empresa.ruc" />
-            <JdInput
-                label="Nombre comercial"
-                :nec="true"
-                v-model="vista.empresa.nombre"
-                style="grid-column: 1/3"
-            />
-            <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
-            <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
-            <JdInput
-                label="Direccion"
-                :nec="true"
-                v-model="vista.empresa.direccion"
-                style="grid-column: 1/3"
-            />
-            <JdInput label="Pc principal" :nec="true" v-model="vista.empresa.pc_principal_ip" />
-            <JdInput
-                label="Impuesto"
-                :nec="true"
-                type="number"
-                v-model="vista.empresa.igv_porcentaje"
-            />
+        <div class="container-datos">
+            <div class="datos-fiscales">
+                <JdInput
+                    label="RUC"
+                    :nec="true"
+                    v-model="vista.empresa.ruc"
+                    style="grid-column: 1/3"
+                />
 
-            <JdButton
-                text="Modificar"
-                @click="modificar"
-                v-if="useAuth.verifyPermiso('vEmpresa:editar')"
-            />
+                <JdInput
+                    label="Razón social"
+                    :nec="true"
+                    v-model="vista.empresa.razon_social"
+                    style="grid-column: 1/5"
+                />
+
+                <JdInput
+                    label="Nombre comercial"
+                    :nec="true"
+                    v-model="vista.empresa.nombre_comercial"
+                    style="grid-column: 1/5"
+                />
+
+                <JdInput
+                    label="Domicilio fiscal"
+                    :nec="true"
+                    v-model="vista.empresa.domicilio_fiscal"
+                    style="grid-column: 1/5"
+                />
+
+                <JdInput
+                    label="Ubigeo"
+                    :nec="true"
+                    v-model="vista.empresa.ubigeo"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Urbanización"
+                    :nec="true"
+                    v-model="vista.empresa.urbanizacion"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Distrito"
+                    :nec="true"
+                    v-model="vista.empresa.distrito"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Provincia"
+                    :nec="true"
+                    v-model="vista.empresa.provincia"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Departamento"
+                    :nec="true"
+                    v-model="vista.empresa.departamento"
+                    style="grid-column: 1/4"
+                />
+            </div>
+
+            <div class="datos-secundarios">
+                <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
+                <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
+
+                <JdInput label="Pc principal" :nec="true" v-model="vista.empresa.pc_principal_ip" />
+                <JdInput
+                    label="Impuesto"
+                    :nec="true"
+                    type="number"
+                    v-model="vista.empresa.igv_porcentaje"
+                />
+
+                <JdButton
+                    text="Modificar"
+                    @click="modificar"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar')"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -81,10 +136,14 @@ export default {
         checkDatos() {
             const props = [
                 'ruc',
-                'nombre',
-                'telefono',
-                'correo',
-                'direccion',
+                'razon_social',
+                'nombre_comercial',
+                'domicilio_fiscal',
+                'ubigeo',
+                'urbanizacion',
+                'distrito',
+                'provincia',
+                'departamento',
                 'pc_principal_ip',
                 'igv_porcentaje',
             ]
@@ -123,9 +182,39 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.containder-datos {
+.container-datos {
     display: grid;
-    grid-template-columns: 20rem 20rem;
-    gap: 0.5rem;
+    grid-template-columns: auto 1fr;
+    // display: flex;
+    // flex-wrap: wrap;
+    gap: 4rem;
+
+    .datos-fiscales {
+        display: grid;
+        grid-template-columns: repeat(4, 6rem);
+        gap: 0.5rem;
+    }
+
+    .datos-secundarios {
+        display: grid;
+        grid-template-columns: 20rem;
+        gap: 0.5rem;
+        // align-items: flex-start;
+        height: fit-content;
+    }
+}
+
+@media (max-width: 540px) {
+    .container-datos {
+        grid-template-columns: 1fr;
+
+        .datos-fiscales {
+            grid-template-columns: 100%;
+
+            > * {
+                grid-column: 1/2 !important;
+            }
+        }
+    }
 }
 </style>

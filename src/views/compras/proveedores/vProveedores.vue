@@ -17,13 +17,12 @@
             :columns="columns"
             :datos="vista.socios || []"
             :colAct="true"
-            :configCols="true"
             :configFiltros="openConfigFiltros"
             :reload="loadSocios"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
-            ref="jdtable"
         >
+            <!-- :configCols="true" -->
         </JdTable>
     </div>
 

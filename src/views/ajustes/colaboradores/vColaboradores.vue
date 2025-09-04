@@ -13,13 +13,13 @@
             </div>
         </div>
 
+        <!-- :configCols="true" -->
         <JdTable
             :name="tableName"
             :columns="columns"
             :datos="vista.colaboradores || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
-            :configCols="true"
             :reload="loadColaboradores"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
@@ -117,7 +117,7 @@ export default {
             },
             {
                 id: 'activo',
-                title: 'Activo?',
+                title: 'Estado',
                 prop: 'activo1.nombre',
                 type: 'select',
                 format: 'yesno',
@@ -247,8 +247,9 @@ export default {
             const cols = this.columns
             cols.find((a) => a.id == 'sexo').lista = this.vista.generos
             cols.find((a) => a.id == 'doc_tipo').lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.estados
+            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
             cols.find((a) => a.id == 'cargo').lista = this.vista.colaborador_cargos
+            cols.find((a) => a.id == 'has_signin').lista = this.vista.estados
 
             const send = {
                 table: this.tableName,
@@ -294,7 +295,7 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['generos', 'documentos_identidad', 'estados', 'colaborador_cargos']
+            const qry = ['generos', 'documentos_identidad', 'estados', 'activo_estados', 'colaborador_cargos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

@@ -26,10 +26,14 @@
             @rowOptionSelected="runMethod"
         >
             <template v-slot:cMoreInfo="{ item }">
-                {{ item.transaccion1?.compra_comprobante_serie }}-{{
-                    item.transaccion1?.compra_comprobante_correlativo
-                }}
-                {{ item.transaccion1?.socio1?.nombres }}
+                <template v-if="item.transaccion1?.compra_comprobante_serie">
+                    {{ item.transaccion1?.compra_comprobante_serie }}-{{
+                        item.transaccion1?.compra_comprobante_correlativo
+                    }}
+                </template>
+                <template v-if="item.comprobante1">
+                    {{ item.comprobante1?.serie_correlativo }}
+                </template>
                 {{ item.observacion }}
             </template>
         </JdTable>
@@ -127,9 +131,10 @@ export default {
         tableRowOptions: [
             {
                 label: 'Eliminar',
-                icon: 'fa-regular fa-trash-can',
+                icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                // permiso: ['vInsumos:kardexDelete', 'vProductos:kardexDelete'],
+                permiso: ['vInsumos:ajusteStock', 'vProductos:ajusteStock'],
+                ocultar: { tipo: [1, 2] },
             },
         ],
     }),
@@ -144,7 +149,7 @@ export default {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                 },
-                incl: ['transaccion1', 'articulo1'],
+                incl: ['articulo1', 'transaccion1', 'comprobante1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

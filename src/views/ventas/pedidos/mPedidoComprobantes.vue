@@ -55,20 +55,13 @@ export default {
                 seek: true,
             },
             {
-                id: 'venta_serie',
-                title: 'Serie',
-                width: '7rem',
+                id: 'serie_correlativo',
+                title: 'Nro comprobante',
+                type: 'text',
+                width: '10rem',
                 show: true,
-                sort: true,
                 seek: true,
-            },
-            {
-                id: 'venta_numero',
-                title: 'Correlativo',
-                width: '7rem',
-                show: true,
                 sort: true,
-                seek: true,
             },
             {
                 id: 'socio',
@@ -82,11 +75,23 @@ export default {
             {
                 id: 'monto',
                 title: 'Monto',
-                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
                 width: '7rem',
                 show: true,
                 sort: true,
                 seek: true,
+            },
+            {
+                id: 'estado',
+                title: 'Estado',
+                type: 'select',
+                prop: 'estado1.nombre',
+                format: 'estado',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: false,
             },
             // { id: '', width: '7rem', title: 'Deuda', slot: 'colDeuda', toRight: true },
         ],
@@ -109,6 +114,8 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, qry)
+            qry.cols.push('venta_serie', 'venta_numero')
+
             this.modal.comprobantes = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.comprobantes}?qry=${JSON.stringify(qry)}`)

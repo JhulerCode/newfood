@@ -11,14 +11,13 @@ export const useVistas = defineStore('vistas', {
             this.pestanas = []
         },
 
-        async showVista(goto, label) {
+        async showVista(goto, label, variables) {
             for (let a in this.show) this.show[a] = false
             this.addPestana(goto, label)
 
             if (this[goto] == undefined) {
                 this[goto] = {
                     loaded: false,
-                    filtros: {}
                 }
             }
             else {
@@ -26,6 +25,10 @@ export const useVistas = defineStore('vistas', {
                     const i = this.pestanas.findIndex(a => a.goto == goto)
                     this.pestanas[i].label = label
                 }
+            }
+
+            if (variables) {
+                Object.assign(this[goto], variables)
             }
 
             this.show[goto] = true
