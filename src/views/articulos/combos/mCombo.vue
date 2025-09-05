@@ -254,9 +254,9 @@ export default {
         async crear() {
             if (this.checkDatos()) return
 
-            this.buttons[0].spin = true
+            this.useAuth.setLoading(true, 'Modificando...')
             const res = await post(urls.articulos, this.articulo)
-            this.buttons[0].spin = false
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
@@ -266,9 +266,9 @@ export default {
         async modificar() {
             if (this.checkDatos()) return
 
-            this.buttons[1].spin = true
+            this.useAuth.setLoading(true, 'Modificando...')
             const res = await patch(urls.articulos, this.articulo)
-            this.buttons[1].spin = false
+            this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 

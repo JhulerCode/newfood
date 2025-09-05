@@ -248,6 +248,7 @@
                                         v-model="a[column.id]"
                                         :disabled="inputsDisabled"
                                         :lista="column.list"
+                                        :mostrar="column.mostrar"
                                         @elegir="
                                             column.onchange
                                                 ? $emit('onChange', column.onchange, a)

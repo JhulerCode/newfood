@@ -42,7 +42,7 @@
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
             ref="jdtable"
-            >
+        >
         </JdTable>
         <!-- :configCols="true" -->
     </div>
@@ -52,6 +52,7 @@
     <mKardex v-if="useModals.show.mKardex" />
     <mAjusteStock v-if="useModals.show.mAjusteStock" />
     <mArticuloReceta v-if="useModals.show.mArticuloReceta" />
+    <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -71,6 +72,7 @@ import mArticulo from '@/views/articulos/mArticulo.vue'
 import mKardex from '@/views/articulos/mKardex.vue'
 import mAjusteStock from '@/views/articulos/mAjusteStock.vue'
 import mArticuloReceta from '@/views/articulos/productos/mArticuloReceta.vue'
+import mArticuloPreciosSemana from '@/views/articulos/productos/mArticuloPreciosSemana.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -95,6 +97,7 @@ export default {
         mKardex,
         mAjusteStock,
         mArticuloReceta,
+        mArticuloPreciosSemana,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -265,6 +268,12 @@ export default {
                 action: 'ajusteStock',
                 permiso: 'vProductos:ajusteStock',
                 ocultar: { has_receta: true },
+            },
+            {
+                label: 'Precios por día',
+                icon: 'fa-solid fa-tags',
+                action: 'openPromociones',
+                permiso: 'vProductos:editar',
             },
         ],
     }),
@@ -526,6 +535,15 @@ export default {
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+        },
+        async openPromociones(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mArticuloPreciosSemana', 'Precios por día', null, res.data)
         },
 
         async loadCategorias() {

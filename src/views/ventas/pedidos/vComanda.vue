@@ -99,7 +99,7 @@
                             </div>
 
                             <div class="articulo-precio" v-if="a.precio_venta">
-                                {{ redondear(a.precio_venta) }}
+                                {{ redondear(showPrecio(a)) }}
                             </div>
                         </li>
                     </ul>
@@ -129,7 +129,17 @@
                         class="pedido-items"
                         @onInput="runMethod"
                     >
-                        <template v-slot:colNombre="{ item }">
+                        <template v-slot:cAction="{ item }">
+                            <JdButton
+                                title="Quitar"
+                                icon="fa-solid fa-trash-can"
+                                tipo="2"
+                                :small="true"
+                                @click="quitar(item)"
+                            />
+                        </template>
+
+                        <template v-slot:cNombre="{ item }">
                             <div class="nombre">
                                 {{ item.articulo1.nombre }}
                                 <ul v-if="item.is_combo" class="combo_items">
@@ -137,10 +147,13 @@
                                         <small>- ({{ a.cantidad }}) {{ a.articulo1.nombre }}</small>
                                     </li>
                                 </ul>
+
+                                {{ item.pu_desc }}
+                                {{ item.desc_monto }}
                             </div>
                         </template>
 
-                        <template v-slot:colCantidad="{ item }">
+                        <template v-slot:cCantidad="{ item }">
                             <div class="cantidad">
                                 <ul>
                                     <li @click="sumarRestar(1, item)">
@@ -160,14 +173,14 @@
                             </div>
                         </template>
 
-                        <template v-slot:cAction="{ item }">
-                            <JdButton
-                                title="Quitar"
-                                icon="fa-solid fa-trash-can"
-                                tipo="2"
-                                :small="true"
-                                @click="quitar(item)"
-                            />
+                        <template v-slot:cPu="{ item }">
+                            <template v-if="item.descuento_tipo">
+                                {{ item.pu_desc }}
+                            </template>
+
+                            <template v-else>
+                                {{ item.pu }}
+                            </template>
                         </template>
                     </JdTable>
                 </template>
@@ -289,9 +302,9 @@ export default {
         vista: {},
 
         columns: [
-            { id: 'articulo', width: '13rem', title: 'Nombre', slot: 'colNombre', show: true },
-            { id: 'cantidad', width: '5rem', title: 'Cantidad', slot: 'colCantidad', show: true },
-            { id: 'pu', width: '4rem', title: 'Pu', prop: 'pu', show: true, toRight: true },
+            { id: 'articulo', width: '13rem', title: 'Nombre', slot: 'cNombre', show: true },
+            { id: 'cantidad', width: '5rem', title: 'Cantidad', slot: 'cCantidad', show: true },
+            { id: 'pu', width: '4rem', title: 'Pu', slot: 'cPu', show: true, toRight: true },
             {
                 id: 'total',
                 title: 'Importe',
@@ -394,10 +407,17 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     activo: { op: 'Es', val: true },
                 },
-                cols: ['nombre', 'precio_venta', 'has_receta', 'is_combo', 'igv_afectacion'],
+                cols: [
+                    'nombre',
+                    'precio_venta',
+                    'has_receta',
+                    'is_combo',
+                    'igv_afectacion',
+                    'precios_semana',
+                ],
                 incl: ['receta_insumos', 'combo_articulos'],
             }
-            console.log(this.vista.categoria)
+
             if (this.vista.categoria != null) {
                 qry.fltr.categoria = { op: 'Es', val: this.vista.categoria }
             }
@@ -442,21 +462,6 @@ export default {
 
             this.vista.socios = res.data
         },
-        setSocio(item) {
-            if (item) {
-                this.vista.pedido.venta_socio_datos = {
-                    doc_tipo: item.doc_tipo,
-                    doc_numero: item.doc_numero,
-                    doc_nombres: item.doc_nombres,
-                    nombres: item.nombres,
-                    telefono: item.telefono,
-                    direccion: item.direccion,
-                    referencia: item.referencia,
-                }
-            } else {
-                this.vista.pedido.venta_socio_datos = {}
-            }
-        },
         async loadEmpresa() {
             const qry = {
                 fltr: {},
@@ -472,6 +477,28 @@ export default {
             this.vista.empresa = res.data
         },
 
+        setSocio(item) {
+            if (item) {
+                this.vista.pedido.venta_socio_datos = {
+                    doc_tipo: item.doc_tipo,
+                    doc_numero: item.doc_numero,
+                    doc_nombres: item.doc_nombres,
+                    nombres: item.nombres,
+                    telefono: item.telefono,
+                    direccion: item.direccion,
+                    referencia: item.referencia,
+                }
+            } else {
+                this.vista.pedido.venta_socio_datos = {}
+            }
+        },
+        showPrecio(item) {
+            const numeroDiaSemana = dayjs().day()
+            const promocion_hoy = item.precios_semana.find((a) => a.id == numeroDiaSemana)
+
+            return promocion_hoy.pu ? promocion_hoy.pu : item.precio_venta
+        },
+
         async addArticulo(item) {
             const i = this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.id)
 
@@ -485,7 +512,7 @@ export default {
 
                     cantidad: 1,
 
-                    pu: item.precio_venta,
+                    pu: this.showPrecio(item),
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
                         item.igv_afectacion == '10' ? this.vista.empresa.igv_porcentaje : 0,
@@ -619,33 +646,6 @@ export default {
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
 
-            // if (vistaPedidos) {
-            //     if (this.vista.pedido.venta_canal == 1) {
-            //         const salon = vistaPedidos.salones.find((a) => a.id == vistaPedidos.salon)
-            //         const mesa = salon.mesas.find((a) => a.id == this.vista.pedido.venta_mesa)
-            //         mesa.pedido = res.data
-
-            //         vistaPedidos.mesaPendientes += 1
-            //     }
-
-            //     if (this.vista.pedido.venta_canal == 2) {
-            //         if (vistaPedidos.venta_canal == 2) {
-            //             this.useVistas.addItem('vPedidos', 'pedidos', res.data)
-            //         }
-
-            //         vistaPedidos.llevarPendientes += 1
-            //     }
-
-            //     if (this.vista.pedido.venta_canal == 3) {
-            //         if (vistaPedidos.venta_canal == 3) {
-            //             this.useVistas.addItem('vPedidos', 'pedidos', res.data)
-            //         }
-
-            //         vistaPedidos.deliveryPendientes += 1
-            //     }
-            // }
-
-            // this.useVistas.vPedidos.reload = true
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
         async grabar1() {
@@ -665,7 +665,6 @@ export default {
             if (res.code != 0) return
 
             const vistaPedidos = this.useVistas.vPedidos
-
             if (vistaPedidos) vistaPedidos.reload = true
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
