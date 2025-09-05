@@ -43,13 +43,13 @@
         </div>
 
         <div class="datos" v-if="modal.mode == 3">
+            <!-- :colAct="true"
+            :rowOptions="tableRowOptions"
+            @rowOptionSelected="runMethod" -->
             <JdTable
                 :columns="columns"
                 :datos="modal.pagos || []"
                 :colNro="true"
-                :colAct="true"
-                :rowOptions="tableRowOptions"
-                @rowOptionSelected="runMethod"
                 :reload="loadPagos"
                 class="table-pagos"
             >

@@ -31,6 +31,11 @@ export default {
         }
 
         this.isLogged()
+
+        const arr = ["Zapatos", "aCuenta", "~Especial", "★Promoción"]
+
+console.log(arr.sort((a, b) => a.localeCompare(b, 'es')))
+
     },
     methods: {
         async isLogged() {

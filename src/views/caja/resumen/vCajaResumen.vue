@@ -243,7 +243,8 @@
                         <div>
                             <span>S/ {{ redondear(vista.resumen.descuentos_total) }}</span>
 
-                            <small>+S/{{redondear(vista.resumen.descuentos_anulados_total)}}</small
+                            <small
+                                >+S/{{ redondear(vista.resumen.descuentos_anulados_total) }}</small
                             >
                         </div>
                         <p>Descuentos</p>
@@ -356,6 +357,20 @@
                     <JdTable
                         :datos="vista.resumen.productos_anulados || []"
                         :columns="columnsProductosAnulados"
+                        :seeker="false"
+                        :download="false"
+                        height="20rem"
+                    />
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <p>Comprobantes canjeados</p>
+                    </div>
+
+                    <JdTable
+                        :datos="vista.resumen.comprobantes_canjeados || []"
+                        :columns="columnsComprobantesAnulados"
                         :seeker="false"
                         :download="false"
                         height="20rem"
@@ -498,6 +513,39 @@ export default {
                 sort: true,
             },
         ],
+        columnsComprobantesAnulados: [
+            {
+                id: 'tipo',
+                title: 'Documento',
+                width: '10rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'id',
+                title: 'Número',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'monto',
+                title: 'Monto',
+                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'canjeado_por',
+                title: 'Canjeado por',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+        ],
 
         columnsProductos: [
             {
@@ -547,7 +595,7 @@ export default {
             {
                 id: 'cantidad',
                 title: 'Cantidad',
-                width: '8rem',
+                width: '5rem',
                 show: true,
                 sort: true,
             },

@@ -580,17 +580,20 @@ export default {
 
             if (this.vista.comprobante.doc_tipo == '01') {
                 if (['1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
-                    return jmsg('error', 'El cliente debe tener RUC')
+                    jmsg('error', 'El cliente debe tener RUC')
+                    return true
                 }
             }
 
             if (this.vista.comprobante.doc_tipo == '03') {
                 if (this.vista.socio.doc_numero == '00000000') {
-                    return jmsg('error', 'El cliente debe tener un DNI válido')
+                    jmsg('error', 'El cliente debe tener un DNI válido')
+                    return true
                 }
 
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
-                    return jmsg('error', 'El cliente debe tener DNI')
+                    jmsg('error', 'El cliente debe tener DNI')
+                    return true
                 }
             }
 
@@ -624,7 +627,6 @@ export default {
             if (this.vista.comprobante.pago_condicion == 1) {
                 if (redondear(this.vista.porPagar) > 0) {
                     jmsg('warning', 'Importes de pago insuficientes')
-
                     return true
                 }
             }

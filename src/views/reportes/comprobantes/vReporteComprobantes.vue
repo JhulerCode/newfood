@@ -31,6 +31,7 @@
         v-if="useModals.show.mComprobantePagos"
         @pagosModificados="actualizarPagos"
     />
+    <mComprobanteCanjear v-if="useModals.show.mComprobanteCanjear" @canjeado="comprobanteCanjedo" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -43,8 +44,9 @@ import JdTable from '@/components/JdTable.vue'
 import mAnular from '@/components/mAnular.vue'
 import mConfigCols from '@/components/mConfigCols.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
-import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mPdfViewer from '@/components/mPdfViewer.vue'
+import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
+import mComprobanteCanjear from './mComprobanteCanjear.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -60,9 +62,10 @@ export default {
         mAnular,
         mConfigCols,
         mConfigFiltros,
+        mPdfViewer,
 
         mComprobantePagos,
-        mPdfViewer,
+        mComprobanteCanjear,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -173,70 +176,67 @@ export default {
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
                 permiso: 'vReporteComprobantes:anular',
-                ocultar: { estado: 0 },
+                ocultar: { estado: ['0', '3'] },
             },
             {
                 label: 'Canjear',
                 icon: 'fa-solid fa-left-right',
                 action: 'canjear',
                 permiso: 'vReporteComprobantes:canjear',
-                ocultar: { estado: 0 },
+                ocultar: { estado: ['0', '3'], venta_tipo_documento_codigo: '01' },
             },
             {
                 label: 'Ver pagos',
                 icon: 'fa-solid fa-up-right-from-square',
                 action: 'verPagos',
                 permiso: 'vReporteComprobantes:verPagos',
-                ocultar: { pagos_monto: 0 },
+                ocultar: { estado: ['0', '3'], pagos_monto: 0 },
             },
             {
                 label: 'Modificar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'editarPagos',
                 permiso: 'vReporteComprobantes:editarPagos',
-                ocultar: { estado: 0, pagos_monto: 0 },
+                ocultar: { estado: ['0', '3'], pagos_monto: 0 },
             },
             {
                 label: 'Agregar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'agregarPagos',
                 permiso: 'vReporteComprobantes:agregarPagos',
-                ocultar: { estado: 0, pagos_monto: { op: '>', val: 0 } },
+                ocultar: { estado: ['0', '3'], pagos_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Enviar por email',
                 icon: 'fa-regular fa-envelope',
                 action: 'enviarCorreo',
                 permiso: 'vReporteComprobantes:enviarCorreo',
-                ocultar: { estado: 0 },
             },
             {
                 label: 'Imprimir',
                 icon: 'fa-solid fa-print',
                 action: 'imprimir',
                 permiso: 'vReporteComprobantes:imprimir',
-                ocultar: { estado: 0 },
             },
             {
                 label: 'Descargar PDF',
                 icon: 'fa-regular fa-file-pdf',
                 action: 'descargarPdf',
                 permiso: 'vReporteComprobantes:descargarPdf',
-                ocultar: { estado: 0 },
             },
             {
                 label: 'Descargar XML',
                 icon: 'fa-solid fa-file-arrow-down',
                 action: 'descargarXml',
                 permiso: 'vReporteComprobantes:descargarXml',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_tipo_documento_codigo: 'NV' },
             },
             {
                 label: 'Descargar CDR',
                 icon: 'fa-solid fa-file-arrow-down',
                 action: 'descargarCdr',
                 permiso: 'vReporteComprobantes:descargarCdr',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_tipo_documento_codigo: 'NV' },
             },
         ],
     }),
@@ -318,7 +318,23 @@ export default {
             )
         },
         canjear(item) {
-            console.log(item)
+            const send = {
+                comprobante: {
+                    id: item.id,
+                    fecha: dayjs().format('YYYY-MM-DD'),
+                    socio: null,
+                    monto: item.monto,
+                    venta_tipo_documento_codigo: item.venta_tipo_documento_codigo,
+                },
+            }
+
+            this.useModals.setModal(
+                'mComprobanteCanjear',
+                `Canjear comprobante ${item.venta_serie}-${item.venta_numero}`,
+                null,
+                send,
+                true,
+            )
         },
         async verPagos(item) {
             const send = {
@@ -383,6 +399,11 @@ export default {
         actualizarPagos(item) {
             const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)
             this.vista.comprobantes[i].pagos_monto = item.monto
+        },
+        comprobanteCanjedo(item) {
+            const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)
+            this.vista.comprobantes[i].estado = 3
+            this.vista.comprobantes[i].estado1 = { id: 3, nombre: 'CANJEADO' }
         },
 
         async loadDatosSistema() {
