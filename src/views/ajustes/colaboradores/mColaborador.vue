@@ -60,6 +60,7 @@
                     :lista="modal.colaborador_cargos || []"
                     mostrar="id"
                     :disabled="modal.mode == 3"
+                    @elegir="setPermisoEstandar"
                 />
 
                 <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
@@ -81,7 +82,6 @@
                         mostrar="label"
                         :disabled="modal.mode == 3"
                         groupBy="menu"
-                        @elegir="asd"
                     />
 
                     <JdInput
@@ -375,8 +375,79 @@ export default {
                 }
             }
         },
-        asd(item) {
-            console.log(item)
+
+        setPermisoEstandar() {
+            if (this.colaborador.id != null && this.colaborador.permisos.lenght > 0) return
+
+            const permisos = {
+                ADMINISTRADOR: [],
+                CAJERO: [
+                    'vClientes:listar',
+                    'vClientes:crear',
+                    'vClientes:ver',
+                    'vClientes:editar',
+
+                    'vPedidos:listar',
+                    'vPedidos:crear',
+                    'vPedidos:ver',
+                    'vPedidos:imprimirComanda',
+                    'vPedidos:imprimirPrecuenta',
+                    'vPedidos:generarComprobante',
+                    'vPedidos:verComprobantes',
+                    'vPedidos:entregar',
+                    'vPedidos:unirMesas',
+                    'vPedidos:cambiarMesa',
+
+                    'vCajaResumen:ver',
+                    'vCajaResumen:aperturar',
+                    'vCajaResumen:cerrar',
+
+                    'vCajaMovimientos:listar',
+                    'vCajaMovimientos:crear',
+                    'vCajaMovimientos:editar',
+                    'vCajaMovimientos:eliminar',
+
+                    'vReporteComprobantes:listar',
+                    'vReporteComprobantes:anular',
+                    'vReporteComprobantes:canjear',
+                    'vReporteComprobantes:verPagos',
+                    'vReporteComprobantes:agregarPagos',
+                    'vReporteComprobantes:editarPagos',
+                    'vReporteComprobantes:enviarCorreo',
+                    'vReporteComprobantes:imprimir',
+                    'vReporteComprobantes:descargarPdf',
+                ],
+                MOZO: [
+                    'vPedidos:listar',
+                    'vPedidos:crear',
+                    'vPedidos:ver',
+                    'vPedidos:imprimirComanda',
+                    'vPedidos:imprimirPrecuenta',
+                    'vPedidos:unirMesas',
+                    'vPedidos:cambiarMesa',
+                ],
+                CONTADOR: [
+                    'vReporteComprobantes:listar',
+                    'vReporteComprobantes:descargarPdf',
+                    'vReporteComprobantes:descargarXml',
+                    'vReporteComprobantes:descargarCdr',
+                ],
+                REPARTIDOR: [''],
+            }
+
+            if (this.colaborador.cargo == 'ADMINISTRADOR') {
+                for (const a of this.useAuth.menu) {
+                    for (const b of a.children) {
+                        for (const c of b.permisos) {
+                            c.val = true
+                        }
+                    }
+                }
+                return
+            }
+
+            this.colaborador.permisos = permisos[this.colaborador.cargo]
+            this.sincronizarChecksConPermisos()
         },
     },
 }

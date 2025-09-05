@@ -295,7 +295,13 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['generos', 'documentos_identidad', 'estados', 'activo_estados', 'colaborador_cargos']
+            const qry = [
+                'generos',
+                'documentos_identidad',
+                'estados',
+                'activo_estados',
+                'colaborador_cargos',
+            ]
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
