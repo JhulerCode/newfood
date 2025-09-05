@@ -35,16 +35,16 @@
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
     <mAnular v-if="useModals.show.mAnular" />
+    <mPdfViewer v-if="useModals.show.mPdfViewer" />
 </template>
 
 <script>
 import JdTable from '@/components/JdTable.vue'
 import mAnular from '@/components/mAnular.vue'
-
 import mConfigCols from '@/components/mConfigCols.vue'
 import mConfigFiltros from '@/components/mConfigFiltros.vue'
-
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
+import mPdfViewer from '@/components/mPdfViewer.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -62,6 +62,7 @@ export default {
         mConfigFiltros,
 
         mComprobantePagos,
+        mPdfViewer,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -301,7 +302,20 @@ export default {
             this[method](item)
         },
         anular(item) {
-            console.log(item)
+            const send = {
+                url: 'comprobantes',
+                vista: 'vReporteComprobantes',
+                array: 'comprobantes',
+                item,
+            }
+
+            this.useModals.setModal(
+                'mAnular',
+                `Anular comprobante N° ${item.venta_serie} - ${item.venta_numero}`,
+                null,
+                send,
+                true,
+            )
         },
         canjear(item) {
             console.log(item)
@@ -352,8 +366,12 @@ export default {
         async imprimir(item) {
             console.log(item)
         },
-        expotarPdf(item) {
-            console.log(item)
+        async descargarPdf(item) {
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`, true)
+
+            this.vista.pdfUrl = URL.createObjectURL(res)
+            this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)
+            // window.open(this.vista.pdfUrl, '_blank')
         },
         descargarXml(item) {
             console.log(item)
@@ -378,21 +396,6 @@ export default {
 
             Object.assign(this.vista, res.data)
         },
-        // async loadColaboradores() {
-        //     const qry = {
-        //         fltr: {},
-        //         cols: ['nombres', 'apellidos', 'nombres_apellidos'],
-        //     }
-
-        //     this.vista.socios = []
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code !== 0) return
-
-        //     this.vista.colaboradores = res.data
-        // },
         async loadSocios() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },

@@ -30,7 +30,7 @@ const urls = {
     transaccion_items: `${host}/api/transaccion_items`,
 }
 
-async function get(url) {
+async function get(url, is_file) {
     let query
 
     try {
@@ -59,6 +59,11 @@ async function get(url) {
     if (query.status == 404) {
         jmsg('error', 'Recurso no encontrado')
         return { code: 404 }
+    }
+
+    if (is_file) {
+        const blob = await query.blob()
+        return blob
     }
 
     const res = await query.json()
@@ -219,6 +224,7 @@ async function delet(url, item, ms) {
 
 async function getFile(url) {
     const response = await fetch(url, {
+        method: 'GET',
         headers: {
             Authorization: `Bearer ${useAuth().token}`,
         }

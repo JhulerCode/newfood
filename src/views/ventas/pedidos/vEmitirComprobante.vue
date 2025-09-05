@@ -724,8 +724,9 @@ export default {
 
     > .right {
         display: grid;
-        grid-template-rows: 1fr auto;
-        gap: 2rem;
+        grid-template-rows: auto 11.5rem;
+        gap: 1rem;
+        overflow: hidden;
 
         .pedido-items {
             .item_descuento {

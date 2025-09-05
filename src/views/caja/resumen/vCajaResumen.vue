@@ -240,7 +240,12 @@
                         <i class="fa-solid fa-tags"></i>
                     </div>
                     <div>
-                        <span>S/ {{ redondear(vista.resumen.descuentos_total) }}</span>
+                        <div>
+                            <span>S/ {{ redondear(vista.resumen.descuentos_total) }}</span>
+
+                            <small>+S/{{redondear(vista.resumen.descuentos_anulados_total)}}</small
+                            >
+                        </div>
                         <p>Descuentos</p>
                     </div>
                 </div>
@@ -510,8 +515,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'descuento',
-                title: 'Descuento',
+                id: 'monto',
+                title: 'Monto',
                 toRight: true,
                 format: 'currency',
                 moneda: 'S/',
@@ -520,8 +525,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'monto',
-                title: 'Monto',
+                id: 'descuento',
+                title: 'Descuento',
                 toRight: true,
                 format: 'currency',
                 moneda: 'S/',
@@ -549,6 +554,16 @@ export default {
             {
                 id: 'monto',
                 title: 'Monto',
+                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'descuento',
+                title: 'Descuento',
                 toRight: true,
                 format: 'currency',
                 moneda: 'S/',

@@ -113,6 +113,17 @@ export default {
                 seek: false,
                 sort: false,
             },
+            {
+                id: 'estado',
+                title: 'Estado',
+                prop: 'estado1.nombre',
+                type: 'select',
+                format: 'estado',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            }
         ],
         tableRowOptions: [],
     }),
@@ -166,6 +177,7 @@ export default {
             cols.find((a) => a.id == 'tipo').lista = this.vista.caja_operacion_tipos
             cols.find((a) => a.id == 'operacion').lista = this.vista.caja_operaciones
             cols.find((a) => a.id == 'pago_metodo').lista = this.vista.pago_metodos
+            cols.find((a) => a.id == 'estado').lista = this.vista.dinero_movimiento_estados
 
             const send = {
                 table: this.tableName,
@@ -176,7 +188,7 @@ export default {
             this.useModals.setModal('mConfigFiltros', 'Filtros', null, send, true)
         },
         async loadDatosSistema() {
-            const qry = ['caja_operacion_tipos', 'caja_operaciones']
+            const qry = ['caja_operacion_tipos', 'caja_operaciones', 'dinero_movimiento_estados']
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
