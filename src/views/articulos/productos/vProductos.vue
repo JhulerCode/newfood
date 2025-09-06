@@ -272,7 +272,7 @@ export default {
             {
                 label: 'Precios por día',
                 icon: 'fa-solid fa-tags',
-                action: 'openPromociones',
+                action: 'openPreciosSemana',
                 permiso: 'vProductos:editar',
             },
         ],
@@ -536,7 +536,7 @@ export default {
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
         },
-        async openPromociones(item) {
+        async openPreciosSemana(item) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}/uno/${item.id}`)
             this.useAuth.setLoading(false)

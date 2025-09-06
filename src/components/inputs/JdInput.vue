@@ -84,7 +84,6 @@ export default {
 .container-input {
     display: grid;
     width: 100%;
-    // height: 2.2rem;
 
     * {
         font-size: 0.9rem;

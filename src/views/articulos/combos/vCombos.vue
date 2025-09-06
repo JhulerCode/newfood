@@ -30,7 +30,7 @@
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mCombo v-if="useModals.show.mCombo" />
     <mKardex v-if="useModals.show.mKardex" />
-    <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -48,7 +48,7 @@ import mEditar from '@/components/mEditar.vue'
 import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
 import mCombo from '@/views/articulos/combos/mCombo.vue'
 import mKardex from '@/views/articulos/mKardex.vue'
-import mAjusteStock from '@/views/articulos/mAjusteStock.vue'
+import mArticuloPreciosSemana from '@/views/articulos/productos/mArticuloPreciosSemana.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -69,7 +69,7 @@ export default {
         mImportarArticulos,
         mCombo,
         mKardex,
-        mAjusteStock,
+        mArticuloPreciosSemana,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -169,6 +169,12 @@ export default {
                 action: 'eliminar',
                 permiso: 'vCombos:eliminar',
             },
+            {
+                label: 'Precios por día',
+                icon: 'fa-solid fa-tags',
+                action: 'openPreciosSemana',
+                permiso: 'vProductos:editar',
+            },
         ],
     }),
     async created() {
@@ -262,6 +268,15 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vCombos', 'articulos', item)
+        },
+        async openPreciosSemana(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mArticuloPreciosSemana', 'Precios por día', null, res.data)
         },
 
         async loadCategorias() {

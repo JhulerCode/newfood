@@ -1,22 +1,29 @@
 <template>
-    <label class="container-input" :style="`height: ${height}rem`">
+    <div class="container-input" :style="`height: ${height}rem`">
         <div class="left" v-if="label || icon">
             <i v-if="icon" :class="icon"></i>
             <span v-if="label">{{ label }}</span>
             <span v-if="nec" class="nec"> *</span>
         </div>
 
-        <div class="right">
-            <!-- <div class="disabled" v-else> -->
+        <div class="right" :class="{ disabled: disabled }">
             {{ inputModel }}
         </div>
 
-        <div class="actions">
+        <div class="actions" v-if="!disabled">
             <i class="fa-solid fa-trash-can" @click="deleteFile" v-if="inputModel"></i>
-            <i class="fa-solid fa-upload" @click="$refs.inputFile.click()"></i>
+            <i class="fa-solid fa-upload" @click="$refs.inputFile.click()" v-if="!inputModel"></i>
         </div>
-    </label>
-    <input type="file" :placeholder="placeholder" :accept="accept" hidden @change="handleFile" ref="inputFile" />
+
+        <input
+            type="file"
+            :placeholder="placeholder"
+            :accept="accept"
+            hidden
+            @change="handleFile"
+            ref="inputFile"
+        />
+    </div>
 </template>
 
 <script>
@@ -57,8 +64,10 @@ export default {
 
             if (file) {
                 this.inputModel = file.name
-                this.$emit('handleFile', file)
+                this.$emit('handleFile', file, URL.createObjectURL(file))
             }
+
+            e.target.value = null
         },
     },
 }
@@ -69,7 +78,6 @@ export default {
     display: grid;
     grid-template-columns: auto 1fr auto;
     width: 100%;
-    // height: 2.2rem;
 
     * {
         font-size: 0.9rem;
@@ -98,32 +106,36 @@ export default {
         background-color: var(--bg-color);
         border-right: initial !important;
 
-        input {
-            width: 100%;
-            background-color: var(--bg-color);
-        }
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        overflow-x: auto;
 
-        .disabled {
-            background-color: var(--bg-color2);
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE y Edge antiguos */
+
+        &::-webkit-scrollbar {
+            display: none; /* Chrome, Safari y Edge moderno */
         }
+    }
+
+    .disabled {
+        background-color: var(--bg-color2);
     }
 
     .actions {
         display: flex;
         align-items: center;
-        // justify-content: center;
         border-radius: 0.2rem;
         border: var(--border);
         border-left: initial !important;
         background-color: var(--bg-color);
-        padding: 0.5rem;
+        padding: 0 0.5rem;
         gap: 0.5rem;
 
         i {
             cursor: pointer;
         }
     }
-
-
 }
 </style>

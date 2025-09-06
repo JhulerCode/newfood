@@ -6,6 +6,8 @@ const host = import.meta.env.VITE_API_HOST
 
 const urls = {
     signin: `${host}/signin`,
+    uploads: `${host}/uploads`,
+
     sistema: `${host}/api/sistema`,
 
     articulo_categorias: `${host}/api/articulo_categorias`,

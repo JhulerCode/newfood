@@ -39,7 +39,7 @@
                 :nec="true"
                 v-model="articulo.produccion_area"
                 :lista="modal.produccion_areas || []"
-                style="grid-column: 1/4"
+                style="grid-column: 1/3"
                 v-if="articulo.tipo == 2"
             />
 
@@ -52,6 +52,15 @@
                 v-if="articulo.tipo == 2"
             />
 
+            <JdInputFile
+                label="Foto"
+                accept="image/*"
+                v-model="articulo.foto_path"
+                @handleFile="(file, blob) => ((articulo.archivo = file), (modal.blob = blob))"
+                @deleteFile="((articulo.archivo = null), (modal.blob = null))"
+                style="grid-column: 1/3"
+            />
+
             <JdSwitch
                 label="Es producto transformado?"
                 v-model="articulo.has_receta"
@@ -60,6 +69,23 @@
             />
 
             <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
+
+            <div
+                style="grid-column: 4/5; grid-row: 5/9"
+                v-if="articulo.archivo || articulo.foto_path"
+                class="producto-foto"
+            >
+                <img
+                    :src="modal.blob"
+                    :alt="articulo.nombre"
+                    v-if="articulo.archivo"
+                />
+                <img
+                    :src="`${urls.uploads}/${articulo.foto_path}`"
+                    :alt="articulo.nombre"
+                    v-else
+                />
+            </div>
         </div>
     </JdModal>
 </template>
@@ -69,6 +95,7 @@ import JdModal from '@/components/JdModal.vue'
 import JdInput from '@/components/inputs/JdInput.vue'
 import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdSwitch from '@/components/inputs/JdSwitch.vue'
+import JdInputFile from '@/components/inputs/JdInputFile.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -83,13 +110,14 @@ export default {
         JdModal,
         JdInput,
         JdSelect,
+        JdInputFile,
         JdSwitch,
     },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
-
+        urls: urls,
         modal: {},
         articulo: {},
 
@@ -129,8 +157,12 @@ export default {
 
             return false
         },
+        shapeDatos() {
+            if (this.articulo.archivo) this.articulo.formData = true
+        },
         async crear() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Creando...')
             const res = await post(urls.articulos, this.articulo)
@@ -147,6 +179,7 @@ export default {
         },
         async modificar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Modificando...')
             const res = await patch(urls.articulos, this.articulo)
@@ -211,8 +244,20 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: repeat(4, 10rem);
+    grid-template-columns: repeat(4, 9rem);
     gap: 0.5rem;
+
+    .producto-foto {
+        width: 9rem;
+        height: 8.9rem;
+        background-color: red;
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    }
 }
 
 @media (max-width: 540px) {

@@ -6,15 +6,15 @@
             <span v-if="nec" class="nec"> *</span>
         </div>
 
-        <div class="right">
+        <div class="right" :class="{ disabled: disabled }">
             <input :type="tipo_input" :placeholder="placeholder" v-model="inputModel" v-if="!disabled" class="input1" />
 
-            <div class="disabled" v-else>
+            <template v-else>
                 {{ inputModel }}
-            </div>
+            </template>
         </div>
 
-        <div class="action" @click="showPass">
+        <div class="action" @click="showPass" v-if="!disabled">
             <i :class="ver_pass ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'"></i>
         </div>
     </label>
@@ -60,7 +60,6 @@ export default {
     display: grid;
     grid-template-columns: auto 1fr 2.5rem;
     width: 100%;
-    // height: 2.2rem;
 
     * {
         font-size: 0.9rem;
@@ -93,10 +92,10 @@ export default {
             width: 100%;
             background-color: var(--bg-color);
         }
+    }
 
-        .disabled {
-            background-color: var(--bg-color2);
-        }
+    .disabled {
+        background-color: var(--bg-color2);
     }
 
     .action {
@@ -108,6 +107,7 @@ export default {
         border-left: initial !important;
         cursor: pointer;
         background-color: var(--bg-color);
+        padding: 0 0.5rem;
     }
 }
 </style>

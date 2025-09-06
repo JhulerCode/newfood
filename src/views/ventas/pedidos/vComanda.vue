@@ -141,15 +141,14 @@
 
                         <template v-slot:cNombre="{ item }">
                             <div class="nombre">
-                                {{ item.articulo1.nombre }}
+                                <p @click="openNotas(item)">
+                                    {{ item.articulo1.nombre }}
+                                </p>
                                 <ul v-if="item.is_combo" class="combo_items">
                                     <li v-for="(a, i) in item.combo_articulos" :key="i">
                                         <small>- ({{ a.cantidad }}) {{ a.articulo1.nombre }}</small>
                                     </li>
                                 </ul>
-
-                                {{ item.pu_desc }}
-                                {{ item.desc_monto }}
                             </div>
                         </template>
 
@@ -263,7 +262,7 @@
         </div>
     </div>
 
-    <!-- <mComandaCombo v-if="useModals.show.mComandaCombo" @sumarTodo="sumarTodo" /> -->
+    <mPedidoItemNota v-if="useModals.show.mPedidoItemNota" />
 </template>
 
 <script>
@@ -272,7 +271,7 @@ import JdSelect from '@/components/inputs/JdSelect.vue'
 import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
 import JdButton from '@/components/inputs/JdButton.vue'
 import JdTable from '@/components/JdTable.vue'
-// import mComandaCombo from '@/views/u/ventas/comanda/mComandaCombo.vue'
+import mPedidoItemNota from '@/views/ventas/pedidos/mPedidoItemNota.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -288,9 +287,9 @@ export default {
         JdInput,
         JdButton,
         JdTable,
-        // mComandaCombo,
         JdSelect,
         JdSelectQuery,
+        mPedidoItemNota,
     },
     data: () => ({
         useModals: useModals(),
@@ -592,6 +591,9 @@ export default {
 
             this.sumarItems()
         },
+        openNotas(item) {
+            this.useModals.setModal('mPedidoItemNota', 'Notas', null, item)
+        },
 
         checkDatos() {
             if (this.vista.pedido.transaccion_items.length == 0) {
@@ -834,6 +836,10 @@ export default {
         .pedido-items {
             .nombre {
                 white-space: wrap;
+
+                p {
+                    cursor: pointer;
+                }
             }
 
             .cantidad {
