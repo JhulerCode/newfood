@@ -126,42 +126,10 @@ export default {
         },
         setArticulo(item) {
             this.modal.articulo1 = item
-
-            // this.loadLotes()
         },
-        // async loadLotes() {
-        //     this.modal.lotes = []
-        //     this.modal.transaccion.lote_padre = null
-        //     this.modal.lotesLoaded = false
-
-        //     if (this.modal.transaccion.articulo == null) return
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     this.modal.lotesLoaded = false
-        //     const res = await get(`${urls.kardex}/lotes/${this.modal.transaccion.articulo}`)
-        //     this.modal.lotesLoaded = true
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code !== 0) return
-
-        //     this.modal.lotes = JSON.parse(JSON.stringify(res.data))
-        // },
-        // selectLote(item) {
-        //     for (const a of this.lotes) a.selected = false
-
-        //     item.selected = true
-        // },
 
         checkDatos() {
             const props = ['fecha', 'tipo', 'articulo', 'cantidad', 'observacion']
-
-            // if (this.modal.is_nuevo_lote) {
-            //     props.push('moneda', 'pu', 'lote')
-
-            //     if (this.modal.articulo1.has_fv) props.push('fv')
-            // } else {
-            //     props.push('lote_padre')
-            // }
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')
@@ -170,38 +138,8 @@ export default {
 
             return false
         },
-        // shapeDatos() {
-        //     if (this.modal.is_nuevo_lote) {
-        //         this.modal.transaccion.igv_afectacion = this.modal.articulo1.igv_afectacion
-        //         this.modal.transaccion.igv_porcentaje = this.modal.empresa.igv_porcentaje
-        //         this.modal.transaccion.tipo_cambio = this.modal.transaccion.moneda == 1 ? 1 : 3.5
-
-        //         this.modal.transaccion.is_lote_padre = true
-        //         this.modal.transaccion.stock = this.modal.transaccion.cantidad
-        //         delete this.modal.transaccion.lote_padre
-        //     } else {
-        //         delete this.modal.transaccion.pu
-        //         delete this.modal.transaccion.igv_afectacion
-        //         delete this.modal.transaccion.igv_porcentaje
-        //         delete this.modal.transaccion.moneda
-        //         delete this.modal.transaccion.tipo_cambio
-
-        //         delete this.modal.transaccion.lote
-        //         delete this.modal.transaccion.fv
-
-        //         delete this.modal.transaccion.is_lote_padre
-        //         delete this.modal.transaccion.stock
-        //     }
-        // },
-        // async grabar1() {
-        //     if (this.checkDatos()) return
-        //     this.shapeDatos()
-
-        //     console.log(this.modal.transaccion)
-        // },
         async grabar() {
             if (this.checkDatos()) return
-            // this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.kardex, this.modal.transaccion)
@@ -210,7 +148,6 @@ export default {
             if (res.code != 0) return
 
             this.initTransaccion()
-            // this.useModals.show.mAjusteStock = false
         },
 
         async loadDatosSistema() {

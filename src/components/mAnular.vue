@@ -29,9 +29,7 @@ export default {
 
         modal: {},
 
-        buttons: [
-            { text: 'Anular', action: 'anular', spin: false, show: true },
-        ],
+        buttons: [{ text: 'Anular', action: 'anular', spin: false, show: true }],
     }),
     created() {
         this.modal = this.useModals.mAnular
@@ -52,11 +50,13 @@ export default {
 
             if (res.code != 0) return
 
-            // this.modal.item.estado = 0
-            // this.modal.item.estado1 = { id: 0, nombre: 'ANULADO' }
-
-            if (this.useVistas[this.modal.vista] && this.useVistas[this.modal.vista][this.modal.array]) {
-                const toMod = this.useVistas[this.modal.vista][this.modal.array].find(a => a.id == this.modal.item.id)
+            if (
+                this.useVistas[this.modal.vista] &&
+                this.useVistas[this.modal.vista][this.modal.array]
+            ) {
+                const toMod = this.useVistas[this.modal.vista][this.modal.array].find(
+                    (a) => a.id == this.modal.item.id,
+                )
                 if (toMod) {
                     toMod.estado = 0
                     toMod.estado1 = { id: 0, nombre: 'ANULADO' }
@@ -65,10 +65,9 @@ export default {
 
             this.$emit('anulado', send.item)
             this.useModals.show.mAnular = false
-        }
+        },
     },
 }
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

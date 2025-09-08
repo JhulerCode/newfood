@@ -407,7 +407,7 @@ export default {
             item.vu =
                 item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
 
-            ///// ----- DESCUENTO ----- /////
+            // --- DESCUENTO --- //
             if (
                 item.descuento_tipo != null &&
                 item.descuento_valor != null &&

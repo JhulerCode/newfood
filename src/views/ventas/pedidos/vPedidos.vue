@@ -775,7 +775,7 @@ export default {
             this.useModals.setModal('mCambiarMesa', `Cambiar de mesa`, null, send, true)
         },
 
-        // ----- OPTIONS DEL GRID DE MESAS ----- //
+       // --- OPTIONS DEL GRID DE MESAS --- //
         toogleRowOptions(item) {
             const previousItem = this.optionsCaseItem
             this.hide()

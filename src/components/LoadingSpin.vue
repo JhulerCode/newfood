@@ -48,7 +48,6 @@ export default {
 
 .spinner {
     border: 0.3rem solid #f3f3f3;
-    // border-top: 0.3rem solid red;
     border-top: 0.3rem solid rgb(196, 196, 196);
     border-radius: 50%;
     width: 1.5rem;

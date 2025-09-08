@@ -220,14 +220,6 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
                         ]
                     },
-                    // {
-                    //     label: 'Cajas', goto: 'vCajas', permisos: [
-                    //         { id: 'vCajas:listar', label: 'Listar' },
-                    //         { id: 'vCajas:crear', label: 'Crear' },
-                    //         { id: 'vCajas:editar', label: 'Editar' },
-                    //         { id: 'vCajas:eliminar', label: 'Eliminar' },
-                    //     ]
-                    // },
                     {
                         label: 'Áreas de producción', goto: 'vProduccionAreas', permisos: [
                             { id: 'vProduccionAreas:listar', label: 'Listar' },
@@ -267,7 +259,7 @@ export const useAuth = defineStore('auth', {
             this.tables = {}
         },
 
-        // ----- LOGIN ----- //
+       // --- LOGIN --- //
         async login() {
             if (this.token == null) return false
 
@@ -305,7 +297,7 @@ export const useAuth = defineStore('auth', {
             return permisos.some(p => this.usuario?.permisos?.includes(p))
         },
 
-        // ----- TABLES ----- //
+       // --- TABLES --- //
         updateQuery(columns, qry) {
             columns.filter(a => a.op).forEach(b => {
                 qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
@@ -332,7 +324,7 @@ export const useAuth = defineStore('auth', {
             })
         },
         setColumns(tableName, columns) {
-            // ----- RECUPERA LAS COLUMNAS GUARDADAS ----- //
+           // --- RECUPERA LAS COLUMNAS GUARDADAS --- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
                     Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
@@ -340,7 +332,7 @@ export const useAuth = defineStore('auth', {
             }
         },
 
-        // ----- PREFERENCIAS ----- //
+       // --- PREFERENCIAS --- //
         setTheme(theme) {
             if (!theme) return
 

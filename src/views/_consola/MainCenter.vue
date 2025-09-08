@@ -37,27 +37,27 @@
 <script>
 import { useVistas } from '@/pinia/vistas.js'
 
-// ----- COMPRAS ----- //
+//----- COMPRAS --- //
 import vProveedores from '@/views/compras/proveedores/vProveedores.vue'
 import vCompras from '@/views/compras/compras/vCompras.vue'
 import vEmitirComprobante from '@/views/ventas/pedidos/vEmitirComprobante.vue'
 
-// ----- VENTAS ----- //
+//----- VENTAS --- //
 import vClientes from '@/views/ventas/clientes/vClientes.vue'
 import vPedidos from '@/views/ventas/pedidos/vPedidos.vue'
 import vComanda from '@/views/ventas/pedidos/vComanda.vue'
 
-// ----- CAJA ----- //
+//----- CAJA --- //
 import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
 import vCajaMovimientos from '@/views/caja/movimientos/vCajaMovimientos.vue'
 
-// ----- ARTÍCULOS ----- //
+//----- ARTÍCULOS --- //
 import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
 import vInsumos from '@/views/articulos/insumos/vInsumos.vue'
 import vProductos from '@/views/articulos/productos/vProductos.vue'
 import vCombos from '@/views/articulos/combos/vCombos.vue'
 
-// ----- REPORTES ----- //
+//----- REPORTES --- //
 import vReportePedidos from '@/views/reportes/pedidos/vReportePedidos.vue'
 import vReporteComprobantes from '@/views/reportes/comprobantes/vReporteComprobantes.vue'
 import VComprobantesDetallado from '../reportes/comprobantes_detallado/vComprobantesDetallado.vue'
@@ -65,7 +65,7 @@ import vCajaAperturas from '@/views/reportes/caja_aperturas/vCajaAperturas.vue'
 import vDineroMovimientos from '@/views/reportes/dinero_movimientos/vDineroMovimientos.vue'
 import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 
-// ----- AJSUTES ----- //
+//----- AJSUTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'

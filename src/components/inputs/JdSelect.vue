@@ -180,7 +180,6 @@ export default {
         toogleList() {
             if (this.disabled == true) return
 
-            /* ABRIR */
             this.isVisible = !this.isVisible
 
             if (this.isVisible) {

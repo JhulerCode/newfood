@@ -53,13 +53,6 @@ export default {
         modal: null,
 
         columns: [
-            // {
-            //     id: 'orden',
-            //     title: 'Orden',
-            //     slot: 'cOrden',
-            //     width: '5rem',
-            //     show: true
-            // },
             {
                 title: 'Nombre',
                 prop: 'title',
@@ -97,12 +90,6 @@ export default {
             { text: 'Grabar', action: 'grabar', show: true },
         ],
     }),
-    computed: {
-        // cols1Ordenado() {
-        //     const cols = [...this.modal.cols1]
-        //     return cols.sort((a, b) => a.orden - b.orden)
-        // }
-    },
     created() {
         this.modal = this.useModals.mConfigCols
         this.modal.cols1 = JSON.parse(JSON.stringify(this.modal.cols))
@@ -126,14 +113,14 @@ export default {
         async grabar() {
             if (this.checkDatos()) return
 
-            // ----- ASIGNAR A COLS ORIGINIAL ----- //
+           // --- ASIGNAR A COLS ORIGINIAL --- //
             const cols1Map = this.modal.cols1.reduce((obj, a) => (obj[a.id] = a, obj), {})
 
             for (const a of this.modal.cols) {
                 Object.assign(a, cols1Map[a.id])
             }
 
-            // ----- GUARDAR LAS COLUMNAS EN PINIA ----- //
+           // --- GUARDAR LAS COLUMNAS EN PINIA --- //
             this.useAuth.saveTableColumns(this.modal.table, this.modal.cols1)
 
             this.modal.reload()

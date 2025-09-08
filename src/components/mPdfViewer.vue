@@ -19,14 +19,6 @@ export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
-
-        usuario: null,
-        contrasena: null,
-
-        // buttons: [
-        //     { text: 'Cancelar', action: 'cancelar', tipo: '2', show: true },
-        //     { text: 'Ingresar', action: 'ingresar', show: true },
-        // ],
     }),
     created() {
         this.modal = this.useModals.mPdfViewer
