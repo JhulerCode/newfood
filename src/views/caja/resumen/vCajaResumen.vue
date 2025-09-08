@@ -298,7 +298,7 @@
 
                     <JdTable
                         :datos="vista.resumen.venta_canales || []"
-                        :columns="columnsPagoMetodos"
+                        :columns="columnsVentaCanales"
                         :seeker="false"
                         :download="false"
                         height="12rem"
@@ -453,6 +453,33 @@ export default {
             },
             {
                 id: 'monto',
+                title: 'Monto',
+                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+        ],
+
+        columnsVentaCanales: [
+            {
+                id: 'name',
+                title: 'Nombre',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
+                width: '4rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'value',
                 title: 'Monto',
                 toRight: true,
                 format: 'currency',

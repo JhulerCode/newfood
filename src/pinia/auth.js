@@ -184,7 +184,7 @@ export const useAuth = defineStore('auth', {
                     },
                     {
                         label: 'Dashboard', goto: 'vDashboard', permisos: [
-                            { id: 'vDashboard:listar', label: 'Listar' },
+                            { id: 'vDashboard:ver', label: 'Listar' },
                         ]
                     }
                 ]
