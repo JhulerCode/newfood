@@ -75,16 +75,8 @@
                 v-if="articulo.archivo || articulo.foto_path"
                 class="producto-foto"
             >
-                <img
-                    :src="modal.blob"
-                    :alt="articulo.nombre"
-                    v-if="articulo.archivo"
-                />
-                <img
-                    :src="`${urls.uploads}/${articulo.foto_path}`"
-                    :alt="articulo.nombre"
-                    v-else
-                />
+                <img :src="modal.blob" :alt="articulo.nombre" v-if="articulo.archivo" />
+                <img :src="`${urls.uploads}/${articulo.foto_path}`" :alt="articulo.nombre" v-else />
             </div>
         </div>
     </JdModal>
@@ -250,7 +242,6 @@ export default {
     .producto-foto {
         width: 9rem;
         height: 8.9rem;
-        background-color: red;
 
         img {
             width: 100%;

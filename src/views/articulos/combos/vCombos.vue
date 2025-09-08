@@ -90,6 +90,16 @@ export default {
                 sort: false,
             },
             {
+                id: 'foto_path',
+                title: 'Foto',
+                filtrable: false,
+                format: 'img',
+                width: '5rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 type: 'text',
@@ -180,6 +190,7 @@ export default {
     async created() {
         this.vista = this.useVistas.vCombos
         this.useAuth.setColumns(this.tableName, this.columns)
+        this.columns[1].host = urls.uploads
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vCombos:listar') == true) this.loadArticulos()

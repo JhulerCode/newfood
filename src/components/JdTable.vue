@@ -375,6 +375,15 @@
                                         </div>
                                     </template>
                                 </template>
+
+                                <template v-if="column.format == 'img'">
+                                    <div class="img-box" v-if="a[column.id]">
+                                        <img
+                                            :src="`${column.host}/${a[column.id]}`"
+                                            :alt="a[column.id]"
+                                        />
+                                    </div>
+                                </template>
                             </template>
 
                             <template v-else-if="column.prop">
@@ -1015,6 +1024,17 @@ export default {
                     .currency-box {
                         display: flex;
                         justify-content: space-between;
+                    }
+
+                    .img-box {
+                        width: 100%;
+                        height: 3rem;
+
+                        img {
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
                     }
                 }
 

@@ -78,13 +78,16 @@ async function get(url, is_file) {
 }
 
 function setFormData(item) {
-    const formData = new FormData();
+    const formData = new FormData()
 
-    for (const key in item) {
-        const value = item[key];
+    // for (const key in item) {
+    //     const value = item[key];
 
-        formData.append(key, value);
-    }
+    //     formData.append(key, value);
+    // }
+    const { archivo, ...resto } = item
+    formData.append('archivo', archivo)
+    formData.append("datos", JSON.stringify(resto))
 
     return formData
 }

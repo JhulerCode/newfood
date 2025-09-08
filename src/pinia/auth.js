@@ -181,6 +181,11 @@ export const useAuth = defineStore('auth', {
                         label: 'Ingresos y egresos', goto: 'vDineroMovimientos', permisos: [
                             { id: 'vDineroMovimientos:listar', label: 'Listar' },
                         ]
+                    },
+                    {
+                        label: 'Dashboard', goto: 'vDashboard', permisos: [
+                            { id: 'vDashboard:listar', label: 'Listar' },
+                        ]
                     }
                 ]
             },

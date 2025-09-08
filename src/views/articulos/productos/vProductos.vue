@@ -118,6 +118,16 @@ export default {
                 sort: false,
             },
             {
+                id: 'foto_path',
+                title: 'Foto',
+                filtrable: false,
+                format: 'img',
+                width: '5rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 type: 'text',
@@ -280,6 +290,7 @@ export default {
     async created() {
         this.vista = this.useVistas.vProductos
         this.useAuth.setColumns(this.tableName, this.columns)
+        this.columns[1].host = urls.uploads
 
         this.verifyRowSelectIsActive()
 

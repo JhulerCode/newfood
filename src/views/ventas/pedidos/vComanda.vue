@@ -89,8 +89,11 @@
                             :title="a.nombre"
                         >
                             <div class="articulo-foto">
+                                <img :src="`${urls.uploads}/${a.foto_path}`" v-if="a.foto_path" />
                                 <img
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTnwhd3F5FQoOej40KGE5zQHeX7nZqYm_paXw&s"
+                                    src="https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg"
+                                    alt="no-image"
+                                    v-else
                                 />
                             </div>
 
@@ -297,6 +300,7 @@ export default {
         useVistas: useVistas(),
         redondear,
         getItemFromArray,
+        urls: urls,
 
         vista: {},
 
@@ -413,6 +417,7 @@ export default {
                     'is_combo',
                     'igv_afectacion',
                     'precios_semana',
+                    'foto_path',
                 ],
                 incl: ['receta_insumos', 'combo_articulos'],
             }
@@ -738,8 +743,7 @@ export default {
             grid-template-rows: auto 1fr;
             overflow: hidden;
             gap: 0.5rem;
-            border-radius: 0.5rem;
-            padding: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
             background-color: var(--bg-color2);
 
             .nombre {
@@ -756,6 +760,7 @@ export default {
                 flex-wrap: wrap;
                 align-content: flex-start;
                 gap: 0.5rem;
+                padding: 1rem;
 
                 .articulo {
                     height: 10rem;
@@ -801,7 +806,9 @@ export default {
                     }
 
                     &:hover {
-                        background-color: var(--amarillo);
+                        // border: 2px solid var(--amarillo);
+                        // background-color: var(--amarillo);
+                        box-shadow: 0 0 0.8rem var(--amarillo);
                     }
                 }
             }

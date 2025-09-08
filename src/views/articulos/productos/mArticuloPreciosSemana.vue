@@ -93,8 +93,12 @@ export default {
             for (const a of this.articulo.precios_semana) {
                 if (a.pu == '') a.pu = null
             }
+
+            this.articulo.patch_mode = 1
         },
         async modificar() {
+            this.shapeDatos()
+
             this.useAuth.setLoading(true, 'Modificando...')
             const res = await patch(urls.articulos, this.articulo)
             this.useAuth.setLoading(false)
