@@ -33,10 +33,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, JdButton, mConfigCols, mConfigFiltros } from 'jd-components'
 
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
 

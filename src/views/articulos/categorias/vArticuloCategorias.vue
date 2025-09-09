@@ -29,8 +29,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdTable, JdButton } from 'jd-components'
 
 import mArticuloCategoria from './mArticuloCategoria.vue'
 

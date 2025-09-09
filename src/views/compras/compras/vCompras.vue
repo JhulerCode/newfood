@@ -41,12 +41,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, JdButton, mAnular, mConfigCols, mConfigFiltros } from 'jd-components'
 
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 

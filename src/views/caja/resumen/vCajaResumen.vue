@@ -409,9 +409,9 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdTable, JdButton } from 'jd-components'
+
 import mCajaAperturar from './mCajaAperturar.vue'
-import JdTable from '@/components/JdTable.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -170,12 +170,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdModal, JdInput, JdSwitch, JdSelect, JdCheckBox, JdButton } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

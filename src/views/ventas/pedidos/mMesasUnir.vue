@@ -62,9 +62,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdCheckBox from '@/components/inputs/JdCheckBox.vue'
+import { JdModal, JdButton, JdCheckBox } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

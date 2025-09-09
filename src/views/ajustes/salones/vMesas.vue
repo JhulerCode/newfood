@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
+import { JdTable } from 'jd-components'
 
 import mMesa from './mMesa.vue'
 

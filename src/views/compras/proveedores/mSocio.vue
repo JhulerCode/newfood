@@ -66,10 +66,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
+import { JdModal, JdInput, JdSelect, JdSwitch } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

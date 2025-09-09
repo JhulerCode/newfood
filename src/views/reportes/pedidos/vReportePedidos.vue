@@ -33,9 +33,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, mConfigFiltros } from 'jd-components'
 
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
 

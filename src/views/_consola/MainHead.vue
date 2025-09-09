@@ -5,20 +5,36 @@
                 <i class="fa-solid fa-bars"></i>
             </div>
 
-            <img src="@/assets/img/logo-black.png" v-if="!useAuth.isDarkMode">
-            <img src="@/assets/img/logo-white.png" v-else>
+            <img src="@/assets/img/logo-black.png" v-if="!useAuth.isDarkMode" />
+            <img src="@/assets/img/logo-white.png" v-else />
         </div>
 
         <div class="right">
             <div class="actions">
-                <ThemeConfig backGround="2"/>
+                <div class="btn" @click="reloadWindow">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </div>
 
-                <ScreenConfig />
+                <div
+                    class="btn"
+                    @click="darkLigthMode"
+                    :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`"
+                >
+                    <i class="fa-regular fa-moon" v-if="!useAuth.isDarkMode"></i>
+                    <i class="fa-regular fa-sun" v-else></i>
+                </div>
+
+                <div class="btn" @click="fullScreen" title="Pantalla completa">
+                    <i class="fa-solid fa-expand"></i>
+                </div>
             </div>
 
             <div class="user-info" v-if="useAuth.usuario" @click="openUserMenu">
                 <div class="user-texts">
-                    <p class="user-name max-1line" :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`">
+                    <p
+                        class="user-name max-1line"
+                        :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+                    >
                         {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
                     </p>
                     <p class="max-1line" :title="useAuth.usuario.cargo">
@@ -27,9 +43,11 @@
                 </div>
 
                 <div class="user-foto">
-                    {{ useAuth.usuario.apellidos
-                        ? useAuth.usuario.nombres[0] + useAuth.usuario.apellidos[0]
-                        : useAuth.usuario.nombres?.slice(0, 2) }}
+                    {{
+                        useAuth.usuario.apellidos
+                            ? useAuth.usuario.nombres[0] + useAuth.usuario.apellidos[0]
+                            : useAuth.usuario.nombres?.slice(0, 2)
+                    }}
                 </div>
             </div>
         </div>
@@ -37,19 +55,12 @@
 </template>
 
 <script>
-import ThemeConfig from '@/components/actions/ThemeConfig.vue'
-import ScreenConfig from '@/components/actions/ScreenConfig.vue'
-
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
 
-// import { urls, patch } from '@/utils/crud'
+import { urls, patch } from '@/utils/crud'
 
 export default {
-    components: {
-        ThemeConfig,
-        ScreenConfig,
-    },
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
@@ -58,8 +69,50 @@ export default {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
         },
+
         reloadWindow() {
             window.location.reload()
+        },
+        async darkLigthMode() {
+            const send = {
+                id: this.useAuth.usuario.colaborador,
+                theme: this.useAuth.isDarkMode == true ? '1' : '2',
+            }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(`${urls.colaboradores}/preferencias`, send, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useAuth.setTheme(send.theme)
+        },
+        fullScreen() {
+            // Alterna el modo pantalla completa
+            const doc = window.document
+            const docEl = doc.documentElement
+
+            const requestFullScreen =
+                docEl.requestFullscreen ||
+                docEl.mozRequestFullScreen ||
+                docEl.webkitRequestFullscreen ||
+                docEl.msRequestFullscreen
+            const cancelFullScreen =
+                doc.exitFullscreen ||
+                doc.mozCancelFullScreen ||
+                doc.webkitExitFullscreen ||
+                doc.msExitFullscreen
+
+            if (
+                !doc.fullscreenElement &&
+                !doc.mozFullScreenElement &&
+                !doc.webkitFullscreenElement &&
+                !doc.msFullscreenElement
+            ) {
+                requestFullScreen.call(docEl)
+            } else {
+                cancelFullScreen.call(doc)
+            }
         },
 
         openUserMenu() {
@@ -82,26 +135,12 @@ header {
         align-items: center;
         gap: 1rem;
 
-        .btn {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-
-            &:hover {
-                background-color: var(--bg-color);
-            }
-        }
-
         img {
             height: 2.5rem;
         }
     }
 
-    >.right {
+    > .right {
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -140,11 +179,34 @@ header {
             }
         }
     }
+
+    .btn {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        i {
+            font-size: 1.2rem;
+            color: var(--text-color2);
+        }
+
+        &:hover {
+            background-color: var(--bg-color);
+
+            * {
+                color: var(--primary-color);
+            }
+        }
+    }
 }
 
 @media (max-width: 540px) {
     header {
-        >.right {
+        > .right {
             .actions {
                 display: none;
             }
@@ -152,3 +214,4 @@ header {
     }
 }
 </style>
+

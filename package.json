@@ -13,6 +13,7 @@
     "echarts": "^6.0.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
+    "jd-components": "github:JhulerCode/jd-components",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^3.2.1",
     "sweetalert2": "^11.22.0",

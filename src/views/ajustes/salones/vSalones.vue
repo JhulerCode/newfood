@@ -66,8 +66,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdTable, JdButton } from 'jd-components'
 
 import mSalon from './mSalon.vue'
 import mMesa from './mMesa.vue'
@@ -304,7 +303,7 @@ export default {
     }
 
     span {
-        color: var(--text-color2)
+        color: var(--text-color2);
     }
 }
 </style>

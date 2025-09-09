@@ -40,13 +40,10 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
-import mPdfViewer from '@/components/mPdfViewer.vue'
+import { JdTable, mConfigCols, mConfigFiltros, mAnular, mPdfViewer } from 'jd-components'
+
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
-import mComprobanteCanjear from './mComprobanteCanjear.vue'
+import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -269,11 +269,8 @@
 </template>
 
 <script>
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from 'jd-components'
+
 import mPedidoItemNota from '@/views/ventas/pedidos/mPedidoItemNota.vue'
 
 import { useAuth } from '@/pinia/auth'

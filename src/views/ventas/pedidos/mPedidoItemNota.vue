@@ -7,14 +7,10 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdTextArea from '@/components/inputs/JdTextArea.vue'
+import { JdModal, JdTextArea } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
-
-// import { jmsg } from '@/utils/swal'
-// import { urls, patch } from '@/utils/crud'
 
 export default {
     components: {

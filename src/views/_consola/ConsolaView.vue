@@ -3,7 +3,7 @@
         <MainHead />
 
         <div class="main-body">
-            <SideBar class="side-bar"/>
+            <SideBar class="side-bar" />
 
             <MainCenter />
         </div>
@@ -16,10 +16,11 @@
 </template>
 
 <script>
+import { mLogin } from 'jd-components'
+
 import MainHead from '@/views/_consola/MainHead.vue'
 import SideBar from '@/views/_consola/SideBar.vue'
 import MainCenter from '@/views/_consola/MainCenter.vue'
-import mLogin from '@/components/mLogin.vue'
 
 import mUserMenu from './mUserMenu.vue'
 import mUserPreferences from './mUserPreferences.vue'

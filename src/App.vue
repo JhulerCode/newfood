@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import LoadingSpin from '@/components/LoadingSpin.vue'
+import { LoadingSpin } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'

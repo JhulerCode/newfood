@@ -116,8 +116,6 @@
                 :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
             >
-                <!-- <template v-slot:colMoreInfo="{ item }">
-                </template> -->
             </JdTable>
         </template>
     </div>
@@ -125,7 +123,6 @@
     <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
     <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
-    <!--<mPagarCuenta v-if="useModals.show.mPagarCuenta" /> -->
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
 
@@ -148,14 +145,11 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
+import { JdTable, JdButton, mAnular } from 'jd-components'
 
 import mMesasUnir from '@/views/ventas/pedidos/mMesasUnir.vue'
 import mCambiarMesa from '@/views/ventas/pedidos/mCambiarMesa.vue'
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
-// import mPagarCuenta from '@/views/u/ventas/clientePedidos/mPagarCuenta.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -164,7 +158,6 @@ import { useVistas } from '@/pinia/vistas'
 import { urls, get, patch, post } from '@/utils/crud'
 import { getItemFromArray, redondear } from '@/utils/mine'
 import { jqst } from '@/utils/swal'
-// import { socio_pedidos_estados } from '@/data/procesos_estados'
 
 import dayjs from 'dayjs'
 
@@ -175,7 +168,6 @@ export default {
         mMesasUnir,
         mCambiarMesa,
         mPedidoComprobantes,
-        // mPagarCuenta,
         mAnular,
     },
     data: () => ({
@@ -183,12 +175,10 @@ export default {
         useAuth: useAuth(),
         useVistas: useVistas(),
         getItemFromArray,
-        // socio_pedidos_estados,
         redondear,
         dayjs,
 
         vista: {},
-        // vista.intervalAgo: null,
 
         optionsShow: false,
         optionsLista: [],
@@ -775,7 +765,7 @@ export default {
             this.useModals.setModal('mCambiarMesa', `Cambiar de mesa`, null, send, true)
         },
 
-       // --- OPTIONS DEL GRID DE MESAS --- //
+        // --- OPTIONS DEL GRID DE MESAS --- //
         toogleRowOptions(item) {
             const previousItem = this.optionsCaseItem
             this.hide()

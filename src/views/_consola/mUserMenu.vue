@@ -9,17 +9,17 @@
     >
         <ul>
             <li @click="openPreferenciasUsuario">
-                <iSliders height="1rem" width="1rem" />
+                <i class="fa-solid fa-sliders" @click="openPreferencias"></i>
                 <span>Preferencias</span>
             </li>
 
             <li @click="updateSession">
-                <iReload height="1rem" width="1rem" />
+                <i class="fa-solid fa-rotate-right"></i>
                 <span>Actualizar sesión</span>
             </li>
 
             <li @click="logout">
-                <iLogOut height="1rem" width="1rem" />
+                <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Salir del sistema</span>
             </li>
         </ul>
@@ -27,10 +27,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import iSliders from '@/components/icons/iSliders.vue'
-import iReload from '@/components/icons/iReload.vue'
-import iLogOut from '@/components/icons/iLogOut.vue'
+import { JdModal } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -38,9 +35,6 @@ import { useModals } from '@/pinia/modals'
 export default {
     components: {
         JdModal,
-        iSliders,
-        iReload,
-        iLogOut,
     },
     data: () => ({
         useAuth: useAuth(),

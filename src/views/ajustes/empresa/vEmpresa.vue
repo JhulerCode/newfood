@@ -101,8 +101,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
+import { JdButton, JdInput } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

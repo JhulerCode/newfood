@@ -27,8 +27,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, mConfigFiltros } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -123,7 +122,7 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-            }
+            },
         ],
         tableRowOptions: [],
     }),

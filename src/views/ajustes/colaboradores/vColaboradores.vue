@@ -34,11 +34,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdButton, JdTable, mConfigCols, mConfigFiltros } from 'jd-components'
 
 import mColaborador from './mColaborador.vue'
 

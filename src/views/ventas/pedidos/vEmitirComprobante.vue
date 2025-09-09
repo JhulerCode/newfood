@@ -216,11 +216,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSelectQuery from '@/components/inputs/JdSelectQuery.vue'
-import JdTable from '@/components/JdTable.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
+import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from 'jd-components'
 
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
 

@@ -19,8 +19,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
+import { JdModal, JdSelect } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

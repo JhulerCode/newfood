@@ -10,6 +10,14 @@
             />
 
             <JdInput
+                label="Fecha"
+                :nec="true"
+                type="date"
+                :disabled="true"
+                v-model="articulo.asd"
+                style="grid-column: 1/5"
+            />
+            <JdInput
                 label="Nombre"
                 :nec="true"
                 v-model="articulo.nombre"
@@ -83,11 +91,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
-import JdInputFile from '@/components/inputs/JdInputFile.vue'
+import { JdModal, JdInput, JdSelect, JdSwitch, JdInputFile } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -121,6 +125,8 @@ export default {
     async created() {
         this.modal = this.useModals.mArticulo
         this.articulo = this.useModals.mArticulo.item
+
+        this.articulo.asd = '2025-12-1'
 
         this.showButtons()
 

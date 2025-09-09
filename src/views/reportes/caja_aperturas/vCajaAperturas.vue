@@ -24,10 +24,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, mConfigCols, mConfigFiltros } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -38,10 +38,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdSelect from '@/components/inputs/JdSelect.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdSwitch from '@/components/inputs/JdSwitch.vue'
+import { JdModal, JdSelect, JdInput, JdSwitch } from 'jd-components'
 
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'

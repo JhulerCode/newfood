@@ -27,9 +27,7 @@
 </template>
 
 <script>
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdInputPassword from '@/components/inputs/JdInputPassword.vue'
-import JdButton from '@/components/inputs/JdButton.vue'
+import { JdInput, JdInputPassword, JdButton } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

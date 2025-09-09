@@ -35,11 +35,7 @@
 </template>
 
 <script>
-import JdTable from '@/components/JdTable.vue'
-import mAnular from '@/components/mAnular.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
+import { JdTable, mConfigCols, mConfigFiltros, mAnular } from 'jd-components'
 
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 

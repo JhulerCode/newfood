@@ -29,8 +29,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
+import { JdButton, JdTable } from 'jd-components'
 
 import mPagoComprobante from './mPagoComprobante.vue'
 

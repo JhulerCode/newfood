@@ -59,10 +59,7 @@
 </template>
 
 <script>
-import JdModal from '@/components/JdModal.vue'
-import JdInput from '@/components/inputs/JdInput.vue'
-import JdTable from '@/components/JdTable.vue'
-// import JdButton from '@/components/inputs/JdButton.vue'
+import { JdModal, JdInput, JdTable } from 'jd-components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -76,7 +73,6 @@ export default {
     components: {
         JdModal,
         JdInput,
-        // JdButton,
         JdTable,
     },
     data: () => ({

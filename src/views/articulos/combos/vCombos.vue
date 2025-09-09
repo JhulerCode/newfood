@@ -38,12 +38,7 @@
 </template>
 
 <script>
-import JdButton from '@/components/inputs/JdButton.vue'
-import JdTable from '@/components/JdTable.vue'
-
-import mConfigCols from '@/components/mConfigCols.vue'
-import mConfigFiltros from '@/components/mConfigFiltros.vue'
-import mEditar from '@/components/mEditar.vue'
+import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from 'jd-components'
 
 import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
 import mCombo from '@/views/articulos/combos/mCombo.vue'
