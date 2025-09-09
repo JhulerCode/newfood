@@ -123,6 +123,7 @@
     <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
     <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @datallesModificados="loadPedidos" />/>
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
 
@@ -145,11 +146,12 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mAnular } from 'jd-components'
+import { JdTable, JdButton, mAnular } from '@jhuler/components'
 
 import mMesasUnir from '@/views/ventas/pedidos/mMesasUnir.vue'
 import mCambiarMesa from '@/views/ventas/pedidos/mCambiarMesa.vue'
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
+import mPedidoDetalles from '@/views/ventas/pedidos/mPedidoDetalles.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -169,6 +171,7 @@ export default {
         mCambiarMesa,
         mPedidoComprobantes,
         mAnular,
+        mPedidoDetalles,
     },
     data: () => ({
         useModals: useModals(),
@@ -270,12 +273,26 @@ export default {
             },
         ],
         tableRowOptions: [
+            // {
+            //     label: 'Editar',
+            //     icon: 'fa-solid fa-pen-to-square',
+            //     action: 'editar',
+            //     permiso: 'vPedidos:editar',
+            //     ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+            // },
             {
-                label: 'Editar',
+                label: 'Añadir productos',
+                icon: 'fa-solid fa-plus',
+                action: 'addProductos',
+                permiso: 'vPedidos:addProductos',
+                ocultar: { estado: 0, venta_facturado: true },
+            },
+            {
+                label: 'Editar detalles',
                 icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vPedidos:editar',
-                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+                action: 'editarDetalles',
+                permiso: 'vPedidos:editarDetalles',
+                ocultar: { estado: 0, venta_facturado: true, venta_canal: 1 },
             },
             {
                 label: 'Anular',
@@ -389,14 +406,19 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('createdAt', 'venta_entregado', 'venta_canal')
+            this.vista.qry.cols.push(
+                'createdAt',
+                'venta_entregado',
+                'venta_canal',
+
+                'socio',
+                'observacion',
+                'venta_pago_metodo',
+            )
 
             if (this.vista.venta_canal == 1) {
-                // this.vista.qry.fltr.estado = { op: 'Es', val: '1' }
-                // this.vista.qry.fltr.venta_entregado = { op: 'Es', val: false }
                 this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.incl.push('venta_mesa1')
-                // } else {
             }
         },
         async loadPedidos() {
@@ -563,13 +585,7 @@ export default {
         runMethod(method, item, item2) {
             this[method](item, item2)
         },
-        async editar(item, mesa) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
+        addProductos(item, mesa) {
             let salon1
             if (mesa) {
                 const salon_find = this.vista.salones.find((a) =>
@@ -581,15 +597,57 @@ export default {
             this.useVistas.showVista('vComanda', 'Editar comanda')
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 2
-            vistaComanda.pedido = res.data
+            vistaComanda.pedido = { ...item, transaccion_items: [] }
             vistaComanda.pedido.salon1 = salon1
-            vistaComanda.socios = [
-                {
-                    id: res.data.socio,
-                    ...res.data.venta_socio_datos,
-                },
-            ]
         },
+        editarDetalles(item) {
+            const send = {
+                pedido: {
+                    id: item.id,
+                    socio: item.socio,
+                    venta_canal: item.venta_canal,
+                    venta_socio_datos: item.venta_socio_datos,
+                    repartidor: item.repartidor,
+                    venta_pago_metodo: item.venta_pago_metodo,
+                    observacion: item.observacion,
+                },
+                socios: [
+                    {
+                        id: item.socio,
+                        ...item.venta_socio_datos,
+                    },
+                ],
+            }
+
+            this.useModals.setModal('mPedidoDetalles', 'Editar detalles', null, send, true)
+        },
+        // async editar(item, mesa) {
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.transacciones}/uno/${item.id}`)
+        //     this.useAuth.setLoading(false)
+
+        //     if (res.code != 0) return
+
+        //     let salon1
+        //     if (mesa) {
+        //         const salon_find = this.vista.salones.find((a) =>
+        //             a.mesas.some((b) => b.id === mesa.id),
+        //         )
+        //         salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+        //     }
+
+        //     this.useVistas.showVista('vComanda', 'Editar comanda')
+        //     const vistaComanda = this.useVistas.vComanda
+        //     vistaComanda.mode = 2
+        //     vistaComanda.pedido = res.data
+        //     vistaComanda.pedido.salon1 = salon1
+        //     vistaComanda.socios = [
+        //         {
+        //             id: res.data.socio,
+        //             ...res.data.venta_socio_datos,
+        //         },
+        //     ]
+        // },
         anular(item) {
             const send = {
                 url: 'transacciones',

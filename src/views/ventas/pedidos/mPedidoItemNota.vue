@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { JdModal, JdTextArea } from 'jd-components'
+import { JdModal, JdTextArea } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

@@ -38,7 +38,7 @@
 </template>
 
 <script>
-import { JdModal, JdSelect, JdInput, JdSwitch } from 'jd-components'
+import { JdModal, JdSelect, JdInput, JdSwitch } from '@jhuler/components'
 
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'

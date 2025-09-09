@@ -117,7 +117,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdTextArea } from 'jd-components'
+import { JdModal, JdInput, JdSelect, JdTextArea } from '@jhuler/components'
 
 import mTransaccionItems from './mTransaccionItems.vue'
 

@@ -40,7 +40,7 @@
 </template>
 
 <script>
-import { JdTable, mConfigCols, mConfigFiltros, mAnular, mPdfViewer } from 'jd-components'
+import { JdTable, mConfigCols, mConfigFiltros, mAnular, mPdfViewer } from '@jhuler/components'
 
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'

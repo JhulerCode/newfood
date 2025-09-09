@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from 'jd-components'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
 

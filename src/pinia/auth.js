@@ -49,9 +49,11 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPedidos:listar', label: 'Listar' },
                             { id: 'vPedidos:crear', label: 'Crear' },
                             { id: 'vPedidos:ver', label: 'Ver' },
+                            { id: 'vPedidos:addProductos', label: 'Añadir productos' },
+                            { id: 'vPedidos:editarDetalles', label: 'Editar detalles' },
                             { id: 'vPedidos:anular', label: 'Anular' },
-                            { id: 'vPedidos:editar', label: 'Editar' },
-                            { id: 'vPedidos:eliminar', label: 'Eliminar' },
+                            // { id: 'vPedidos:editar', label: 'Editar' },
+                            // { id: 'vPedidos:eliminar', label: 'Eliminar' },
 
                             { id: 'vPedidos:imprimirComanda', label: 'Imprimir comanda' },
                             { id: 'vPedidos:imprimirPrecuenta', label: 'Imprimir precuenta' },

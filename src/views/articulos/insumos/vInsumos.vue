@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from 'jd-components'
+import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from '@jhuler/components'
 
 import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
 import mArticulo from '@/views/articulos/mArticulo.vue'

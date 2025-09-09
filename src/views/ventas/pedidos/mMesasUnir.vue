@@ -62,7 +62,7 @@
 </template>
 
 <script>
-import { JdModal, JdButton, JdCheckBox } from 'jd-components'
+import { JdModal, JdButton, JdCheckBox } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

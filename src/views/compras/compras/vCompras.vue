@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, mAnular, mConfigCols, mConfigFiltros } from 'jd-components'
+import { JdTable, JdButton, mAnular, mConfigCols, mConfigFiltros } from '@jhuler/components'
 
 import mTransaccion from '@/views/compras/compras/mTransaccion.vue'
 

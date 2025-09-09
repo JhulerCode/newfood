@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { JdModal } from 'jd-components'
+import { JdModal } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

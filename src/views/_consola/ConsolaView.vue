@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mLogin } from 'jd-components'
+import { mLogin } from '@jhuler/components'
 
 import MainHead from '@/views/_consola/MainHead.vue'
 import SideBar from '@/views/_consola/SideBar.vue'

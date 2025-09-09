@@ -170,7 +170,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdSelect, JdCheckBox, JdButton } from 'jd-components'
+import { JdModal, JdInput, JdSwitch, JdSelect, JdCheckBox, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -385,6 +385,8 @@ export default {
                     'vPedidos:listar',
                     'vPedidos:crear',
                     'vPedidos:ver',
+                    'vPedidos:addProductos',
+                    'vPedidos:editarDetalles',
                     'vPedidos:imprimirComanda',
                     'vPedidos:imprimirPrecuenta',
                     'vPedidos:generarComprobante',
@@ -416,6 +418,8 @@ export default {
                     'vPedidos:listar',
                     'vPedidos:crear',
                     'vPedidos:ver',
+                    'vPedidos:addProductos',
+                    'vPedidos:editarDetalles',
                     'vPedidos:imprimirComanda',
                     'vPedidos:imprimirPrecuenta',
                     'vPedidos:unirMesas',

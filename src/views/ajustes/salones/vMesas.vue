@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { JdTable } from 'jd-components'
+import { JdTable } from '@jhuler/components'
 
 import mMesa from './mMesa.vue'
 

@@ -216,7 +216,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from 'jd-components'
+import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from '@jhuler/components'
 
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
@@ -564,6 +564,8 @@ export default {
         setSocioCreated(item) {
             this.vista.socios = [item]
             this.vista.comprobante.socio = item.id
+
+            this.setSocio(item)
         },
 
         checkDatos() {

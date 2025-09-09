@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import { JdTable, mConfigCols, mConfigFiltros, mAnular } from 'jd-components'
+import { JdTable, mConfigCols, mConfigFiltros, mAnular } from '@jhuler/components'
 
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 

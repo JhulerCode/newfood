@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { JdInput, JdInputPassword, JdButton } from 'jd-components'
+import { JdInput, JdInputPassword, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

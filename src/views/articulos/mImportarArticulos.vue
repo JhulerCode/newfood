@@ -10,7 +10,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable } from 'jd-components'
+import { JdModal, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

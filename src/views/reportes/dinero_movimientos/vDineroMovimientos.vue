@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { JdTable, mConfigFiltros } from 'jd-components'
+import { JdTable, mConfigFiltros } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

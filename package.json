@@ -1,6 +1,6 @@
 {
   "name": "newrest-frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,11 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@jhuler/components": "^1.0.2",
     "dayjs": "^1.11.13",
     "echarts": "^6.0.0",
     "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
-    "jd-components": "github:JhulerCode/jd-components",
     "pinia": "^3.0.3",
     "pinia-plugin-persistedstate": "^3.2.1",
     "sweetalert2": "^11.22.0",

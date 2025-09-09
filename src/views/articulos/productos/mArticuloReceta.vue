@@ -75,7 +75,7 @@
 </template>
 
 <script>
-import { JdModal, JdTable, JdSelectQuery, JdInput, JdButton } from 'jd-components'
+import { JdModal, JdTable, JdSelectQuery, JdInput, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

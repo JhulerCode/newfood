@@ -101,7 +101,7 @@
 </template>
 
 <script>
-import { JdButton, JdInput } from 'jd-components'
+import { JdButton, JdInput } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { JdButton, JdTable } from 'jd-components'
+import { JdButton, JdTable } from '@jhuler/components'
 
 import mImpresora from './mImpresora.vue'
 

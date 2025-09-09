@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput } from 'jd-components'
+import { JdModal, JdInput } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'

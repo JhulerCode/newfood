@@ -2,7 +2,7 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                {{ vista.mode == 1 ? 'Nueva comanda' : 'Editar comanda N°' }}
+                {{ vista.mode == 1 ? 'Nueva comanda' : 'Añadir a comanda N°' }}
                 {{ vista.pedido.venta_codigo }}
                 <template v-if="vista.pedido.venta_canal == 1">
                     ({{ vista.pedido.salon1.nombre }} - {{ vista.pedido.venta_mesa1.nombre }})
@@ -18,14 +18,15 @@
                     tipo="2"
                     @click="regresar()"
                 />
+
                 <template v-if="vista.mode == 1 && useAuth.verifyPermiso('vPedidos:crear')">
                     <JdButton text="Grabar" tipo="2" @click="grabar()" />
                     <JdButton text="Grabar e imprimir" />
                 </template>
 
-                <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:editar')">
-                    <JdButton text="Actualizar" tipo="2" @click="modificar()" />
-                    <JdButton text="Actualizar e imprimir" />
+                <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
+                    <JdButton text="Grabar" tipo="2" @click="modificar()" />
+                    <JdButton text="Grabar e imprimir" />
                 </template>
             </div>
         </div>
@@ -109,8 +110,13 @@
                 </div>
             </div>
 
-            <div class="right">
-                <ul class="pedido-head">
+            <div
+                class="right"
+                :style="{
+                    'grid-template-rows': `${vista.mode != 2 ? 'auto 1fr auto' : '1fr auto'}`,
+                }"
+            >
+                <ul class="pedido-head" v-if="vista.mode != 2">
                     <li @click="vista.detalle = 1" :class="{ activo: vista.detalle == 1 }">
                         Pedido
                     </li>
@@ -188,7 +194,10 @@
                 </template>
 
                 <div class="pedido-detalles" v-if="vista.detalle == 2">
-                    <template v-if="vista.pedido.venta_canal == 2 || vista.pedido.venta_canal == 3">
+                    <div
+                        v-if="vista.pedido.venta_canal == 2 || vista.pedido.venta_canal == 3"
+                        class="dato-cliente"
+                    >
                         <JdSelectQuery
                             icon="fa-solid fa-magnifying-glass"
                             placeholder="Buscar cliente"
@@ -199,7 +208,21 @@
                             @search="loadSocios"
                             @elegir="setSocio"
                         />
-                    </template>
+
+                        <JdButton
+                            icon="fa-solid fa-user-plus"
+                            title="Nuevo socio"
+                            tipo="2"
+                            :small="true"
+                            @click="nuevoSocio()"
+                        />
+                    </div>
+
+                    <JdInput
+                        label="Nombres"
+                        :nec="true"
+                        v-model="vista.pedido.venta_socio_datos.nombres"
+                    />
 
                     <template v-if="vista.pedido.venta_canal == 3">
                         <JdInput
@@ -227,7 +250,6 @@
                     </template>
 
                     <JdInput label="Observación" v-model="vista.pedido.observacion" />
-                    <!-- {{ vista.pedido.venta_socio_datos }} -->
                 </div>
 
                 <div class="pedido-foot">
@@ -266,12 +288,14 @@
     </div>
 
     <mPedidoItemNota v-if="useModals.show.mPedidoItemNota" />
+    <mSocio @created="setSocioCreated" v-if="useModals.show.mSocio" />
 </template>
 
 <script>
-import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from 'jd-components'
+import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from '@jhuler/components'
 
 import mPedidoItemNota from '@/views/ventas/pedidos/mPedidoItemNota.vue'
+import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -290,6 +314,7 @@ export default {
         JdSelect,
         JdSelectQuery,
         mPedidoItemNota,
+        mSocio,
     },
     data: () => ({
         useModals: useModals(),
@@ -493,6 +518,17 @@ export default {
                 this.vista.pedido.venta_socio_datos = {}
             }
         },
+        nuevoSocio() {
+            const send = { tipo: 2, activo: true }
+
+            this.useModals.setModal('mSocio', 'Nuevo cliente', 1, send)
+        },
+        setSocioCreated(item) {
+            this.vista.socios = [item]
+            this.vista.pedido.socio = item.id
+
+            this.setSocio(item)
+        },
         showPrecio(item) {
             const numeroDiaSemana = dayjs().day()
             const promocion_hoy = item.precios_semana.find((a) => a.id == numeroDiaSemana)
@@ -605,7 +641,7 @@ export default {
 
             if (this.vista.pedido.venta_canal == 2 || this.vista.pedido.venta_canal == 3) {
                 if (incompleteData(this.vista.pedido.venta_socio_datos, ['nombres'])) {
-                    jmsg('warning', 'Ingrese los datos necesarios en Detalles')
+                    jmsg('warning', 'Ingrese los datos del cliente en Detalles')
                     return true
                 }
             }
@@ -637,6 +673,12 @@ export default {
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
         },
+        async grabar1() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            console.log(this.vista.pedido)
+        },
         async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -652,18 +694,12 @@ export default {
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-
-            console.log(this.vista.pedido)
-        },
         async modificar() {
             if (this.checkDatos()) return
             this.vista.pedido.monto = this.vista.mtoImpVenta
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(urls.transacciones, this.vista.pedido)
+            const res = await patch(`${urls.transacciones}/add-productos`, this.vista.pedido)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -815,7 +851,7 @@ export default {
     .right {
         height: 100%;
         display: grid;
-        grid-template-rows: auto 1fr auto;
+        // grid-template-rows: auto 1fr auto;
         overflow: hidden;
         gap: 0.5rem;
 
@@ -886,6 +922,11 @@ export default {
             gap: 0.5rem;
             height: fit-content;
             overflow-y: auto;
+
+            .dato-cliente {
+                display: flex;
+                gap: 0.5rem;
+            }
         }
 
         .pedido-foot {

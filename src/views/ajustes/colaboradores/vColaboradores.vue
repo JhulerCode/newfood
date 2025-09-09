@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { JdButton, JdTable, mConfigCols, mConfigFiltros } from 'jd-components'
+import { JdButton, JdTable, mConfigCols, mConfigFiltros } from '@jhuler/components'
 
 import mColaborador from './mColaborador.vue'
 

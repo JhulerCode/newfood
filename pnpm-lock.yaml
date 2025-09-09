@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@jhuler/components':
+        specifier: ^1.0.2
+        version: 1.0.2(vue@3.5.17)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -20,9 +23,6 @@ importers:
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
-      jd-components:
-        specifier: github:JhulerCode/jd-components
-        version: https://codeload.github.com/JhulerCode/jd-components/tar.gz/0ccac9fb7a4743c2e025ebf57cefdab9366ad32b
       pinia:
         specifier: ^3.0.3
         version: 3.0.3(vue@3.5.17)
@@ -876,6 +876,11 @@ packages:
   '@humanwhocodes/retry@0.4.3':
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
+
+  '@jhuler/components@1.0.2':
+    resolution: {integrity: sha512-V1NAs2gGFOVcDd0Kty+N0qA3hTZWIp5QvgRjerav783BFn5okf5krgRkvVeQ8VmbM68XtjD1re6r85miHHafng==}
+    peerDependencies:
+      vue: ^3.0.0
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -2074,10 +2079,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  jd-components@https://codeload.github.com/JhulerCode/jd-components/tar.gz/0ccac9fb7a4743c2e025ebf57cefdab9366ad32b:
-    resolution: {tarball: https://codeload.github.com/JhulerCode/jd-components/tar.gz/0ccac9fb7a4743c2e025ebf57cefdab9366ad32b}
-    version: 1.0.0
-
   jiti@2.4.2:
     resolution: {integrity: sha512-rg9zJN+G4n2nfJl5MW3BMygZX56zKPNVEYYqq7adpmMh4Jn2QNEwhvQlFy6jPVdcod7txZtKHWnyZiA3a0zP7A==}
     hasBin: true
@@ -2760,8 +2761,8 @@ packages:
     resolution: {integrity: sha512-5kaZCrbp5mmbz5ulBkDkbY0SsPOjKqVS35VpL9ulMPfSl0J0Xsm+9Evphv9CoIZFwre7aJoa94AY6seMKGVN5Q==}
     engines: {node: '>=4'}
 
-  unicode-match-property-value-ecmascript@2.2.0:
-    resolution: {integrity: sha512-4IehN3V/+kkr5YeSSDDQG8QLqO26XpL2XP3GQtqwlT/QYSECAwFztxVHjlbh0+gjJ3XmNLS0zDsbgs9jWKExLg==}
+  unicode-match-property-value-ecmascript@2.2.1:
+    resolution: {integrity: sha512-JQ84qTuMg4nVkx8ga4A16a1epI9H6uTXAknqxkGF/aFfRLw1xC/Bp24HNLaZhHSkWd3+84t8iXnp1J0kYcZHhg==}
     engines: {node: '>=4'}
 
   unicode-property-aliases-ecmascript@2.1.0:
@@ -3985,6 +3986,10 @@ snapshots:
   '@humanwhocodes/retry@0.3.1': {}
 
   '@humanwhocodes/retry@0.4.3': {}
+
+  '@jhuler/components@1.0.2(vue@3.5.17)':
+    dependencies:
+      vue: 3.5.17
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
@@ -5299,8 +5304,6 @@ snapshots:
       filelist: 1.0.4
       picocolors: 1.1.1
 
-  jd-components@https://codeload.github.com/JhulerCode/jd-components/tar.gz/0ccac9fb7a4743c2e025ebf57cefdab9366ad32b: {}
-
   jiti@2.4.2:
     optional: true
 
@@ -5651,7 +5654,7 @@ snapshots:
       regjsgen: 0.8.0
       regjsparser: 0.12.0
       unicode-match-property-ecmascript: 2.0.0
-      unicode-match-property-value-ecmascript: 2.2.0
+      unicode-match-property-value-ecmascript: 2.2.1
 
   regjsgen@0.8.0: {}
 
@@ -6015,7 +6018,7 @@ snapshots:
       unicode-canonical-property-names-ecmascript: 2.0.1
       unicode-property-aliases-ecmascript: 2.1.0
 
-  unicode-match-property-value-ecmascript@2.2.0: {}
+  unicode-match-property-value-ecmascript@2.2.1: {}
 
   unicode-property-aliases-ecmascript@2.1.0: {}
 

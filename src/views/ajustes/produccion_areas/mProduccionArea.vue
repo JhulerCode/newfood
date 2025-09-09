@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch } from 'jd-components'
+import { JdModal, JdInput, JdSwitch } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
