@@ -49,7 +49,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get } from '@/utils/crud'
+import { urls, get, post } from '@/utils/crud'
 
 import dayjs from 'dayjs'
 
@@ -373,18 +373,19 @@ export default {
                 true,
             )
         },
-        enviarCorreo(item) {
-            console.log(item)
+        async enviarCorreo(item) {
+            const res = await post(`${urls.comprobantes}/send-mail`, item, 'Correo enviado con éxito')
+
+            if (res.code != 0) return
         },
         async imprimir(item) {
             console.log(item)
         },
         async descargarPdf(item) {
-            const res = await get(`${urls.comprobantes}/uno/${item.id}`, true)
+            const res = await get(`${urls.comprobantes}/pdf/${item.id}`, true)
 
             this.vista.pdfUrl = URL.createObjectURL(res)
             this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)
-            // window.open(this.vista.pdfUrl, '_blank')
         },
         descargarXml(item) {
             console.log(item)

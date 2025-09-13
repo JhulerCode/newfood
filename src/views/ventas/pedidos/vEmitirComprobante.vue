@@ -104,6 +104,9 @@
                     <span>Impuesto:</span>
                     <p>{{ redondear(vista.mtoIGV) }}</p>
 
+                    <span>Descuento:</span>
+                    <p>{{ redondear(vista.total_descuento) }}</p>
+
                     <strong>Total</strong>
                     <strong class="total">
                         {{ redondear(vista.mtoImpVenta) }}
@@ -399,42 +402,36 @@ export default {
             this.vista.socios = res.data
         },
 
-        calcularUno(item) {
-            item.vu =
-                item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
+        calcularUno(a) {
+            a.vu = a.igv_afectacion == '10' ? a.pu / (1 + a.igv_porcentaje / 100) : a.pu
 
             // --- DESCUENTO --- //
-            if (
-                item.descuento_tipo != null &&
-                item.descuento_valor != null &&
-                item.descuento_valor != 0
-            ) {
-                if (item.descuento_tipo == 1) {
-                    item.vu_desc =
-                        item.igv_afectacion == '10'
-                            ? item.descuento_valor / (1 + item.igv_porcentaje / 100)
-                            : item.descuento_valor
-                } else if (item.descuento_tipo == 2) {
-                    item.vu_desc =
-                        item.igv_afectacion == '10'
-                            ? (item.cantidad * item.pu * (item.descuento_valor / 100)) /
-                              (1 + item.igv_porcentaje / 100)
-                            : item.cantidad * item.pu * (item.descuento_valor / 100)
+            if (a.descuento_tipo != null && a.descuento_valor != null && a.descuento_valor != 0) {
+                if (a.descuento_tipo == 1) {
+                    a.descuento_vu =
+                        a.igv_afectacion == '10'
+                            ? a.descuento_valor / (1 + a.igv_porcentaje / 100)
+                            : a.descuento_valor
+                } else if (a.descuento_tipo == 2) {
+                    a.descuento_vu =
+                        a.igv_afectacion == '10'
+                            ? (a.pu * (a.descuento_valor / 100)) / (1 + a.igv_porcentaje / 100)
+                            : a.pu * (a.descuento_valor / 100)
                 }
             } else {
-                item.vu_desc = 0
+                a.descuento_vu = 0
             }
 
-            item.mtoValorVenta = item.cantidad * item.vu - item.vu_desc
-            item.igv =
-                item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
-            item.total = item.mtoValorVenta + item.igv
+            a.mtoValorVenta = a.cantidad * (a.vu - a.descuento_vu)
+            a.igv = a.igv_afectacion == '10' ? a.mtoValorVenta * (a.igv_porcentaje / 100) : 0
+            a.total = a.mtoValorVenta + a.igv
         },
         calcularTotales() {
             this.vista.mtoOperGravadas = 0
             this.vista.mtoOperExoneradas = 0
             this.vista.mtoOperInafectas = 0
             this.vista.mtoIGV = 0
+            this.vista.total_descuento = 0
 
             for (const a of this.vista.comprobante.comprobante_items) {
                 if (a.igv_afectacion == '10') {
@@ -445,6 +442,8 @@ export default {
                 } else if (a.igv_afectacion == '30') {
                     this.vista.mtoOperInafectas += a.mtoValorVenta
                 }
+
+                this.vista.total_descuento += a.descuento_vu * a.cantidad
             }
 
             this.vista.valorVenta =
@@ -638,11 +637,12 @@ export default {
                 this.vista.comprobante.pago_metodos = this.vista.pago_metodos
             }
 
-            this.vista.comprobante.total_gravada = redondear(this.vista.mtoOperGravadas, 2)
-            this.vista.comprobante.total_exonerada = redondear(this.vista.mtoOperExoneradas, 2)
-            this.vista.comprobante.total_inafecta = redondear(this.vista.mtoOperInafectas, 2)
-            this.vista.comprobante.total_igv = redondear(this.vista.mtoIGV, 2)
-            this.vista.comprobante.monto = redondear(this.vista.mtoImpVenta, 2)
+            this.vista.comprobante.total_gravada = this.vista.mtoOperGravadas
+            this.vista.comprobante.total_exonerada = this.vista.mtoOperExoneradas
+            this.vista.comprobante.total_inafecta = this.vista.mtoOperInafectas
+            this.vista.comprobante.total_igv = this.vista.mtoIGV
+            this.vista.comprobante.monto = this.vista.mtoImpVenta
+            this.vista.comprobante.total_descuento = this.vista.total_descuento
         },
         async grabar1() {
             if (this.checkDatos()) return
