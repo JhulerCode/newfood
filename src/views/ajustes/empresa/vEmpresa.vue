@@ -205,6 +205,8 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            this.vista.empresa = res.data
         },
     },
 }

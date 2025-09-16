@@ -962,11 +962,15 @@ export default {
                 this.vista.comprobante.pago_metodos = this.vista.pago_metodos
             }
 
-            // this.vista.comprobante.total_gravada = this.vista.mtoOperGravadas
-            // this.vista.comprobante.total_exonerada = this.vista.mtoOperExoneradas
-            // this.vista.comprobante.total_inafecta = this.vista.mtoOperInafectas
-            // this.vista.comprobante.total_igv = this.vista.mtoIGV
-            // this.vista.comprobante.total_descuento = this.vista.total_descuento
+            this.vista.comprobante.sub_total_ventas = this.vista.totals.sub_total_ventas
+            this.vista.comprobante.anticipos = this.vista.totals.anticipos
+            this.vista.comprobante.descuentos = this.vista.totals.descuentos
+            this.vista.comprobante.valor_venta = this.vista.totals.valor_venta
+            this.vista.comprobante.isc = this.vista.totals.isc
+            this.vista.comprobante.igv = this.vista.totals.igv
+            this.vista.comprobante.icbper = this.vista.totals.icbper
+            this.vista.comprobante.otros_cargos = this.vista.totals.otros_cargos
+            this.vista.comprobante.otros_tributos = this.vista.totals.otros_tributos
             this.vista.comprobante.monto = this.vista.totals.importe_total
         },
         async grabar1() {
