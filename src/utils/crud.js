@@ -227,25 +227,6 @@ async function delet(url, item, ms) {
     return res
 }
 
-async function getFile(url) {
-    const response = await fetch(url, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${useAuth().token}`,
-        }
-    })
-
-    if (!response.ok) {
-        jmsg('error', 'Archivo no encontrado')
-        return
-    }
-
-    const blob = await response.blob()
-    const newuri = window.URL.createObjectURL(blob)
-
-    window.open(newuri, '_blank')
-}
-
 export {
     host,
     urls,
@@ -253,5 +234,4 @@ export {
     post,
     patch,
     delet,
-    getFile,
 }

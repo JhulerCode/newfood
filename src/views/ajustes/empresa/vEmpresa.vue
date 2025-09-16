@@ -21,6 +21,8 @@
 
         <div class="container-datos">
             <div class="datos-fiscales">
+                <strong style="grid-column: 1/3">Datos fiscales</strong>
+
                 <JdInput
                     label="RUC"
                     :nec="true"
@@ -57,13 +59,6 @@
                 />
 
                 <JdInput
-                    label="Urbanización"
-                    :nec="true"
-                    v-model="vista.empresa.urbanizacion"
-                    style="grid-column: 1/4"
-                />
-
-                <JdInput
                     label="Distrito"
                     :nec="true"
                     v-model="vista.empresa.distrito"
@@ -86,21 +81,15 @@
             </div>
 
             <div class="datos-secundarios">
+                <strong>Datos generales</strong>
+
                 <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
 
                 <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
 
-                <JdInput label="Pc principal" :nec="true" v-model="vista.empresa.pc_principal_ip" />
-
-                <JdInput
-                    label="Impuesto"
-                    :nec="true"
-                    type="number"
-                    v-model="vista.empresa.igv_porcentaje"
-                />
-
                 <JdInputFile
                     label="Logo"
+                    :nec="true"
                     accept="image/*"
                     v-model="vista.empresa.logo"
                     @handleFile="
@@ -108,26 +97,73 @@
                     "
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
                 />
+
+                <div v-if="vista.empresa.archivo || vista.empresa.logo" class="empresa-logo">
+                    <img
+                        :src="vista.blob"
+                        :alt="'logo-' + vista.empresa.razon_social"
+                        v-if="vista.empresa.archivo"
+                    />
+                    <img
+                        :src="`${urls.uploads}/${vista.empresa.logo}`"
+                        :alt="'logo-' + vista.empresa.razon_social"
+                        v-else
+                    />
+                </div>
             </div>
 
-            <div v-if="vista.empresa.archivo || vista.empresa.logo" class="empresa-logo">
-                <img
-                    :src="vista.blob"
-                    :alt="'logo-' + vista.empresa.razon_social"
-                    v-if="vista.empresa.archivo"
-                />
-                <img
-                    :src="`${urls.uploads}/${vista.empresa.logo}`"
-                    :alt="'logo-' + vista.empresa.razon_social"
-                    v-else
-                />
+            <div>
+                <div class="datos-secundarios">
+                    <strong>Facturación electrónica</strong>
+
+                    <JdInput
+                        label="Impuesto (%)"
+                        :nec="true"
+                        type="number"
+                        v-model="vista.empresa.igv_porcentaje"
+                    />
+
+                    <JdInput label="Usuario SOL" :nec="true" v-model="vista.empresa.sol_usuario" />
+
+                    <JdInputPassword
+                        label="Clave SOL"
+                        :nec="true"
+                        v-model="vista.empresa.sol_clave"
+                    />
+
+                    <JdButton text="Subir certificado" tipo="2" @click="subirCdt" />
+
+                    <!-- <JdInputFile
+                        label="Certificado (CDT)"
+                        :nec="true"
+                        accept="image/*"
+                        v-model="vista.empresa.cdt"
+                        @handleFile="
+                            (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
+                        "
+                        @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
+                    /> -->
+                </div>
+
+                <div class="datos-secundarios mrg-top2">
+                    <strong>Impresión</strong>
+
+                    <JdInput
+                        label="Pc principal"
+                        :nec="true"
+                        v-model="vista.empresa.pc_principal_ip"
+                    />
+                </div>
             </div>
         </div>
     </div>
+
+    <mEmpresaCdt v-if="useModals.show.mEmpresaCdt" />
 </template>
 
 <script>
-import { JdButton, JdInput, JdInputFile } from '@jhuler/components'
+import { JdButton, JdInput, JdInputFile, JdInputPassword } from '@jhuler/components'
+import mEmpresaCdt from './mEmpresaCdt.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -142,6 +178,8 @@ export default {
         JdButton,
         JdInput,
         JdInputFile,
+        JdInputPassword,
+        mEmpresaCdt,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -178,12 +216,20 @@ export default {
                 'nombre_comercial',
                 'domicilio_fiscal',
                 'ubigeo',
-                'urbanizacion',
+                // 'urbanizacion',
                 'distrito',
                 'provincia',
                 'departamento',
-                'pc_principal_ip',
+
+                'telefono',
+                'correo',
+                'logo',
+
                 'igv_porcentaje',
+                'sol_usuario',
+                'sol_clave',
+
+                'pc_principal_ip',
             ]
 
             if (incompleteData(this.vista.empresa, props)) {
@@ -208,6 +254,15 @@ export default {
 
             this.vista.empresa = res.data
         },
+
+        subirCdt() {
+            this.useModals.setModal(
+                'mEmpresaCdt',
+                'Subir certificado digital tributario',
+                null,
+                this.vista.empresa,
+            )
+        },
     },
 }
 </script>
@@ -215,7 +270,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: auto auto 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     // display: flex;
     // flex-wrap: wrap;
     gap: 4rem;
@@ -223,30 +278,28 @@ export default {
 
     .datos-fiscales {
         display: grid;
-        grid-template-columns: repeat(4, 6rem);
+        // grid-template-columns: repeat(4, 6rem);
         gap: 0.5rem;
         height: fit-content;
     }
 
     .datos-secundarios {
         display: grid;
-        grid-template-columns: 20rem;
+        // grid-template-columns: 20rem;
         gap: 0.5rem;
         // align-items: flex-start;
         height: fit-content;
     }
 
     .empresa-logo {
-        width: 100%;
+        // width: 100%;
         padding: 0.5rem;
-        // height: 20rem;
+        box-shadow: 0 0 0.5rem var(--shadow-color);
+        margin: 0.5rem 0.5rem 0 0.5rem;
 
         img {
             width: 100%;
             border-radius: 0.5rem;
-            box-shadow: 0 0 0.5rem var(--shadow-color);
-            // height: 100%;
-            // object-fit: cover;
         }
     }
 }
@@ -254,7 +307,7 @@ export default {
 @media (max-width: 540px) {
     .container-datos {
         grid-template-columns: 1fr;
-        gap: 1rem;
+        gap: 2rem;
 
         .datos-fiscales {
             grid-template-columns: 100%;

@@ -260,7 +260,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('caja_apertura')
+            this.vista.qry.cols.push('caja_apertura', 'empresa')
         },
         async loadComprobantes() {
             this.setQuery()
@@ -281,8 +281,7 @@ export default {
             await this.loadSocios()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'doc_tipo').lista =
-                this.vista.pago_comprobantes
+            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.pago_comprobantes
             cols.find((a) => a.id == 'socio').lista = this.vista.socios
             cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
 
@@ -374,7 +373,11 @@ export default {
             )
         },
         async enviarCorreo(item) {
-            const res = await post(`${urls.comprobantes}/send-mail`, item, 'Correo enviado con éxito')
+            const res = await post(
+                `${urls.comprobantes}/send-mail`,
+                item,
+                'Correo enviado con éxito',
+            )
 
             if (res.code != 0) return
         },
@@ -389,11 +392,45 @@ export default {
             this.vista.pdfUrl = URL.createObjectURL(res)
             this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)
         },
-        descargarXml(item) {
-            console.log(item)
+        async descargarXml(item) {
+            const xmlid = `${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/xml/${xmlid}`, true)
+            this.useAuth.setLoading(false)
+
+            const url = window.URL.createObjectURL(res)
+
+            // Crear link invisible
+            const a = document.createElement('a')
+            a.href = url
+            a.download = xmlid
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+
+            // Liberar memoria
+            window.URL.revokeObjectURL(url)
         },
-        descargarCdr(item) {
-            console.log(item)
+        async descargarCdr(item) {
+            const xmlid = `R-${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/xml/${xmlid}`, true)
+            this.useAuth.setLoading(false)
+
+            const url = window.URL.createObjectURL(res)
+
+            // Crear link invisible
+            const a = document.createElement('a')
+            a.href = url
+            a.download = xmlid
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+
+            // Liberar memoria
+            window.URL.revokeObjectURL(url)
         },
 
         actualizarPagos(item) {
