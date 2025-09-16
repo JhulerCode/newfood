@@ -173,7 +173,7 @@ export default {
         tableName: 'vDashboard',
         columns: [
             {
-                id: 'venta_fecha_emision',
+                id: 'fecha_emision',
                 title: 'Fecha',
             },
         ],

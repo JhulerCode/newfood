@@ -34,7 +34,7 @@ export default {
 
         columns: [
             {
-                id: 'venta_fecha_emision',
+                id: 'fecha_emision',
                 title: 'Fecha',
                 format: 'date',
                 width: '7rem',
@@ -43,9 +43,9 @@ export default {
                 seek: true,
             },
             {
-                id: 'venta_tipo_documento_codigo',
+                id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'venta_tipo_documento_codigo1.nombre',
+                prop: 'doc_tipo1.nombre',
                 width: '10rem',
                 show: true,
                 sort: true,
@@ -111,7 +111,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, qry)
-            qry.cols.push('venta_serie', 'venta_numero')
+            qry.cols.push('serie', 'numero')
 
             this.modal.comprobantes = []
             this.useAuth.setLoading(true, 'Cargando...')

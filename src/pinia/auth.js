@@ -53,7 +53,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPedidos:editarDetalles', label: 'Editar detalles' },
                             { id: 'vPedidos:anular', label: 'Anular' },
                             // { id: 'vPedidos:editar', label: 'Editar' },
-                            // { id: 'vPedidos:eliminar', label: 'Eliminar' },
+                            { id: 'vPedidos:eliminar', label: 'Eliminar' },
 
                             { id: 'vPedidos:imprimirComanda', label: 'Imprimir comanda' },
                             { id: 'vPedidos:imprimirPrecuenta', label: 'Imprimir precuenta' },

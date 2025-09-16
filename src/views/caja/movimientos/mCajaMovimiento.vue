@@ -85,8 +85,8 @@ export default {
         ],
 
         buttons: [
-            { text: 'Aperutar', action: 'crear' },
-            { text: 'Cerrar', action: 'modificar' },
+            { text: 'Grabar', action: 'crear' },
+            { text: 'Actualizar', action: 'modificar' },
         ],
     }),
     created() {
@@ -117,7 +117,7 @@ export default {
         async crear() {
             if (this.checkDatos()) return
 
-            this.useAuth.setLoading(true, 'Aperturando caja...')
+            this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.dinero_movimientos, this.dinero_movimiento)
             this.useAuth.setLoading(false)
 
@@ -129,7 +129,7 @@ export default {
         async modificar() {
             if (this.checkDatos()) return
 
-            this.useAuth.setLoading(true, 'Cerrando caja...')
+            this.useAuth.setLoading(true, 'Modificando...')
             const res = await patch(urls.dinero_movimientos, this.dinero_movimiento)
             this.useAuth.setLoading(false)
 

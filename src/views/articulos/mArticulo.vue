@@ -113,7 +113,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
-        urls: urls,
+        urls,
         modal: {},
         articulo: {},
 

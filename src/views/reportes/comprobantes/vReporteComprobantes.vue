@@ -75,7 +75,7 @@ export default {
         tableName: 'vReporteComprobantes',
         columns: [
             {
-                id: 'venta_fecha_emision',
+                id: 'fecha_emision',
                 title: 'Fecha',
                 type: 'date',
                 format: 'date',
@@ -85,9 +85,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'venta_tipo_documento_codigo',
+                id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'venta_tipo_documento_codigo1.nombre',
+                prop: 'doc_tipo1.nombre',
                 type: 'select',
                 width: '10rem',
                 show: true,
@@ -95,7 +95,7 @@ export default {
                 seek: true,
             },
             {
-                id: 'venta_serie',
+                id: 'serie',
                 title: 'Serie',
                 type: 'text',
                 width: '5rem',
@@ -104,7 +104,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'venta_numero',
+                id: 'numero',
                 title: 'Correlativo',
                 type: 'text',
                 width: '7rem',
@@ -173,35 +173,35 @@ export default {
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
                 permiso: 'vReporteComprobantes:anular',
-                ocultar: { estado: ['0', '3'] },
+                ocultar: { estado: ['0', '4'] },
             },
             {
                 label: 'Canjear',
                 icon: 'fa-solid fa-left-right',
                 action: 'canjear',
                 permiso: 'vReporteComprobantes:canjear',
-                ocultar: { estado: ['0', '3'], venta_tipo_documento_codigo: '01' },
+                ocultar: { estado: ['0', '4'], doc_tipo: '01' },
             },
             {
                 label: 'Ver pagos',
                 icon: 'fa-solid fa-up-right-from-square',
                 action: 'verPagos',
                 permiso: 'vReporteComprobantes:verPagos',
-                ocultar: { estado: ['0', '3'], pagos_monto: 0 },
+                ocultar: { estado: ['0', '4'], pagos_monto: 0 },
             },
             {
                 label: 'Modificar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'editarPagos',
                 permiso: 'vReporteComprobantes:editarPagos',
-                ocultar: { estado: ['0', '3'], pagos_monto: 0 },
+                ocultar: { estado: ['0', '4'], pagos_monto: 0 },
             },
             {
                 label: 'Agregar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'agregarPagos',
                 permiso: 'vReporteComprobantes:agregarPagos',
-                ocultar: { estado: ['0', '3'], pagos_monto: { op: '>', val: 0 } },
+                ocultar: { estado: ['0', '4'], pagos_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Enviar por email',
@@ -226,14 +226,14 @@ export default {
                 icon: 'fa-solid fa-file-arrow-down',
                 action: 'descargarXml',
                 permiso: 'vReporteComprobantes:descargarXml',
-                ocultar: { estado: 0, venta_tipo_documento_codigo: 'NV' },
+                ocultar: { estado: 0, doc_tipo: 'NV' },
             },
             {
                 label: 'Descargar CDR',
                 icon: 'fa-solid fa-file-arrow-down',
                 action: 'descargarCdr',
                 permiso: 'vReporteComprobantes:descargarCdr',
-                ocultar: { estado: 0, venta_tipo_documento_codigo: 'NV' },
+                ocultar: { estado: 0, doc_tipo: 'NV' },
             },
         ],
     }),
@@ -281,7 +281,7 @@ export default {
             await this.loadSocios()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'venta_tipo_documento_codigo').lista =
+            cols.find((a) => a.id == 'doc_tipo').lista =
                 this.vista.pago_comprobantes
             cols.find((a) => a.id == 'socio').lista = this.vista.socios
             cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
@@ -308,7 +308,7 @@ export default {
 
             this.useModals.setModal(
                 'mAnular',
-                `Anular comprobante N° ${item.venta_serie} - ${item.venta_numero}`,
+                `Anular comprobante N° ${item.serie} - ${item.numero}`,
                 null,
                 send,
                 true,
@@ -321,13 +321,13 @@ export default {
                     fecha: dayjs().format('YYYY-MM-DD'),
                     socio: null,
                     monto: item.monto,
-                    venta_tipo_documento_codigo: item.venta_tipo_documento_codigo,
+                    doc_tipo: item.doc_tipo,
                 },
             }
 
             this.useModals.setModal(
                 'mComprobanteCanjear',
-                `Canjear comprobante ${item.venta_serie}-${item.venta_numero}`,
+                `Canjear comprobante ${item.serie}-${item.numero}`,
                 null,
                 send,
                 true,
@@ -341,7 +341,7 @@ export default {
 
             this.useModals.setModal(
                 'mComprobantePagos',
-                `Pagos de ${item.venta_serie} - ${item.venta_numero}`,
+                `Pagos de ${item.serie} - ${item.numero}`,
                 3,
                 send,
                 true,
@@ -354,7 +354,7 @@ export default {
 
             this.useModals.setModal(
                 'mComprobantePagos',
-                `Editar pagos de ${item.venta_serie} - ${item.venta_numero}`,
+                `Editar pagos de ${item.serie} - ${item.numero}`,
                 2,
                 send,
                 true,
@@ -367,7 +367,7 @@ export default {
 
             this.useModals.setModal(
                 'mComprobantePagos',
-                `Agregar pagos de ${item.venta_serie} - ${item.venta_numero}`,
+                `Agregar pagos de ${item.serie} - ${item.numero}`,
                 1,
                 send,
                 true,
@@ -382,7 +382,9 @@ export default {
             console.log(item)
         },
         async descargarPdf(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.comprobantes}/pdf/${item.id}`, true)
+            this.useAuth.setLoading(false)
 
             this.vista.pdfUrl = URL.createObjectURL(res)
             this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)

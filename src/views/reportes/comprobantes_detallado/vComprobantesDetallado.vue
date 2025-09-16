@@ -69,7 +69,7 @@ export default {
             {
                 id: 'comprobante_fecha',
                 title: 'Fecha',
-                prop: 'comprobante1.venta_fecha_emision',
+                prop: 'comprobante1.fecha_emision',
                 format: 'date',
                 type: 'date',
                 width: '8rem',
@@ -90,7 +90,7 @@ export default {
             {
                 id: 'comprobante_serie',
                 title: 'Serie',
-                prop: 'comprobante1.venta_serie',
+                prop: 'comprobante1.serie',
                 type: 'text',
                 width: '5rem',
                 show: true,
@@ -100,7 +100,7 @@ export default {
             {
                 id: 'comprobante_correlativo',
                 title: 'Correlativo',
-                prop: 'comprobante1.venta_numero',
+                prop: 'comprobante1.numero',
                 type: 'text',
                 width: '7rem',
                 show: true,

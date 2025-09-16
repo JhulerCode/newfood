@@ -69,7 +69,7 @@ export default {
         pago_comprobantes_filtered() {
             if (this.modal.pago_comprobantes == null) return []
 
-            if (this.modal.comprobante.venta_tipo_documento_codigo == '03') {
+            if (this.modal.comprobante.doc_tipo == '03') {
                 return this.modal.pago_comprobantes.filter((a) => a.id != 'NV' && a.id != '03')
             } else {
                 return this.modal.pago_comprobantes.filter((a) => a.id != 'NV')

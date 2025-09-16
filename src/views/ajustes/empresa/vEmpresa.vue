@@ -6,8 +6,15 @@
             <div class="buttons">
                 <JdButton
                     text="Recargar"
+                    tipo="2"
                     @click="loadEmpresa"
                     v-if="useAuth.verifyPermiso('vEmpresa:ver')"
+                />
+
+                <JdButton
+                    text="Modificar"
+                    @click="modificar"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar')"
                 />
             </div>
         </div>
@@ -80,9 +87,11 @@
 
             <div class="datos-secundarios">
                 <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
+
                 <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
 
                 <JdInput label="Pc principal" :nec="true" v-model="vista.empresa.pc_principal_ip" />
+
                 <JdInput
                     label="Impuesto"
                     :nec="true"
@@ -90,10 +99,27 @@
                     v-model="vista.empresa.igv_porcentaje"
                 />
 
-                <JdButton
-                    text="Modificar"
-                    @click="modificar"
-                    v-if="useAuth.verifyPermiso('vEmpresa:editar')"
+                <JdInputFile
+                    label="Logo"
+                    accept="image/*"
+                    v-model="vista.empresa.logo"
+                    @handleFile="
+                        (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
+                    "
+                    @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
+                />
+            </div>
+
+            <div v-if="vista.empresa.archivo || vista.empresa.logo" class="empresa-logo">
+                <img
+                    :src="vista.blob"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-if="vista.empresa.archivo"
+                />
+                <img
+                    :src="`${urls.uploads}/${vista.empresa.logo}`"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-else
                 />
             </div>
         </div>
@@ -101,7 +127,7 @@
 </template>
 
 <script>
-import { JdButton, JdInput } from '@jhuler/components'
+import { JdButton, JdInput, JdInputFile } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -115,11 +141,13 @@ export default {
     components: {
         JdButton,
         JdInput,
+        JdInputFile,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
         useModals: useModals(),
+        urls,
 
         vista: {},
     }),
@@ -132,6 +160,17 @@ export default {
         if (this.useAuth.verifyPermiso('vEmpresa:ver') == true) this.loadEmpresa()
     },
     methods: {
+        async loadEmpresa() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(urls.empresa)
+            this.useAuth.setLoading(false)
+            this.vista.loaded = true
+
+            if (res.code != 0) return
+
+            this.vista.empresa = res.data
+        },
+
         checkDatos() {
             const props = [
                 'ruc',
@@ -154,27 +193,18 @@ export default {
 
             return false
         },
-        async loadEmpresa() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
-            this.vista.loaded = true
-
-            if (res.code != 0) return
-
-            this.vista.empresa = res.data
+        shapeDatos() {
+            if (this.vista.empresa.archivo) this.vista.empresa.formData = true
         },
-
         async modificar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await patch(urls.empresa, this.vista.empresa)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            this.useModals.setModal('mColaborador', 'Editar colaborador', 2, res.data)
         },
     },
 }
@@ -183,15 +213,17 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto auto 1fr;
     // display: flex;
     // flex-wrap: wrap;
     gap: 4rem;
+    overflow-y: auto;
 
     .datos-fiscales {
         display: grid;
         grid-template-columns: repeat(4, 6rem);
         gap: 0.5rem;
+        height: fit-content;
     }
 
     .datos-secundarios {
@@ -201,11 +233,26 @@ export default {
         // align-items: flex-start;
         height: fit-content;
     }
+
+    .empresa-logo {
+        width: 100%;
+        padding: 0.5rem;
+        // height: 20rem;
+
+        img {
+            width: 100%;
+            border-radius: 0.5rem;
+            box-shadow: 0 0 0.5rem var(--shadow-color);
+            // height: 100%;
+            // object-fit: cover;
+        }
+    }
 }
 
 @media (max-width: 540px) {
     .container-datos {
         grid-template-columns: 1fr;
+        gap: 1rem;
 
         .datos-fiscales {
             grid-template-columns: 100%;

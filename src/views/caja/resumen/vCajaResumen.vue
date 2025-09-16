@@ -378,7 +378,7 @@
                 </div>
             </div>
 
-            <div class="second" v-if="vista.resumen">
+            <div class="sixth" v-if="vista.resumen">
                 <div class="card">
                     <div class="card-head">
                         <p>Pedidos anulados</p>
@@ -761,7 +761,7 @@ export default {
     justify-content: space-between;
     gap: 1rem;
     flex-wrap: wrap;
-    position: sticky;
+    // position: sticky;
     top: 0;
     background-color: var(--bg-color2);
     padding: 1rem;
@@ -779,7 +779,7 @@ export default {
 }
 
 .tablero-body {
-    padding: 0 1rem;
+    padding: 0 1rem 0 0;
 }
 
 .card {
@@ -929,12 +929,19 @@ export default {
     margin-bottom: 2rem;
 }
 
+.sixth {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+}
+
 @media (max-width: 540px) {
     .first,
     .second,
     .third,
     .forth,
-    .fifth {
+    .fifth,
+    .sixth {
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 1rem;

@@ -75,7 +75,7 @@ export default {
         caja_apertura: {},
 
         buttons: [
-            { text: 'Aperutar', action: 'crear' },
+            { text: 'Aperturar', action: 'crear' },
             { text: 'Cerrar', action: 'modificar' },
         ],
     }),

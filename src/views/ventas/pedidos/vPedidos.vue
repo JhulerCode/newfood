@@ -123,7 +123,7 @@
     <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
     <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
-    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @datallesModificados="loadPedidos" />/>
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @datallesModificados="loadPedidos" />
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
 
@@ -157,7 +157,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, patch, post } from '@/utils/crud'
+import { urls, get, patch, post, delet } from '@/utils/crud'
 import { getItemFromArray, redondear } from '@/utils/mine'
 import { jqst } from '@/utils/swal'
 
@@ -280,6 +280,12 @@ export default {
             //     permiso: 'vPedidos:editar',
             //     ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             // },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vPedidos:eliminar',
+            },
             {
                 label: 'Añadir productos',
                 icon: 'fa-solid fa-plus',
@@ -414,6 +420,7 @@ export default {
                 'socio',
                 'observacion',
                 'venta_pago_metodo',
+                'tipo',
             )
 
             if (this.vista.venta_canal == 1) {
@@ -648,6 +655,18 @@ export default {
         //         },
         //     ]
         // },
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.transacciones, item)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.removeItem('vPedidos', 'pedidos', item)
+        },
         anular(item) {
             const send = {
                 url: 'transacciones',
