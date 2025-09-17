@@ -232,7 +232,11 @@ export default {
         },
 
         nuevo() {
-            const item = { activo: true, has_signin: false }
+            const item = {
+                doc_tipo: 1,
+                activo: true,
+                has_signin: false
+            }
 
             this.useModals.setModal('mColaborador', 'Nuevo colaborador', 1, item)
         },

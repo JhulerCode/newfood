@@ -2,31 +2,47 @@
     <JdModal modal="mColaborador" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-todo">
             <div class="container-datos">
-                <JdInput
-                    label="Nombres"
-                    :nec="true"
-                    v-model="colaborador.nombres"
-                    :disabled="modal.mode == 3"
-                />
-                <JdInput
-                    label="Apellidos"
-                    :nec="true"
-                    v-model="colaborador.apellidos"
-                    :disabled="modal.mode == 3"
-                />
-
                 <JdSelect
                     label="Tipo documento"
                     :nec="true"
                     v-model="colaborador.doc_tipo"
                     :lista="modal.documentos_identidad || []"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
+
                 <JdInput
                     label="Nro documento"
                     :nec="true"
                     v-model="colaborador.doc_numero"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-magnifying-glass"
+                    title="Buscar DNI"
+                    tipo="2"
+                    :small="true"
+                    @click="loadDni"
+                    style="grid-column: 3/4"
+                    v-if="colaborador.doc_tipo == 1"
+                />
+
+                <JdInput
+                    label="Nombres"
+                    :nec="true"
+                    v-model="colaborador.nombres"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
+                />
+
+                <JdInput
+                    label="Apellidos"
+                    :nec="true"
+                    v-model="colaborador.apellidos"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
                 />
 
                 <JdInput
@@ -34,23 +50,29 @@
                     type="date"
                     v-model="colaborador.fecha_nacimiento"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
+
                 <JdSelect
                     label="Sexo"
                     v-model="colaborador.sexo"
                     :lista="modal.generos || []"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
 
                 <JdInput
                     label="Dirección"
                     v-model="colaborador.direccion"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
                 />
+
                 <JdInput
                     label="Teléfono"
                     v-model="colaborador.telefono"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
 
                 <JdSelect
@@ -61,14 +83,21 @@
                     mostrar="id"
                     :disabled="modal.mode == 3"
                     @elegir="setPermisoEstandar"
+                    style="grid-column: 1/3"
                 />
 
-                <JdSwitch label="Activo" v-model="colaborador.activo" :disabled="modal.mode == 3" />
+                <JdSwitch
+                    label="Activo"
+                    v-model="colaborador.activo"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
+                />
 
                 <JdSwitch
                     label="Tiene usuario?"
                     v-model="colaborador.has_signin"
                     :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
             </div>
 
@@ -305,6 +334,21 @@ export default {
 
             Object.assign(this.modal, res.data)
         },
+        async loadDni() {
+            if (!this.colaborador.doc_numero || this.colaborador.doc_numero.length != 8) {
+                jmsg('warning', 'Ingrese un DNI válido')
+                return
+            }
+
+            this.useAuth.setLoading(true, 'Buscando...')
+            const res = await get(`${urls.decolecta}/dni/${this.colaborador.doc_numero}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.colaborador.nombres = res.data.first_name
+            this.colaborador.apellidos = `${res.data.first_last_name} ${res.data.second_last_name}`
+        },
 
         sincronizarChecksConPermisos() {
             const permisos = this.colaborador.permisos || []
@@ -461,7 +505,7 @@ export default {
 
 .container-datos {
     display: grid;
-    grid-template-columns: 30rem;
+    grid-template-columns: repeat(3, 10rem);
     gap: 0.5rem;
     height: fit-content;
 }
@@ -520,6 +564,10 @@ export default {
     .container-datos,
     .right .container-accesos {
         grid-template-columns: minmax(100%, 33.5rem) !important;
+
+        > * {
+            grid-column: 1/2 !important;
+        }
     }
 }
 </style>

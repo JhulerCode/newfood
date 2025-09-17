@@ -16,7 +16,27 @@
                 :nec="true"
                 v-model="socio.doc_numero"
                 :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
+
+            <JdButton
+                icon="fa-solid fa-magnifying-glass"
+                title="Buscar DNI"
+                tipo="2"
+                :small="true"
+                @click="loadDni"
                 style="grid-column: 3/5"
+                v-if="socio.doc_tipo == 1"
+            />
+
+            <JdButton
+                icon="fa-solid fa-magnifying-glass"
+                title="Buscar RUC"
+                tipo="2"
+                :small="true"
+                @click="loadRuc"
+                style="grid-column: 3/5"
+                v-if="socio.doc_tipo == 6"
             />
 
             <JdInput
@@ -45,7 +65,7 @@
                 label="Dirección"
                 v-model="socio.direccion"
                 :disabled="modal.mode == 3"
-                style="grid-column: 1/4"
+                style="grid-column: 1/5"
             />
 
             <JdInput
@@ -66,7 +86,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSwitch, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -82,6 +102,7 @@ export default {
         JdSelect,
         JdInput,
         JdSwitch,
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -158,6 +179,35 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
+        },
+        async loadDni() {
+            if (!this.socio.doc_numero || this.socio.doc_numero.length != 8) {
+                jmsg('warning', 'Ingrese un DNI válido')
+                return
+            }
+
+            this.useAuth.setLoading(true, 'Buscando...')
+            const res = await get(`${urls.decolecta}/dni/${this.socio.doc_numero}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.socio.nombres = res.data.full_name
+        },
+        async loadRuc() {
+            if (!this.socio.doc_numero || this.socio.doc_numero.length != 11) {
+                jmsg('warning', 'Ingrese un RUC válido')
+                return
+            }
+
+            this.useAuth.setLoading(true, 'Buscando...')
+            const res = await get(`${urls.decolecta}/ruc/${this.socio.doc_numero}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.socio.nombres = res.data.razon_social
+            this.socio.direccion = res.data.direccion
         },
     },
 }
