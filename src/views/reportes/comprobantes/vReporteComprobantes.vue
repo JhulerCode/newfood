@@ -382,7 +382,15 @@ export default {
             if (res.code != 0) return
         },
         async imprimir(item) {
-            console.log(item)
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const query = await fetch(`http://localhost/imprimir/comprobante.php?data=${JSON.stringify(res.data)}`)
+            const res1 = await query.json()
+            console.log(res1)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')

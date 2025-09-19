@@ -441,7 +441,7 @@ export default {
                     'precios_semana',
                     'foto_path',
                 ],
-                incl: ['receta_insumos', 'combo_articulos'],
+                incl: ['receta_insumos', 'combo_articulos', 'produccion_area1'],
             }
 
             if (this.vista.categoria != null) {
@@ -562,6 +562,8 @@ export default {
                     combo_articulos: item.combo_articulos,
 
                     importe: 1 * item.precio_venta,
+
+                    produccion_area1: item.produccion_area1,
                 })
 
                 this.sumarItems()
@@ -673,13 +675,32 @@ export default {
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
         },
-        async grabar1() {
+        async grabar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.pedido)
+
+            let venta_canal = ''
+
+            if (this.vista.pedido.venta_canal == 1) {
+                venta_canal = `${this.vista.pedido.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre}`
+            } else if (this.vista.pedido.venta_canal == 2) {
+                venta_canal = 'PARA LLEVAR'
+            } else if (this.vista.pedido.venta_canal == 3) {
+                venta_canal = 'DELIVERY'
+            }
+
+            const send = {
+                fecha: this.vista.pedido.fecha,
+                venta_canal,
+                venta_codigo: this.vista.pedido.venta_codigo,
+                productos: this.vista.pedido.transaccion_items,
+            }
+
+            await fetch(`http://localhost/imprimir/comanda.php?data=${JSON.stringify(send)}`)
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
@@ -691,6 +712,8 @@ export default {
 
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
+
+            console.log(this.vista.pedido)
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },

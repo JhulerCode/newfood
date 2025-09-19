@@ -90,10 +90,43 @@
 
                 <div class="totales" v-if="vista.totals">
                     <span>Sub Total Ventas:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_GRAVADO) }}</p>
+
+                    <span>Anticipos:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_EXONERADO) }}</p>
+
+                    <span>Descuentos:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_INAFECTO) }}</p>
+
+                    <span>Valor Venta:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_GRATUITO) }}</p>
+
+                    <span>ISC:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_DESCUENTO) }}</p>
+
+                    <span>IGV:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_TRIB_IGV) }}</p>
+
+                    <span>ICBPER:</span>
+                    <p>{{ redondear(vista.totals.MNT_TOT_TRIB_ISC) }}</p>
+
+                    <span>Otros Cargos:</span>
+                    <p>{{ redondear(vista.totals.MNT_IMPUESTO_BOLSAS) }}</p>
+
+                    <strong>Importe Total</strong>
+                    <strong class="total">
+                        {{ redondear(vista.totals.MNT_TOT) }}
+                    </strong>
+                </div>
+
+                <!-- <div class="totales" v-if="vista.totals">
+                    <span>Sub Total Ventas:</span>
                     <p>{{ redondear(vista.totals.sub_total_ventas) }}</p>
 
-                    <!-- <span>Anticipos:</span>
-                    <p>{{ redondear(vista.totals.anticipos) }}</p> -->
+                    <template v-if="false">
+                        <span>Anticipos:</span>
+                        <p>{{ redondear(vista.totals.anticipos) }}</p>
+                    </template>
 
                     <span>Descuentos:</span>
                     <p>{{ redondear(vista.totals.descuentos) }}</p>
@@ -110,17 +143,19 @@
                     <span>ICBPER:</span>
                     <p>{{ redondear(vista.totals.icbper) }}</p>
 
-                    <!-- <span>Otros Cargos:</span>
-                    <p>{{ redondear(vista.totals.otros_cargos) }}</p>
+                    <template v-if="false">
+                        <span>Otros Cargos:</span>
+                        <p>{{ redondear(vista.totals.otros_cargos) }}</p>
 
-                    <span>Otros Tributos:</span>
-                    <p>{{ redondear(vista.totals.otros_tributos) }}</p> -->
+                        <span>Otros Tributos:</span>
+                        <p>{{ redondear(vista.totals.otros_tributos) }}</p>
+                    </template>
 
                     <strong>Importe Total</strong>
                     <strong class="total">
                         {{ redondear(vista.totals.importe_total) }}
                     </strong>
-                </div>
+                </div> -->
             </div>
 
             <div class="right">
@@ -171,9 +206,7 @@
                             <!-- {{ redondear(item.descuento_vu) }} -->
                         </div>
 
-                        <div v-else>
-                            CORTESÍA
-                        </div>
+                        <div v-else>CORTESÍA</div>
                         {{ item.igv_afectacion }}
                     </template>
                 </JdTable>
@@ -414,7 +447,7 @@ export default {
             this.vista.socios = res.data
         },
 
-        calculateInvoiceLineValues(product) {
+        calculateInvoiceLineValues1(product) {
             const tributosCatalog = this.vista.CATALOGO_TRIBUTOS_SUNAT
             const bolsa_tax_unit_amount = 0.5
             // asegurar números
@@ -433,7 +466,7 @@ export default {
             const has_bolsa_tax = !!product.has_bolsa_tax
             const isc_porcentaje = product.isc_porcentaje
             const isc_precio_sugerido = product.isc_precio_sugerido
-            const isc_monto_fijo_unitario = product.isc_monto_fijo_unitario
+            const isc_monto_fijo_uni = product.isc_monto_fijo_uni
             const ivap_porcentaje = product.ivap_porcentaje
 
             // tax_info fallback
@@ -520,8 +553,8 @@ export default {
                         isc_tier = '01'
                         break
                     case '02':
-                        isc_unitario = isc_monto_fijo_unitario
-                        isc_base_unit = isc_monto_fijo_unitario
+                        isc_unitario = isc_monto_fijo_uni
+                        isc_base_unit = isc_monto_fijo_uni
                         isc_percent = 0
                         isc_tier = '02'
                         break
@@ -570,7 +603,7 @@ export default {
             product.descuento_base = descuento_base
             product.descuento_factor = descuento_factor
 
-            const noOnerosas = ['11','12','13','14','15','16','17']
+            const noOnerosas = ['11', '12', '13', '14', '15', '16', '17']
             product.valor_venta = noOnerosas.includes(igvAfect) ? 0 : valor_venta_round
             product.igv = noOnerosas.includes(igvAfect) ? 0 : igv_total_round
             product.total = noOnerosas.includes(igvAfect) ? 0 : total_linea_round
@@ -630,7 +663,7 @@ export default {
                 },
             }
         },
-        calculateInvoiceTotals(
+        calculateInvoiceTotals1(
             globalAllowanceAmount = 0,
             globalChargeAmount = 0,
             prepaidAmount = 0,
@@ -732,6 +765,343 @@ export default {
             }
 
             this.calculateInvoiceTotals()
+        },
+        calculateInvoiceLineValues(item) {
+            const cantidad = item.cantidad
+            const pu = item.pu // Precio unitario de lista (con IGV/ISC)
+            const igv_porcentaje = item.igv_porcentaje
+            const igv_afectacion = item.igv_afectacion // Catálogo 07
+            const descuento_tipo = item.descuento_tipo
+            const descuento_valor = item.descuento_valor
+            const bolsa_tax_unit_amount = item.has_bolsa_tax === true ? 0.5 : 0
+            const isc_porcentaje = item.isc_porcentaje !== null ? item.isc_porcentaje : 0
+            const isc_monto_fijo_uni =
+                item.isc_monto_fijo_uni !== null ? item.isc_monto_fijo_uni : 0
+            const ivap_porcentaje = item.ivap_porcentaje !== null ? item.ivap_porcentaje : 0
+
+            // Tasas de impuestos en formato decimal
+            const IGV_RATE_DECIMAL = igv_porcentaje / 100
+            // const IVAP_RATE_DECIMAL = ivap_porcentaje / 100
+            const ISC_RATE_DECIMAL = isc_porcentaje / 100
+
+            // Variables para los cálculos intermedios y finales
+            let val_unit_item_raw // VAL_UNIT_ITEM antes de descuentos de ítem, sin IGV/ISC
+            let isc_unitario_calculated = 0 // ISC unitario para el cálculo de otros impuestos
+            let cod_tip_sist_isc = null // Código de sistema de cálculo del ISC
+            let por_isc_item_output = null // Porcentaje de ISC para el JSON final
+
+            // 2. Determinar COD_TIP_PRC_VTA (Tipo de Precio de Venta)
+            let cod_tip_prc_vta = '01' // Default: Precio unitario (incluye IGV)
+            // Se usa '02' para operaciones gratuitas o no onerosas
+            // Lista de códigos de afectación del IGV (Catálogo 07) que corresponden a operaciones gratuitas/retiros
+            const codigosAfectacionGratuitas = [
+                '11',
+                '12',
+                '13',
+                '14',
+                '15',
+                '16', // Gravado – Retiro por...
+                '21', // Exonerado - Transferencia gratuita
+                '31',
+                '32',
+                '33',
+                '34',
+                '35',
+                '36',
+                '37', // Inafecto – Retiro por... o Transferencia gratuita
+            ]
+
+            if (codigosAfectacionGratuitas.includes(igv_afectacion)) {
+                cod_tip_prc_vta = '02'
+            }
+
+            // 3. Determinar COD_TRIB_IGV_ITEM y POR_IGV_ITEM para el JSON final
+            let cod_trib_igv_item
+            let por_igv_item_output // Porcentaje de IGV/IVAP para el JSON final
+            let actual_igv_rate_for_calculation // Tasa de IGV/IVAP real para los cálculos
+
+            switch (igv_afectacion) {
+                case '10': // Gravado - Operación Onerosa
+                    cod_trib_igv_item = '1000'
+                    por_igv_item_output = igv_porcentaje
+                    actual_igv_rate_for_calculation = IGV_RATE_DECIMAL
+                    break
+                case '17': // Gravado - IVAP
+                    cod_trib_igv_item = '1016'
+                    por_igv_item_output = ivap_porcentaje > 0 ? ivap_porcentaje : igv_porcentaje // Prioriza IVAP rate
+                    actual_igv_rate_for_calculation = por_igv_item_output / 100
+                    break
+                case '20': // Exonerado - Operación Onerosa
+                    cod_trib_igv_item = '9997'
+                    por_igv_item_output = 0
+                    actual_igv_rate_for_calculation = 0
+                    break
+                case '30': // Inafecto - Operación Onerosa
+                    cod_trib_igv_item = '9998'
+                    por_igv_item_output = 0
+                    actual_igv_rate_for_calculation = 0
+                    break
+                case '40': // Exportación de Bienes o Servicios
+                    cod_trib_igv_item = '9995'
+                    por_igv_item_output = 0
+                    actual_igv_rate_for_calculation = 0
+                    break
+                case '11':
+                case '12':
+                case '13':
+                case '14':
+                case '15':
+                case '16': // Gravado – Retiro por... (Gratuito pero afecto a IGV por naturaleza)
+                    cod_trib_igv_item = '9996'
+                    por_igv_item_output = igv_porcentaje
+                    actual_igv_rate_for_calculation = IGV_RATE_DECIMAL
+                    break
+                case '21':
+                case '31':
+                case '32':
+                case '33':
+                case '34':
+                case '35':
+                case '36':
+                case '37': // Exonerado/Inafecto - Transferencia gratuita o retiro
+                    cod_trib_igv_item = '9996'
+                    por_igv_item_output = 0
+                    actual_igv_rate_for_calculation = 0
+                    break
+                default:
+                    cod_trib_igv_item = '9998' // Default a Inafecto si no hay match claro
+                    por_igv_item_output = 0
+                    actual_igv_rate_for_calculation = 0
+                    break
+            }
+
+            // Determinar si el item está gravado con IGV/IVAP para cálculos de base imponible
+            const isGravado = actual_igv_rate_for_calculation > 0
+
+            // 4. Calcular VAL_UNIT_ITEM (val_unit_item_raw) y ISC unitario inicial, trabajando hacia atrás desde pu
+            if (isc_monto_fijo_uni > 0) {
+                // ISC por monto fijo unitario (Catálogo 08, código 02)
+                cod_tip_sist_isc = '02'
+                por_isc_item_output = 0 // No aplica porcentaje si es monto fijo unitario
+                isc_unitario_calculated = isc_monto_fijo_uni // El ISC unitario es el monto fijo
+
+                if (isGravado) {
+                    // pu = VU + ISC_fixed + (VU + ISC_fixed) * IGV_rate = (VU + ISC_fixed) * (1 + IGV_rate)
+                    val_unit_item_raw =
+                        pu / (1 + actual_igv_rate_for_calculation) - isc_unitario_calculated
+                } else {
+                    // pu = VU + ISC_fixed
+                    val_unit_item_raw = pu - isc_unitario_calculated
+                }
+            } else if (isc_porcentaje > 0) {
+                // ISC por porcentaje (ejemplo usa código 01)
+                cod_tip_sist_isc = '01'
+                por_isc_item_output = isc_porcentaje
+
+                if (isGravado) {
+                    // pu = VU * (1 + ISC_rate) * (1 + IGV_rate)
+                    val_unit_item_raw =
+                        pu / ((1 + ISC_RATE_DECIMAL) * (1 + actual_igv_rate_for_calculation))
+                } else {
+                    // pu = VU * (1 + ISC_rate)
+                    val_unit_item_raw = pu / (1 + ISC_RATE_DECIMAL)
+                }
+                isc_unitario_calculated = val_unit_item_raw * ISC_RATE_DECIMAL // Calcular ISC unitario basado en VAL_UNIT_ITEM_raw
+            } else {
+                // Sin ISC
+                if (isGravado) {
+                    // pu = VU * (1 + IGV_rate)
+                    val_unit_item_raw = pu / (1 + actual_igv_rate_for_calculation)
+                } else {
+                    // pu = VU
+                    val_unit_item_raw = pu
+                }
+            }
+
+            // Asegurarse de que val_unit_item_raw no sea negativo
+            if (val_unit_item_raw < 0) val_unit_item_raw = 0
+
+            // 5. Calcular MNT_BRUTO (monto bruto del item antes de descuentos por item)
+            // Este campo podría variar cuando se aplica un descuento para mostrar el valor original.
+            const mnt_bruto_total = val_unit_item_raw * cantidad
+
+            // 6. Aplicar descuentos por item al VAL_UNIT_ITEM_raw
+            let monto_dscto_unitario_sin_igv = 0
+            if (descuento_valor > 0) {
+                if (descuento_tipo == 1) {
+                    // Descuento en monto del total de la línea
+                    monto_dscto_unitario_sin_igv = descuento_valor / cantidad
+                } else if (descuento_tipo == 2) {
+                    // Descuento en porcentaje
+                    monto_dscto_unitario_sin_igv = val_unit_item_raw * (descuento_valor / 100)
+                }
+            }
+            // Asegurarse de que el descuento no haga el valor unitario negativo
+            const val_unit_item_after_discount = Math.max(
+                0,
+                val_unit_item_raw - monto_dscto_unitario_sin_igv,
+            )
+
+            // 7. Recalcular ISC unitario final después del descuento del item (si es por porcentaje)
+            let isc_unitario_final =
+                isc_monto_fijo_uni > 0
+                    ? isc_monto_fijo_uni
+                    : isc_porcentaje > 0
+                      ? val_unit_item_after_discount * ISC_RATE_DECIMAL
+                      : 0
+
+            // 8. Calcular IGV unitario final
+            let mnt_igv_item_unitario_final = 0
+            if (isGravado) {
+                // MNT_IGV_ITEM = (VAL_UNIT_ITEM + MNT_ISC_ITEM) x POR_IGV_ITEM
+                mnt_igv_item_unitario_final =
+                    (val_unit_item_after_discount + isc_unitario_final) *
+                    actual_igv_rate_for_calculation
+            }
+
+            // 9. Calcular PRC_VTA_UNIT_ITEM (precio de venta unitario final)
+            const precio_venta_unitario_final =
+                val_unit_item_after_discount +
+                isc_unitario_final +
+                mnt_igv_item_unitario_final +
+                bolsa_tax_unit_amount
+
+            // 10. Asignar al producto
+            item.PRC_VTA_UNIT_ITEM = precio_venta_unitario_final // Precio del item incluido IGV
+            item.VAL_UNIT_ITEM = val_unit_item_after_discount // Valor del item sin IGV (10 decimales)
+            item.VAL_VTA_ITEM = val_unit_item_after_discount * cantidad // Valor total del item sin IGV
+            item.MNT_BRUTO = mnt_bruto_total // Monto bruto del item
+            item.MNT_PV_ITEM = precio_venta_unitario_final * cantidad // Venta Total del ITEM incluido IGV, descuentos, cargos adicionales
+
+            item.COD_TIP_PRC_VTA = cod_tip_prc_vta
+            item.COD_TRIB_IGV_ITEM = cod_trib_igv_item // Código de tributo IGV/IVAP (Catálogo 05)
+            item.POR_IGV_ITEM = por_igv_item_output // Tasa de IGV del item
+            item.MNT_IGV_ITEM = mnt_igv_item_unitario_final * cantidad // IGV total del item
+
+            if (monto_dscto_unitario_sin_igv * cantidad > 0) {
+                item.MNT_DSCTO_ITEM = monto_dscto_unitario_sin_igv * cantidad // Monto total del descuento del item sin IGV
+            }
+            if (isc_unitario_final > 0) {
+                item.MNT_ISC_ITEM = isc_unitario_final * cantidad // ISC total del item
+                item.POR_ISC_ITEM = por_isc_item_output // Porcentaje de ISC del item
+                item.COD_TIP_SIST_ISC = cod_tip_sist_isc // Código de sistema de cálculo del ISC (Catálogo 08)
+            }
+            if (bolsa_tax_unit_amount > 0) {
+                item.IMPUESTO_BOLSAS_UNIT = bolsa_tax_unit_amount // Impuesto a la bolsa unitario
+            }
+        },
+        calculateInvoiceTotals() {
+            // --- Procesamiento de ítems y acumulación de totales ---
+            let rawTotalGravadoItems = 0
+            let rawTotalExoneradoItems = 0
+            let rawTotalInafectoItems = 0
+            let rawTotalGratuitoItems = 0
+            let rawTotalIgvItems = 0
+            let rawTotalIscItems = 0
+            let rawTotalDescuentoItems = 0 // Descuentos por ítem
+            let rawTotalImpuestoBolsasItems = 0
+
+            // Catálogo 07 para identificar ítems gratuitos
+            const codigosAfectacionGratuitas = [
+                '11',
+                '12',
+                '13',
+                '14',
+                '15',
+                '16', // Gravado – Retiro por...
+                '21', // Exonerado - Transferencia gratuita
+                '31',
+                '32',
+                '33',
+                '34',
+                '35',
+                '36',
+                '37', // Inafecto – Retiro por... o Transferencia gratuita
+            ]
+
+            // Catálogo 07 para identificar ítems inafectos (operación onerosa)
+            const codigosAfectacionInafectoOneroso = ['30', '40'] // 30: Inafecto - Operación Onerosa, 40: Exportación de Bienes o Servicios
+
+            for (const item of this.vista.comprobante.comprobante_items) {
+                this.calculateInvoiceLineValues(item)
+
+                const valVtaItem = item.VAL_VTA_ITEM
+                const mntIgvItem = item.MNT_IGV_ITEM || 0
+                const mntIscItem = item.MNT_ISC_ITEM || 0
+                const mntDsctoItem = item.MNT_DSCTO_ITEM || 0
+                const impBolsaUnit = item.IMPUESTO_BOLSAS_UNIT || 0
+                const cantUnidItem = item.cantidad
+
+                // Suma de impuestos de todos los ítems
+                rawTotalIgvItems += mntIgvItem
+                rawTotalIscItems += mntIscItem
+                rawTotalDescuentoItems += mntDsctoItem
+                rawTotalImpuestoBolsasItems += impBolsaUnit * cantUnidItem
+
+                // Separación de bases imponibles (gravado, exonerado, inafecto, gratuito)
+                const igvAfectacion = item.igv_afectacion
+                if (codigosAfectacionGratuitas.includes(igvAfectacion)) {
+                    // Gratuito
+                    rawTotalGratuitoItems += valVtaItem
+                } else if (igvAfectacion === 10 || igvAfectacion === 17) {
+                    // Gravado
+                    rawTotalGravadoItems += valVtaItem
+                } else if (igvAfectacion === 20) {
+                    // Exonerado
+                    rawTotalExoneradoItems += valVtaItem
+                } else if (codigosAfectacionInafectoOneroso.includes(igvAfectacion)) {
+                    // Inafecto
+                    rawTotalInafectoItems += valVtaItem
+                }
+            }
+
+            this.vista.totals = {}
+
+            // Aplicar Descuento Global (reduce la base gravada y su IGV si aplica)
+            const descuentoGlobalBase = this.vista.descuento_global?.monto || 0
+            const descuentoGlobalTipo = this.vista.descuento_global?.tipo
+
+            if (descuentoGlobalBase && descuentoGlobalBase > 0) {
+                if (rawTotalGravadoItems > 0) {
+                    const factorReduccion = descuentoGlobalBase / rawTotalGravadoItems
+                    rawTotalGravadoItems -= descuentoGlobalBase
+                    rawTotalIgvItems -= rawTotalIgvItems * factorReduccion
+                } else if (rawTotalExoneradoItems > 0) {
+                    rawTotalExoneradoItems -= descuentoGlobalBase
+                } else if (rawTotalInafectoItems > 0) {
+                    rawTotalInafectoItems -= descuentoGlobalBase
+                }
+
+                this.vista.totals.MNT_DSCTO_GLOB = descuentoGlobalBase
+
+                // Si hay anticipo, este sobrescribe el COD_TIP_DSCTO del anticipo. Se debe manejar la prioridad si ambos aplican. Por simplicidad, el último que se asigna prevalece.
+                if (descuentoGlobalTipo) this.vista.totals.COD_TIP_DSCTO = descuentoGlobalTipo
+            }
+
+            // Asegurarse de que los totales no sean negativos después de descuentos/anticipos
+            rawTotalGravadoItems = Math.max(0, rawTotalGravadoItems)
+            rawTotalExoneradoItems = Math.max(0, rawTotalExoneradoItems)
+            rawTotalInafectoItems = Math.max(0, rawTotalInafectoItems)
+            rawTotalIgvItems = Math.max(0, rawTotalIgvItems)
+
+            // --- Asignación de totales finales a la cabecera ---
+            this.vista.totals.MNT_TOT_GRAVADO = rawTotalGravadoItems
+            this.vista.totals.MNT_TOT_EXONERADO = rawTotalExoneradoItems
+            this.vista.totals.MNT_TOT_INAFECTO = rawTotalInafectoItems
+            this.vista.totals.MNT_TOT_GRATUITO = rawTotalGratuitoItems
+            this.vista.totals.MNT_TOT_DESCUENTO = rawTotalDescuentoItems
+            this.vista.totals.MNT_TOT_TRIB_IGV = rawTotalIgvItems
+            this.vista.totals.MNT_TOT_TRIB_ISC = rawTotalIscItems
+            this.vista.totals.MNT_IMPUESTO_BOLSAS = rawTotalImpuestoBolsasItems
+
+            // Cálculo del Monto Total del Documento (MNT_TOT)
+            this.vista.totals.MNT_TOT =
+                rawTotalGravadoItems +
+                rawTotalExoneradoItems +
+                rawTotalInafectoItems +
+                rawTotalIgvItems +
+                rawTotalIscItems +
+                rawTotalImpuestoBolsasItems
         },
 
         // calcularUno(a) {
