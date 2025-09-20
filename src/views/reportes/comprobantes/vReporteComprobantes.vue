@@ -52,6 +52,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, post } from '@/utils/crud'
 
 import dayjs from 'dayjs'
+import { saveAs } from 'file-saver'
 
 export default {
     components: {
@@ -235,6 +236,13 @@ export default {
                 permiso: 'vReporteComprobantes:descargarCdr',
                 ocultar: { estado: 0, doc_tipo: 'NV' },
             },
+            {
+                label: 'Consultar estado',
+                icon: 'fa-solid fa-file-arrow-down',
+                action: 'consultarEstado',
+                permiso: 'vReporteComprobantes:descargarCdr',
+                ocultar: { estado: 0, doc_tipo: 'NV' },
+            },
         ],
     }),
     async created() {
@@ -388,7 +396,9 @@ export default {
 
             if (res.code != 0) return
 
-            const query = await fetch(`http://localhost/imprimir/comprobante.php?data=${JSON.stringify(res.data)}`)
+            const query = await fetch(
+                `http://localhost/imprimir/comprobante.php?data=${JSON.stringify(res.data)}`,
+            )
             const res1 = await query.json()
             console.log(res1)
         },
@@ -401,44 +411,57 @@ export default {
             this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)
         },
         async descargarXml(item) {
-            const xmlid = `${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+            const send = {
+                empresa: item.empresa,
+                fecha_emision: item.fecha_emision,
+                doc_tipo: item.doc_tipo,
+                serie: item.serie,
+                numero: item.numero,
+                xml: true,
+            }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.comprobantes}/xml/${xmlid}`, true)
+            const res = await get(`${urls.comprobantes}/xml?item=${JSON.stringify(send)}`, true)
             this.useAuth.setLoading(false)
 
-            const url = window.URL.createObjectURL(res)
-
-            // Crear link invisible
-            const a = document.createElement('a')
-            a.href = url
-            a.download = xmlid
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
-
-            // Liberar memoria
-            window.URL.revokeObjectURL(url)
+            if (!res.code) {
+                const xmlid = `${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+                saveAs(res, xmlid)
+            }
         },
         async descargarCdr(item) {
-            const xmlid = `R-${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+            const send = {
+                empresa: item.empresa,
+                fecha_emision: item.fecha_emision,
+                doc_tipo: item.doc_tipo,
+                serie: item.serie,
+                numero: item.numero,
+                cdr: true,
+            }
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.comprobantes}/xml/${xmlid}`, true)
+            const res = await get(`${urls.comprobantes}/xml?item=${JSON.stringify(send)}`, true)
             this.useAuth.setLoading(false)
 
-            const url = window.URL.createObjectURL(res)
+            if (!res.code) {
+                const xmlid = `R-${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+                saveAs(res, xmlid)
+            }
+        },
+        async consultarEstado(item) {
+            const send = {
+                empresa: item.empresa,
+                fecha_emision: item.fecha_emision,
+                doc_tipo: item.doc_tipo,
+                serie: item.serie,
+                numero: item.numero,
+            }
 
-            // Crear link invisible
-            const a = document.createElement('a')
-            a.href = url
-            a.download = xmlid
-            document.body.appendChild(a)
-            a.click()
-            a.remove()
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/estado/uno?item=${JSON.stringify(send)}`)
+            this.useAuth.setLoading(false)
 
-            // Liberar memoria
-            window.URL.revokeObjectURL(url)
+            if (res.code != 0) return
         },
 
         actualizarPagos(item) {

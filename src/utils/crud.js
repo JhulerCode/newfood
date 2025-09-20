@@ -1,6 +1,7 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
+// import { saveAs } from 'file-saver'
 
 const host = import.meta.env.VITE_API_HOST
 
@@ -33,11 +34,11 @@ const urls = {
     transaccion_items: `${host}/api/transaccion_items`,
 }
 
-async function get(url, is_file) {
-    let query
+async function get(url) {
+    let response
 
     try {
-        query = await fetch(url, {
+        response = await fetch(url, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${useAuth().token}`,
@@ -48,34 +49,41 @@ async function get(url, is_file) {
         return { code: -2 }
     }
 
-    if (query.status == 401) {
+    if (response.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
         useModals().setModal('mLogin', 'Sesión terminada', null, null)
         return { code: 401 }
     }
 
-    if (query.status == 403) {
+    if (response.status == 403) {
         jmsg('error', 'Acceso denegado: permisos insuficientes')
         return { code: 403 }
     }
 
-    if (query.status == 404) {
+    if (response.status == 404) {
         jmsg('error', 'Recurso no encontrado')
         return { code: 404 }
     }
 
-    if (is_file) {
-        const blob = await query.blob()
-        return blob
+    const contentType = response.headers.get("Content-Type")
+    if (contentType && contentType.includes("application/json")) {
+        const data = await response.json()
+
+        if (data.code == -1) jmsg('error', 'Algo salió mal')
+
+        if (data.code > 0) jmsg('error', data.msg)
+
+        return data
     }
-
-    const res = await query.json()
-
-    if (res.code == -1) jmsg('error', 'Algo salió mal')
-
-    if (res.code > 0) jmsg('error', res.msg)
-
-    return res
+    else {
+        const blob = await response.blob()
+        return blob
+        // const fileName = response.headers
+        //     .get("Content-Disposition")
+        //     ?.split("filename=")[1]
+        //     ?.replace(/"/g, "")
+        // saveAs(blob, fileName)
+    }
 }
 
 function setFormData(item) {

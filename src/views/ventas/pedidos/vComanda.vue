@@ -21,7 +21,7 @@
 
                 <template v-if="vista.mode == 1 && useAuth.verifyPermiso('vPedidos:crear')">
                     <JdButton text="Grabar" tipo="2" @click="grabar()" />
-                    <JdButton text="Grabar e imprimir" />
+                    <JdButton text="Grabar e imprimir" @click="grabarImprimir()" />
                 </template>
 
                 <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
@@ -675,11 +675,36 @@ export default {
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.pedido)
+        },
+        async grabar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await post(urls.transacciones, this.vista.pedido)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const vistaPedidos = this.useVistas.vPedidos
+            if (vistaPedidos) vistaPedidos.reload = true
+
+            this.useVistas.closePestana('vComanda', 'vPedidos')
+        },
+        async grabarImprimir() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await post(urls.transacciones, this.vista.pedido)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
 
             let venta_canal = ''
 
@@ -695,26 +720,14 @@ export default {
                 fecha: this.vista.pedido.fecha,
                 venta_canal,
                 venta_codigo: this.vista.pedido.venta_codigo,
+                is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
             }
 
             await fetch(`http://localhost/imprimir/comanda.php?data=${JSON.stringify(send)}`)
-        },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(urls.transacciones, this.vista.pedido)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
 
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
-
-            console.log(this.vista.pedido)
-
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
         async modificar() {

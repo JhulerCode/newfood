@@ -310,13 +310,13 @@ export default {
             {
                 label: 'Imprimir comanda',
                 icon: 'fa-solid fa-print',
-                action: 'imprimir',
+                action: 'imprimirComanda',
                 permiso: 'vPedidos:imprimirComanda',
             },
             {
                 label: 'Imprimir precuenta',
                 icon: 'fa-solid fa-print',
-                action: 'imprimir',
+                action: 'imprimirPrecuenta',
                 permiso: 'vPedidos:imprimirPrecuenta',
                 ocultar: { estado: 0 },
             },
@@ -567,7 +567,7 @@ export default {
                 venta_canal: this.vista.venta_canal,
                 socio: 1,
                 venta_socio_datos: {
-                    doc_tipo: '1',
+                    doc_tipo: '0',
                     doc_numero: '00000000',
                     doc_nombres: '00000000 - CLIENTES VARIOS',
                     nombres: 'CLIENTES VARIOS',
@@ -666,6 +666,20 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vPedidos', 'pedidos', item)
+
+            if (this.vista.venta_canal == 1) {
+                const salon = this.vista.salones.find((a) => a.id == this.vista.salon)
+                const mesa = salon.mesas.find((a) => a.id == item.venta_mesa)
+                mesa.pedido = null
+            }
+
+            if (item.venta_canal == 1) {
+                this.vista.mesaPendientes--
+            } else if (item.venta_canal == 2) {
+                this.vista.llevarPendientes--
+            } else if (item.venta_canal == 3) {
+                this.vista.deliveryPendientes--
+            }
         },
         anular(item) {
             const send = {
@@ -698,9 +712,10 @@ export default {
                 this.vista.deliveryPendientes--
             }
         },
-        imprimir(item) {
+        imprimirComanda(item) {
             console.log(item)
         },
+        imprimirPrecuenta() {},
         async generarComprobante(item, mesa) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
@@ -742,7 +757,7 @@ export default {
                 socio: res.data.socio,
                 pago_condicion: res.data.pago_condicion,
                 estado: 1,
-                fecha: dayjs().format('YYYY-MM-DD'),
+                fecha_emision: dayjs().format('YYYY-MM-DD'),
 
                 comprobante_items,
 
