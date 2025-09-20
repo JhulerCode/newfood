@@ -21,12 +21,12 @@
 
                 <template v-if="vista.mode == 1 && useAuth.verifyPermiso('vPedidos:crear')">
                     <JdButton text="Grabar" tipo="2" @click="grabar()" />
-                    <JdButton text="Grabar e imprimir" @click="grabarImprimir()" />
+                    <JdButton text="Grabar e imprimir" @click="grabar(true)" />
                 </template>
 
                 <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
                     <JdButton text="Grabar" tipo="2" @click="modificar()" />
-                    <JdButton text="Grabar e imprimir" />
+                    <JdButton text="Grabar e imprimir" @click="modificar(true)" />
                 </template>
             </div>
         </div>
@@ -681,7 +681,7 @@ export default {
 
             console.log(this.vista.pedido)
         },
-        async grabar() {
+        async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 
@@ -690,22 +690,30 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            if (print == true) await this.imprimir()
 
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
-
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        async grabarImprimir() {
+        async modificar(print) {
             if (this.checkDatos()) return
-            this.shapeDatos()
+            this.vista.pedido.monto = this.vista.mtoImpVenta
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(urls.transacciones, this.vista.pedido)
+            const res = await patch(`${urls.transacciones}/add-productos`, this.vista.pedido)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
+            if (print == true) await this.imprimir()
+
+            const vistaPedidos = this.useVistas.vPedidos
+            if (vistaPedidos) vistaPedidos.reload = true
+            this.useVistas.closePestana('vComanda', 'vPedidos')
+        },
+        async imprimir() {
             let venta_canal = ''
 
             if (this.vista.pedido.venta_canal == 1) {
@@ -724,26 +732,12 @@ export default {
                 productos: this.vista.pedido.transaccion_items,
             }
 
-            await fetch(`http://localhost/imprimir/comanda.php?data=${JSON.stringify(send)}`)
-
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) vistaPedidos.reload = true
-            this.useVistas.closePestana('vComanda', 'vPedidos')
-        },
-        async modificar() {
-            if (this.checkDatos()) return
-            this.vista.pedido.monto = this.vista.mtoImpVenta
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.transacciones}/add-productos`, this.vista.pedido)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) vistaPedidos.reload = true
-
-            this.useVistas.closePestana('vComanda', 'vPedidos')
+            try {
+                await fetch(`http://localhost/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
+            }
         },
 
         runMethod(method, item) {

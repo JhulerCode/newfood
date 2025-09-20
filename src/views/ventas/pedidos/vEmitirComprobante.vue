@@ -30,7 +30,7 @@
                 />
                 <JdButton
                     text="Grabar e imprimir"
-                    @click="grabarImprimir()"
+                    @click="grabar(true)"
                     v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
                 />
             </div>
@@ -93,13 +93,15 @@
                     <span>Ope. gravadas:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_GRAVADO) }}</p>
 
-                    <span>Ope. exoneradas:</span>
-                    <p>{{ redondear(vista.totals.MNT_TOT_EXONERADO) }}</p>
+                    <template v-if="false">
+                        <span>Ope. exoneradas:</span>
+                        <p>{{ redondear(vista.totals.MNT_TOT_EXONERADO) }}</p>
 
-                    <span>Ope. inafectas:</span>
-                    <p>{{ redondear(vista.totals.MNT_TOT_INAFECTO) }}</p>
+                        <span>Ope. inafectas:</span>
+                        <p>{{ redondear(vista.totals.MNT_TOT_INAFECTO) }}</p>
+                    </template>
 
-                    <span>Ope. gratuitas</span>
+                    <span>Ope. gratuitas:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_GRATUITO) }}</p>
 
                     <span>Descuentos:</span>
@@ -108,13 +110,15 @@
                     <span>IGV:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_TRIB_IGV) }}</p>
 
-                    <span>ISC:</span>
-                    <p>{{ redondear(vista.totals.MNT_TOT_TRIB_ISC) }}</p>
+                    <template v-if="false">
+                        <span>ISC:</span>
+                        <p>{{ redondear(vista.totals.MNT_TOT_TRIB_ISC) }}</p>
 
-                    <span>ICBPER:</span>
-                    <p>{{ redondear(vista.totals.MNT_IMPUESTO_BOLSAS) }}</p>
+                        <span>ICBPER:</span>
+                        <p>{{ redondear(vista.totals.MNT_IMPUESTO_BOLSAS) }}</p>
+                    </template>
 
-                    <strong>Importe total</strong>
+                    <strong>Importe total:</strong>
                     <strong class="total">
                         {{ redondear(vista.totals.MNT_TOT) }}
                     </strong>
@@ -1346,7 +1350,7 @@ export default {
 
             console.log(this.vista.comprobante)
         },
-        async grabar() {
+        async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 
@@ -1356,27 +1360,21 @@ export default {
 
             if (res.code != 0) return
 
+            if (print == true) await this.imprimir(res.data)
+
             const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) {
-                vistaPedidos.reload = true
-            }
+            if (vistaPedidos) vistaPedidos.reload = true
             this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
-        async grabarImprimir() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
-
-            this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.comprobantes, this.vista.comprobante)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) {
-                vistaPedidos.reload = true
+        async imprimir(data) {
+            try {
+                await fetch(
+                    `http://localhost/imprimir/comprobante.php?data=${JSON.stringify(data)}`,
+                )
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
             }
-            this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
 
         runMethod(method, item) {
