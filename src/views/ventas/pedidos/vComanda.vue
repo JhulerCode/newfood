@@ -545,6 +545,7 @@ export default {
                     articulo1: {
                         nombre: item.nombre,
                         unidad: item.unidad,
+                        produccion_area1: item.produccion_area1,
                     },
 
                     cantidad: 1,
@@ -562,8 +563,6 @@ export default {
                     combo_articulos: item.combo_articulos,
 
                     importe: 1 * item.precio_venta,
-
-                    produccion_area1: item.produccion_area1,
                 })
 
                 this.sumarItems()
@@ -674,6 +673,10 @@ export default {
             this.vista.pedido.fecha = dayjs().format('YYYY-MM-DD')
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
+
+            if (this.vista.pedido.venta_pago_metodo != 1) {
+                this.vista.pedido.venta_pago_con = null
+            }
         },
         async grabar1() {
             if (this.checkDatos()) return
@@ -733,7 +736,7 @@ export default {
             }
 
             try {
-                await fetch(`http://localhost/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+                await fetch(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`)
             } catch (error) {
                 console.log(error)
                 jmsg('error', 'Error al imprimir')

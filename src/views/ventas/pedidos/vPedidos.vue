@@ -159,7 +159,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, patch, post, delet } from '@/utils/crud'
 import { getItemFromArray, redondear } from '@/utils/mine'
-import { jqst } from '@/utils/swal'
+import { jqst, jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 
@@ -308,7 +308,7 @@ export default {
                 ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
             {
-                label: 'Imprimir comanda',
+                label: 'Reimprimir pedido',
                 icon: 'fa-solid fa-print',
                 action: 'imprimirComanda',
                 permiso: 'vPedidos:imprimirComanda',
@@ -419,8 +419,9 @@ export default {
 
                 'socio',
                 'observacion',
-                'venta_pago_metodo',
                 'tipo',
+                'venta_pago_metodo',
+                'venta_pago_con',
             )
 
             if (this.vista.venta_canal == 1) {
@@ -616,6 +617,7 @@ export default {
                     venta_socio_datos: item.venta_socio_datos,
                     repartidor: item.repartidor,
                     venta_pago_metodo: item.venta_pago_metodo,
+                    venta_pago_con: item.venta_pago_con,
                     observacion: item.observacion,
                 },
                 socios: [
@@ -712,10 +714,93 @@ export default {
                 this.vista.deliveryPendientes--
             }
         },
-        imprimirComanda(item) {
-            console.log(item)
+        async imprimirComanda(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            let venta_canal = ''
+
+            if (res.data.venta_canal == 1) {
+                venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+            } else if (res.data.venta_canal == 2) {
+                venta_canal = 'PARA LLEVAR'
+            } else if (res.data.venta_canal == 3) {
+                venta_canal = 'DELIVERY'
+            }
+
+            const send = {
+                fecha: res.data.fecha,
+                venta_canal,
+                venta_codigo: res.data.venta_codigo,
+                is_reprint: true,
+                productos: res.data.transaccion_items,
+            }
+
+            try {
+                await fetch(
+                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+                )
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
+            }
         },
-        imprimirPrecuenta() {},
+        async imprimirPrecuenta(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(urls.empresa)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            let atencion = ''
+
+            if (res.data.venta_canal == 1) {
+                atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+            } else if (res.data.venta_canal == 2) {
+                atencion = 'PARA LLEVAR'
+            } else if (res.data.venta_canal == 3) {
+                atencion = 'DELIVERY'
+            }
+
+            const send = {
+                empresa: res1.data,
+                fecha: res.data.fecha,
+                venta_canal: res.data.venta_canal,
+                atencion,
+                venta_codigo: res.data.venta_codigo,
+                is_reprint: true,
+                productos: res.data.transaccion_items,
+                venta_socio_datos: res.data.venta_socio_datos,
+                venta_pago_metodo1: res.data.venta_pago_metodo1,
+                venta_pago_con: res.data.venta_pago_con,
+                // impresora: {
+                //     tipo: 1,
+                //     nombre: 'POS-80C',
+                // },
+                impresora: {
+                    tipo: 2,
+                    nombre: '192.168.18.100',
+                }
+            }
+
+            try {
+                await fetch(
+                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
+                )
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
+            }
+        },
         async generarComprobante(item, mesa) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)

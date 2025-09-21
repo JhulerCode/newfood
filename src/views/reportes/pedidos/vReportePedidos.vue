@@ -42,6 +42,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
+import { jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 
@@ -158,7 +159,7 @@ export default {
         ],
         tableRowOptions: [
             {
-                label: 'Imprimir comanda',
+                label: 'Imprimir',
                 icon: 'fa-solid fa-print',
                 action: 'imprimir',
                 permiso: 'vReportePedidos:imprimirComanda',
@@ -234,7 +235,36 @@ export default {
             this[method](item)
         },
         async imprimir(item) {
-            console.log(item)
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            let venta_canal = ''
+
+            if (res.data.venta_canal == 1) {
+                venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+            } else if (res.data.venta_canal == 2) {
+                venta_canal = 'PARA LLEVAR'
+            } else if (res.data.venta_canal == 3) {
+                venta_canal = 'DELIVERY'
+            }
+
+            const send = {
+                fecha: res.data.fecha,
+                venta_canal,
+                venta_codigo: res.data.venta_codigo,
+                is_reprint: true,
+                productos: res.data.transaccion_items,
+            }
+
+            try {
+                await fetch(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
+            }
         },
         async verComprobantes(item) {
             const send = {

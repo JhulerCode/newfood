@@ -50,6 +50,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get, post } from '@/utils/crud'
+import { jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 import { saveAs } from 'file-saver'
@@ -396,11 +397,22 @@ export default {
 
             if (res.code != 0) return
 
-            const query = await fetch(
-                `http://localhost/imprimir/comprobante.php?data=${JSON.stringify(res.data)}`,
-            )
-            const res1 = await query.json()
-            console.log(res1)
+            const send = {
+                ...res.data,
+                impresora: {
+                    tipo: 1,
+                    nombre: 'POS-80C',
+                },
+            }
+
+            try {
+                await fetch(
+                    `http://${this.useAuth.usuario.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+                )
+            } catch (error) {
+                console.log(error)
+                jmsg('error', 'Error al imprimir')
+            }
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')

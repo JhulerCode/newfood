@@ -50,6 +50,14 @@
                     v-model="modal.pedido.venta_pago_metodo"
                     :lista="modal.pago_metodos || []"
                 />
+
+                <JdInput
+                    label="Paga con"
+                    :nec="true"
+                    type="number"
+                    v-model="modal.pedido.venta_pago_con"
+                    v-if="modal.pedido.venta_canal == 3 && modal.pedido.venta_pago_metodo == 1"
+                />
             </template>
 
             <JdInput label="Observación" v-model="modal.pedido.observacion" />
@@ -72,6 +80,7 @@ import { urls, get, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 
 export default {
+    emits: ['datallesModificados'],
     components: {
         JdModal,
         JdInput,
@@ -195,8 +204,14 @@ export default {
                 }
             }
         },
+        shapeDatos() {
+            if (this.modal.pedido.venta_pago_metodo != 1) {
+                this.modal.pedido.venta_pago_con = null
+            }
+        },
         async modificar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await patch(urls.transacciones, this.modal.pedido)

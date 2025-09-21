@@ -1367,9 +1367,16 @@ export default {
             this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
         async imprimir(data) {
+            const send = {
+                ...data,
+                impresora: {
+                    tipo: 1,
+                    nombre: 'POS-80C',
+                },
+            }
             try {
                 await fetch(
-                    `http://localhost/imprimir/comprobante.php?data=${JSON.stringify(data)}`,
+                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
                 )
             } catch (error) {
                 console.log(error)
