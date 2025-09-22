@@ -165,6 +165,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vReporteComprobantes:descargarPdf', label: 'Descargar PDF' },
                             { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },
                             { id: 'vReporteComprobantes:descargarCdr', label: 'Descargar CDR' },
+                            { id: 'vReporteComprobantes:consultarEstado', label: 'Consultar estado' },
                         ]
                     },
                     {

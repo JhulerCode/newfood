@@ -281,6 +281,12 @@ export default {
             //     ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             // },
             {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vPedidos:ver',
+            },
+            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -318,7 +324,7 @@ export default {
                 icon: 'fa-solid fa-print',
                 action: 'imprimirPrecuenta',
                 permiso: 'vPedidos:imprimirPrecuenta',
-                ocultar: { estado: 0 },
+                ocultar: { estado: 0, venta_facturado: true },
             },
             {
                 label: 'Generar comprobante',
@@ -629,6 +635,33 @@ export default {
             }
 
             this.useModals.setModal('mPedidoDetalles', 'Editar detalles', null, send, true)
+        },
+        async ver(item, mesa) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            let salon1
+            if (mesa) {
+                const salon_find = this.vista.salones.find((a) =>
+                    a.mesas.some((b) => b.id === mesa.id),
+                )
+                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+            }
+
+            this.useVistas.showVista('vComanda', 'Editar comanda')
+            const vistaComanda = this.useVistas.vComanda
+            vistaComanda.mode = 3
+            vistaComanda.pedido = res.data
+            vistaComanda.pedido.salon1 = salon1
+            vistaComanda.socios = [
+                {
+                    id: res.data.socio,
+                    ...res.data.venta_socio_datos,
+                },
+            ]
         },
         // async editar(item, mesa) {
         //     this.useAuth.setLoading(true, 'Cargando...')

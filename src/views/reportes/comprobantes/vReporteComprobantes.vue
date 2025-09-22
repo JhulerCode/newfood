@@ -244,7 +244,7 @@ export default {
                 label: 'Consultar estado',
                 icon: 'fa-solid fa-question',
                 action: 'consultarEstado',
-                permiso: 'vReporteComprobantes:descargarCdr',
+                permiso: 'vReporteComprobantes:consultarEstado',
                 ocultar: { doc_tipo: 'NV' },
             },
         ],

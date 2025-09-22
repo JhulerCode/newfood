@@ -2,7 +2,9 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                {{ vista.mode == 1 ? 'Nueva comanda' : 'Añadir a comanda N°' }}
+                <template v-if="vista.mode == 1">Nueva comanda</template>
+                <template v-if="vista.mode == 2">Añadir a comanda N°</template>
+                <template v-if="vista.mode == 3">Comanda</template>
                 {{ vista.pedido.venta_codigo }}
                 <template v-if="vista.pedido.venta_canal == 1">
                     ({{ vista.pedido.salon1.nombre }} - {{ vista.pedido.venta_mesa1.nombre }})
@@ -43,7 +45,7 @@
                         class="select-categoria"
                         v-if="isSmallScreen"
                     >
-                        <option :value="null">TODOS</option>
+                        <option :value="null" v-if="this.vista.mode != 3">TODOS</option>
                         <option v-for="(a, i) in vista.categorias" :key="i" :value="a.id">
                             {{ a.nombre }}
                         </option>
@@ -54,6 +56,7 @@
                             class="categoria max-1line"
                             :class="{ 'categoria-selected': vista.categoria == null }"
                             @click="((vista.categoria = null), loadArticulos())"
+                            v-if="this.vista.mode != 3"
                         >
                             TODOS
                         </li>
@@ -145,6 +148,7 @@
                                 tipo="2"
                                 :small="true"
                                 @click="quitar(item)"
+                                v-if="vista.mode != 3"
                             />
                         </template>
 
@@ -162,7 +166,7 @@
                         </template>
 
                         <template v-slot:cCantidad="{ item }">
-                            <div class="cantidad">
+                            <div class="cantidad" v-if="vista.mode != 3">
                                 <ul>
                                     <li @click="sumarRestar(1, item)">
                                         <i class="fa-solid fa-plus"></i>
@@ -179,6 +183,10 @@
                                     @input="sumarUno(item)"
                                 />
                             </div>
+
+                            <template v-else>
+                                {{ item.cantidad }}
+                            </template>
                         </template>
 
                         <template v-slot:cPu="{ item }">
@@ -359,15 +367,17 @@ export default {
         // this.vista.screenWidth = window.innerWidth
 
         this.sumarItems()
-        await this.loadEmpresa()
+        // await this.loadEmpresa()
 
         if (this.vista.pedido.venta_canal == 3) {
             await this.loadColaboradores()
             await this.loadPagoMetodos()
         }
 
-        await this.loadCategorias()
-        this.loadArticulos()
+        if (this.vista.mode != 3) {
+            await this.loadCategorias()
+            this.loadArticulos()
+        }
     },
     mounted() {
         window.addEventListener('resize', this.handleResize)
@@ -488,20 +498,20 @@ export default {
 
             this.vista.socios = res.data
         },
-        async loadEmpresa() {
-            const qry = {
-                fltr: {},
-                cols: ['igv_porcentaje'],
-            }
+        // async loadEmpresa() {
+        //     const qry = {
+        //         fltr: {},
+        //         cols: ['igv_porcentaje'],
+        //     }
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.empresa}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.empresa}?qry=${JSON.stringify(qry)}`)
+        //     this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+        //     if (res.code != 0) return
 
-            this.vista.empresa = res.data
-        },
+        //     this.vista.empresa = res.data
+        // },
 
         setSocio(item) {
             if (item) {
@@ -553,7 +563,9 @@ export default {
                     pu: this.showPrecio(item),
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
-                        item.igv_afectacion == '10' ? this.vista.empresa.igv_porcentaje : 0,
+                        item.igv_afectacion == '10'
+                            ? this.useAuth.usuario.empresa.igv_porcentaje
+                            : 0,
 
                     observacion: '',
 
@@ -736,7 +748,9 @@ export default {
             }
 
             try {
-                await fetch(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+                await fetch(
+                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+                )
             } catch (error) {
                 console.log(error)
                 jmsg('error', 'Error al imprimir')

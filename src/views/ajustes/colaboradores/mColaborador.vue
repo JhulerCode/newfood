@@ -416,7 +416,7 @@ export default {
         },
 
         setPermisoEstandar() {
-            if (this.colaborador.id != null && this.colaborador.permisos.lenght > 0) return
+            // if (this.colaborador.id != null && this.colaborador.permisos.lenght > 0) return
 
             const permisos = {
                 ADMINISTRADOR: [],
@@ -474,6 +474,7 @@ export default {
                     'vReporteComprobantes:descargarPdf',
                     'vReporteComprobantes:descargarXml',
                     'vReporteComprobantes:descargarCdr',
+                    'vReporteComprobantes:consultarEstado',
                 ],
                 REPARTIDOR: [''],
             }

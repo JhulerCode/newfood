@@ -37,11 +37,10 @@
                 v-if="modal.mode == 2"
             />
 
-            <div class="diferencia">
+            <div class="diferencia" v-if="modal.mode == 2">
                 <small>Diferencia:</small>
-                <p v-if="modal.mode == 2" :class="{ 'diferencia-negativa': diferencia_negativa }">
+                <p :class="{ 'diferencia-negativa': diferencia_negativa }">
                     {{ diferencia }}
-                    <!-- {{ caja_apertura.caja_total }} -->
                 </p>
             </div>
         </div>
