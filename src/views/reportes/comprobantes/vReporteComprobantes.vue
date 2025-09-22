@@ -32,7 +32,7 @@
         @pagosModificados="actualizarPagos"
     />
     <mComprobanteCanjear v-if="useModals.show.mComprobanteCanjear" @canjeado="comprobanteCanjedo" />
-    <mComprobanteCorreo v-if="useModals.show.mComprobanteCorreo"/>
+    <mComprobanteCorreo v-if="useModals.show.mComprobanteCorreo" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -242,10 +242,10 @@ export default {
             },
             {
                 label: 'Consultar estado',
-                icon: 'fa-solid fa-file-arrow-down',
+                icon: 'fa-solid fa-question',
                 action: 'consultarEstado',
                 permiso: 'vReporteComprobantes:descargarCdr',
-                ocultar: { estado: 0, doc_tipo: 'NV' },
+                ocultar: { doc_tipo: 'NV' },
             },
         ],
     }),
@@ -329,7 +329,7 @@ export default {
             const send = {
                 comprobante: {
                     id: item.id,
-                    fecha: dayjs().format('YYYY-MM-DD'),
+                    fecha_emision: dayjs().format('YYYY-MM-DD'),
                     socio: null,
                     monto: item.monto,
                     doc_tipo: item.doc_tipo,
@@ -385,7 +385,12 @@ export default {
             )
         },
         async enviarCorreo(item) {
-            this.useModals.setModal('mComprobanteCorreo', 'Enviar comrpobante por email', null, item)
+            this.useModals.setModal(
+                'mComprobanteCorreo',
+                'Enviar comrpobante por email',
+                null,
+                item,
+            )
         },
         async imprimir(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -397,8 +402,8 @@ export default {
             const send = {
                 ...res.data,
                 impresora: {
-                    tipo: 1,
-                    nombre: 'POS-80C',
+                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
+                    nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
             }
 

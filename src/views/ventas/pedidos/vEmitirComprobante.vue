@@ -1081,7 +1081,6 @@ export default {
                     rawTotalIgvItems += mntIgvItem
                 } else if (igvAfectacion === '20') {
                     // Exonerado
-                    console.log(item.articulo, item.nombre)
                     rawTotalExoneradoItems += valVtaItem
                 } else if (codigosAfectacionInafectoOneroso.includes(igvAfectacion)) {
                     // Inafecto
@@ -1344,12 +1343,12 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
+        // async grabar1() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
 
-            console.log(this.vista.comprobante)
-        },
+        //     console.log(this.vista.comprobante)
+        // },
         async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -1370,8 +1369,8 @@ export default {
             const send = {
                 ...data,
                 impresora: {
-                    tipo: 1,
-                    nombre: 'POS-80C',
+                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
+                    nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
             }
             try {

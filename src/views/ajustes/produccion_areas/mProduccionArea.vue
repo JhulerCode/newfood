@@ -23,7 +23,11 @@
                 :disabled="modal.mode == 3"
             />
 
-            <JdSwitch label="Activo" v-model="modal.item.activo" :disabled="modal.mode == 3" />
+            <JdSwitch
+                label="Activo"
+                v-model="modal.item.activo"
+                :disabled="modal.mode == 3 || modal.item == 1"
+            />
         </div>
     </JdModal>
 </template>

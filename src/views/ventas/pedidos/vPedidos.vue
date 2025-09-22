@@ -776,13 +776,9 @@ export default {
                 venta_socio_datos: res.data.venta_socio_datos,
                 venta_pago_metodo1: res.data.venta_pago_metodo1,
                 venta_pago_con: res.data.venta_pago_con,
-                // impresora: {
-                //     tipo: 1,
-                //     nombre: 'POS-80C',
-                // },
                 impresora: {
-                    tipo: 2,
-                    nombre: '192.168.18.100',
+                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
+                    nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
             }
 

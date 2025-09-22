@@ -397,7 +397,6 @@ export default {
             if (res.code != 0) return
 
             this.vista.data = res.data
-            console.log(this.vista.data)
         },
     },
 }

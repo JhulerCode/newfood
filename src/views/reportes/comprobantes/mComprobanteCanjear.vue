@@ -11,14 +11,14 @@
                 label="Fecha"
                 :nec="true"
                 type="date"
-                v-model="modal.comprobante.fecha"
+                v-model="modal.comprobante.fecha_emision"
                 style="grid-column: 1/2"
             />
 
             <JdSelect
                 label="Tipo"
                 :nec="true"
-                v-model="modal.comprobante.doc_tipo"
+                v-model="modal.comprobante.doc_tipo1"
                 :lista="pago_comprobantes_filtered"
                 style="grid-column: 1/3"
             />
@@ -46,6 +46,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, patch } from '@/utils/crud'
+import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -79,6 +80,10 @@ export default {
     created() {
         this.modal = this.useModals.mComprobanteCanjear
         this.loadDatosSistema()
+
+        if (this.modal.comprobante.doc_tipo == '03') {
+            this.modal.comprobante.doc_tipo1 = '01'
+        }
     },
     methods: {
         async loadDatosSistema() {
@@ -128,18 +133,24 @@ export default {
         },
 
         checkDatos() {
-            if (this.modal.comprobante.doc_tipo == '01') {
-                if (['1', '4', '7'].includes(this.modal.socio.doc_tipo)) {
+            const props = ['fecha_emision', 'doc_tipo1', 'socio']
+            if (incompleteData(this.modal.comprobante, props)) {
+                jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            if (this.modal.comprobante.doc_tipo1 == '01') {
+                if (['0', '1', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
             }
 
-            if (this.modal.comprobante.doc_tipo == '03') {
-                if (this.modal.socio.doc_numero == '00000000') {
-                    jmsg('error', 'El cliente debe tener un DNI válido')
-                    return true
-                }
+            if (this.modal.comprobante.doc_tipo1 == '03') {
+                // if (this.modal.socio.doc_numero == '00000000') {
+                //     jmsg('error', 'El cliente debe tener un DNI válido')
+                //     return true
+                // }
 
                 if (['6', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
