@@ -32,6 +32,7 @@
         @pagosModificados="actualizarPagos"
     />
     <mComprobanteCanjear v-if="useModals.show.mComprobanteCanjear" @canjeado="comprobanteCanjedo" />
+    <mComprobanteCorreo v-if="useModals.show.mComprobanteCorreo"/>
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -44,12 +45,13 @@ import { JdTable, mConfigCols, mConfigFiltros, mAnular, mPdfViewer } from '@jhul
 
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
+import mComprobanteCorreo from '@/views/reportes/comprobantes/mComprobanteCorreo.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, post } from '@/utils/crud'
+import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -65,6 +67,7 @@ export default {
 
         mComprobantePagos,
         mComprobanteCanjear,
+        mComprobanteCorreo,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -382,13 +385,7 @@ export default {
             )
         },
         async enviarCorreo(item) {
-            const res = await post(
-                `${urls.comprobantes}/send-mail`,
-                item,
-                'Correo enviado con éxito',
-            )
-
-            if (res.code != 0) return
+            this.useModals.setModal('mComprobanteCorreo', 'Enviar comrpobante por email', null, item)
         },
         async imprimir(item) {
             this.useAuth.setLoading(true, 'Cargando...')

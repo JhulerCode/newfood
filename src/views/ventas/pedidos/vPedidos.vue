@@ -750,12 +750,6 @@ export default {
         },
         async imprimirPrecuenta(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res1 = await get(urls.empresa)
-            this.useAuth.setLoading(false)
-
-            if (res1.code != 0) return
-
-            this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
@@ -772,7 +766,7 @@ export default {
             }
 
             const send = {
-                empresa: res1.data,
+                empresa: this.useAuth.usuario.empresa,
                 fecha: res.data.fecha,
                 venta_canal: res.data.venta_canal,
                 atencion,
@@ -789,7 +783,7 @@ export default {
                 impresora: {
                     tipo: 2,
                     nombre: '192.168.18.100',
-                }
+                },
             }
 
             try {
