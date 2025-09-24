@@ -52,7 +52,6 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
-import { jmsg } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 import { saveAs } from 'file-saver'
@@ -407,14 +406,15 @@ export default {
                 },
             }
 
-            try {
-                await fetch(
-                    `http://${this.useAuth.usuario.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
-                )
-            } catch (error) {
-                console.log(error)
-                jmsg('error', 'Error al imprimir')
-            }
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+                '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')

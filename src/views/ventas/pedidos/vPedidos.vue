@@ -159,7 +159,7 @@ import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, patch, post, delet } from '@/utils/crud'
 import { getItemFromArray, redondear } from '@/utils/mine'
-import { jqst, jmsg } from '@/utils/swal'
+import { jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
 
@@ -757,7 +757,11 @@ export default {
             let venta_canal = ''
 
             if (res.data.venta_canal == 1) {
-                venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+                if (res.data.venta_mesa1.salon1) {
+                    venta_canal = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+                } else {
+                    venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+                }
             } else if (res.data.venta_canal == 2) {
                 venta_canal = 'PARA LLEVAR'
             } else if (res.data.venta_canal == 3) {
@@ -772,14 +776,15 @@ export default {
                 productos: res.data.transaccion_items,
             }
 
-            try {
-                await fetch(
-                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
-                )
-            } catch (error) {
-                console.log(error)
-                jmsg('error', 'Error al imprimir')
-            }
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+                '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
         },
         async imprimirPrecuenta(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -818,20 +823,12 @@ export default {
             const nuevaVentana = window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
                 '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
 
             setTimeout(() => {
                 nuevaVentana.close()
             }, 500)
-
-            // try {
-            //     await fetch(
-            //         `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
-            //     )
-            // } catch (error) {
-            //     console.log(error)
-            //     jmsg('error', 'Error al imprimir')
-            // }
         },
         async generarComprobante(item, mesa) {
             this.useAuth.setLoading(true, 'Cargando...')

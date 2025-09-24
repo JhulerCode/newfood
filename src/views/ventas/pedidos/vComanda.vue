@@ -706,7 +706,7 @@ export default {
 
             if (res.code != 0) return
 
-            if (print == true) await this.imprimir()
+            if (print == true) this.imprimir()
 
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
@@ -722,13 +722,13 @@ export default {
 
             if (res.code != 0) return
 
-            if (print == true) await this.imprimir()
+            if (print == true) this.imprimir()
 
             const vistaPedidos = this.useVistas.vPedidos
             if (vistaPedidos) vistaPedidos.reload = true
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        async imprimir() {
+        imprimir() {
             let venta_canal = ''
 
             if (this.vista.pedido.venta_canal == 1) {
@@ -747,14 +747,15 @@ export default {
                 productos: this.vista.pedido.transaccion_items,
             }
 
-            try {
-                await fetch(
-                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
-                )
-            } catch (error) {
-                console.log(error)
-                jmsg('error', 'Error al imprimir')
-            }
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+                '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
         },
 
         runMethod(method, item) {
