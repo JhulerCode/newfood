@@ -1373,14 +1373,24 @@ export default {
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
             }
-            try {
-                await fetch(
-                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
-                )
-            } catch (error) {
-                console.log(error)
-                jmsg('error', 'Error al imprimir')
-            }
+
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+                '_blank',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
+
+            // try {
+            //     await fetch(
+            //         `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+            //     )
+            // } catch (error) {
+            //     console.log(error)
+            //     jmsg('error', 'Error al imprimir')
+            // }
         },
 
         runMethod(method, item) {

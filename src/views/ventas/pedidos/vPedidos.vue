@@ -815,14 +815,23 @@ export default {
                 },
             }
 
-            try {
-                await fetch(
-                    `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
-                )
-            } catch (error) {
-                console.log(error)
-                jmsg('error', 'Error al imprimir')
-            }
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
+                '_blank',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
+
+            // try {
+            //     await fetch(
+            //         `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
+            //     )
+            // } catch (error) {
+            //     console.log(error)
+            //     jmsg('error', 'Error al imprimir')
+            // }
         },
         async generarComprobante(item, mesa) {
             this.useAuth.setLoading(true, 'Cargando...')
