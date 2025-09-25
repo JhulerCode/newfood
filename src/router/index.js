@@ -4,13 +4,13 @@ const routes = [
     {
         path: '/signin',
         name: 'SignIn',
-        meta: { title: 'Sign In - Eko Business' },
+        meta: { title: 'DivergeRest - Sign In' },
         component: () => import('@/views/_signin/SignIn.vue'),
     },
     {
         path: '/consola',
         name: 'ConsolaView',
-        meta: { title: 'Consola - Eko Business' },
+        meta: { title: 'DivergeRest - Consola' },
         component: () => import('@/views/_consola/ConsolaView.vue'),
     },
 ]

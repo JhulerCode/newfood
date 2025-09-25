@@ -17,9 +17,9 @@ export default defineConfig({
             },
             includeAssets: ['robots.txt', 'apple-touch-icon.png'], //apple 180x180 px
             manifest: {
-                name: 'New Rest App',
-                short_name: 'New Rest App',
-                description: 'New Rest App',
+                name: 'DivergeRest',
+                short_name: 'DivergeRest',
+                description: 'DivergeRest',
                 start_url: '/',
                 display: 'standalone',
                 background_color: '#ffffff',
