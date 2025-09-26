@@ -367,7 +367,6 @@ export default {
         // this.vista.screenWidth = window.innerWidth
 
         this.sumarItems()
-        // await this.loadEmpresa()
 
         if (this.vista.pedido.venta_canal == 3) {
             await this.loadColaboradores()
@@ -498,20 +497,6 @@ export default {
 
             this.vista.socios = res.data
         },
-        // async loadEmpresa() {
-        //     const qry = {
-        //         fltr: {},
-        //         cols: ['igv_porcentaje'],
-        //     }
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.empresa}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.vista.empresa = res.data
-        // },
 
         setSocio(item) {
             if (item) {

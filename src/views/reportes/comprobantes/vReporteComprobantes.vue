@@ -271,7 +271,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('caja_apertura', 'empresa')
+            this.vista.qry.cols.push('caja_apertura', 'empresa_datos')
         },
         async loadComprobantes() {
             this.setQuery()
@@ -426,7 +426,7 @@ export default {
         },
         async descargarXml(item) {
             const send = {
-                empresa: item.empresa,
+                empresa_datos: item.empresa_datos,
                 fecha_emision: item.fecha_emision,
                 doc_tipo: item.doc_tipo,
                 serie: item.serie,
@@ -439,13 +439,13 @@ export default {
             this.useAuth.setLoading(false)
 
             if (!res.code) {
-                const xmlid = `${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+                const xmlid = `${item.empresa_datos.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
                 saveAs(res, xmlid)
             }
         },
         async descargarCdr(item) {
             const send = {
-                empresa: item.empresa,
+                empresa_datos: item.empresa_datos,
                 fecha_emision: item.fecha_emision,
                 doc_tipo: item.doc_tipo,
                 serie: item.serie,
@@ -458,13 +458,13 @@ export default {
             this.useAuth.setLoading(false)
 
             if (!res.code) {
-                const xmlid = `R-${item.empresa.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
+                const xmlid = `R-${item.empresa_datos.ruc}-${item.doc_tipo}-${item.serie}-${item.numero}.xml`
                 saveAs(res, xmlid)
             }
         },
         async consultarEstado(item) {
             const send = {
-                empresa: item.empresa,
+                empresa_datos: item.empresa_datos,
                 fecha_emision: item.fecha_emision,
                 doc_tipo: item.doc_tipo,
                 serie: item.serie,
