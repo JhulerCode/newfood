@@ -5,7 +5,7 @@
         </div>
 
         <div class="container-logo">
-            <img src="@/assets/img/logo.png" />
+            <img src="@/assets/img/logo.webp" />
         </div>
 
         <div class="info">
