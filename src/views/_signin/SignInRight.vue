@@ -5,10 +5,7 @@
         </div>
 
         <div class="container-logo">
-            <img src="@/assets/img/logo-principal-negro.png" v-if="!useAuth.isDarkMode" />
-            <img src="@/assets/img/logo-white.png" v-else />
-            <!-- <LogoYellow /> -->
-             <!-- {{ logoPrincipalAmarillo }} -->
+            <img src="@/assets/img/logo.png" />
         </div>
 
         <div class="info">
@@ -30,8 +27,6 @@
 
 <script>
 import { JdInput, JdInputPassword, JdButton } from '@jhuler/components'
-// import LogoYellow from '../../assets/LogoYellow.vue'
-// import logoPrincipalAmarillo from '@/assets/img/logo-principal-amarillo.png'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -44,12 +39,10 @@ export default {
         JdInput,
         JdInputPassword,
         JdButton,
-        // LogoYellow,
     },
     data: () => ({
         useAuth: useAuth(),
         useVistas: useVistas(),
-        // logoPrincipalAmarillo,
 
         usuario: '',
         contrasena: '',
@@ -137,11 +130,13 @@ export default {
     }
 
     .container-logo {
-        height: 5rem;
+        height: 8rem;
         width: 100%;
         margin-bottom: 2rem;
 
         img {
+            background-color: white;
+            border-radius: 1rem;
             max-height: 100%;
         }
     }

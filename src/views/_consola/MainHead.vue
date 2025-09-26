@@ -5,8 +5,7 @@
                 <i class="fa-solid fa-bars"></i>
             </div>
 
-            <img src="@/assets/img/logo-black.png" v-if="!useAuth.isDarkMode" />
-            <img src="@/assets/img/logo-white.png" v-else />
+            <img src="@/assets/img/logo.webp" />
         </div>
 
         <div class="right">

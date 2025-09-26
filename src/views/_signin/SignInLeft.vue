@@ -1,7 +1,5 @@
 <template>
     <div class="left">
-        <!-- <strong>New Food</strong> -->
-
         <img src="@/assets/img/login-icon.png" alt="" />
     </div>
 </template>
@@ -28,11 +26,6 @@ export default {}
 
     img {
         max-width: 80%;
-    }
-
-    strong {
-        color: var(--text-color3);
-        font-size: 4rem;
     }
 }
 </style>
