@@ -210,6 +210,7 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
+            await this.loadPagoComprobantes()
 
             const cols = this.columns
             cols.find((a) => a.id == 'comprobante_tipo').lista = this.vista.pago_comprobantes
@@ -225,7 +226,7 @@ export default {
         },
 
         async loadDatosSistema() {
-            const qry = ['pago_comprobantes', 'comprobante_estados']
+            const qry = ['comprobante_estados']
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
@@ -234,6 +235,21 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.vista, res.data)
+        },
+        async loadPagoComprobantes() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre', 'estandar'],
+            }
+
+            this.vista.pago_comprobantes = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.vista.pago_comprobantes = res.data
         },
     },
 }

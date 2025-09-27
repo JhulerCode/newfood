@@ -5,7 +5,7 @@
                 label="Nombre"
                 :nec="true"
                 v-model="modal.item.nombre"
-                :disabled="modal.mode == 3 || modal.item.id == 1"
+                :disabled="modal.mode == 3 || modal.item.nombre == 'CAJA'"
             />
 
             <JdSelect
@@ -26,7 +26,7 @@
             <JdSwitch
                 label="Activo"
                 v-model="modal.item.activo"
-                :disabled="modal.mode == 3 || modal.item == 1"
+                :disabled="modal.mode == 3 || modal.item.nombre == 'CAJA'"
             />
         </div>
     </JdModal>

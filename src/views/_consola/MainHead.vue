@@ -5,7 +5,7 @@
                 <i class="fa-solid fa-bars"></i>
             </div>
 
-            <img src="@/assets/img/logo.webp" />
+            <img src="@/assets/img/logo-h.webp" />
         </div>
 
         <div class="right">

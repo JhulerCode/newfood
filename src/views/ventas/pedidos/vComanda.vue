@@ -267,7 +267,11 @@
                     </div>
 
                     <template
-                        v-if="vista.pedido.venta_canal == 3 && vista.pedido.venta_pago_metodo == 1"
+                        v-if="
+                            vista.pedido.venta_canal == 3 &&
+                            vista.pedido.venta_pago_metodo ==
+                                `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                        "
                     >
                         <div class="pedido-paga">
                             <span>Paga con</span>
@@ -658,7 +662,8 @@ export default {
                 }
 
                 if (
-                    this.vista.pedido.venta_pago_metodo == 1 &&
+                    this.vista.pedido.venta_pago_metodo ==
+                        `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
                     this.vista.pedido.venta_pago_con < this.vista.pedido.monto
                 ) {
                     jmsg('warning', 'Monto de pago no es suficiente')
@@ -671,7 +676,10 @@ export default {
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
 
-            if (this.vista.pedido.venta_pago_metodo != 1) {
+            if (
+                this.vista.pedido.venta_pago_metodo !=
+                `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO`
+            ) {
                 this.vista.pedido.venta_pago_con = null
             }
         },

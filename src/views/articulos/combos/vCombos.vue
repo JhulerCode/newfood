@@ -200,6 +200,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('is_combo')
         },
         async loadArticulos() {
             this.setQuery()

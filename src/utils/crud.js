@@ -14,14 +14,13 @@ const urls = {
 
     articulo_categorias: `${host}/api/articulo_categorias`,
     articulos: `${host}/api/articulos`,
-    cajas: `${host}/api/cajas`,
+    // cajas: `${host}/api/cajas`,
     caja_aperturas: `${host}/api/caja_aperturas`,
     colaboradores: `${host}/api/colaboradores`,
     comprobante_items: `${host}/api/comprobante_items`,
     comprobantes: `${host}/api/comprobantes`,
     dinero_movimientos: `${host}/api/dinero_movimientos`,
     empresa: `${host}/api/empresa`,
-    impresoras: `${host}/api/impresoras`,
     mesas: `${host}/api/mesas`,
     kardex: `${host}/api/kardex`,
     pago_comprobantes: `${host}/api/pago_comprobantes`,
@@ -84,33 +83,6 @@ async function get(url) {
         //     ?.replace(/"/g, "")
         // saveAs(blob, fileName)
     }
-}
-
-function setFormData(item) {
-    const formData = new FormData()
-
-    // for (const key in item) {
-    //     const value = item[key];
-
-    //     formData.append(key, value);
-    // }
-    const { archivo, ...resto } = item
-    formData.append('archivo', archivo)
-    formData.append("datos", JSON.stringify(resto))
-
-    return formData
-}
-
-function setHeaders(item) {
-    const headers = {
-        Authorization: `Bearer ${useAuth().token}`,
-    }
-
-    if (!item.formData) {
-        headers['Content-Type'] = 'application/json'
-    }
-
-    return headers
 }
 
 async function post(url, item, ms) {
@@ -234,6 +206,41 @@ async function delet(url, item, ms) {
     }
 
     return res
+}
+
+function getSubdominio() {
+    const hostname = window.location.hostname
+
+    const parts = hostname.split(".")
+
+    if (parts.length > 2) return parts[0]
+
+    return 'localhost'
+}
+
+function setFormData(item) {
+    const formData = new FormData()
+
+    const { archivo, ...resto } = item
+    formData.append('archivo', archivo)
+    formData.append("datos", JSON.stringify(resto))
+
+    return formData
+}
+
+function setHeaders(item) {
+    const headers = {
+        Authorization: `Bearer ${useAuth().token}`,
+    }
+
+    if (!item.formData) {
+        headers['Content-Type'] = 'application/json'
+    }
+
+    const subdominio = getSubdominio()
+    if (subdominio) headers['x-empresa'] = subdominio
+
+    return headers
 }
 
 export {

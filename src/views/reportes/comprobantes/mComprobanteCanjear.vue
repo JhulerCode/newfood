@@ -70,33 +70,26 @@ export default {
         pago_comprobantes_filtered() {
             if (this.modal.pago_comprobantes == null) return []
 
-            if (this.modal.comprobante.doc_tipo == '03') {
-                return this.modal.pago_comprobantes.filter((a) => a.id != 'NV' && a.id != '03')
+            const pago_comprobante_actual = this.modal.pago_comprobantes.find(
+                (a) => a.id == this.modal.comprobante.doc_tipo1,
+            )
+
+            if (pago_comprobante_actual.nombre == 'BOLETA DE VENTA') {
+                return this.modal.pago_comprobantes.filter((a) => a.nombre != 'NOTA DE VENTA' && a.nombre != 'BOLETA DE VENTA')
             } else {
-                return this.modal.pago_comprobantes.filter((a) => a.id != 'NV')
+                return this.modal.pago_comprobantes.filter((a) => a.nombre != 'NOTA DE VENTA')
             }
         },
     },
     created() {
         this.modal = this.useModals.mComprobanteCanjear
-        this.loadDatosSistema()
+        this.loadPagoComprobantes()
 
         if (this.modal.comprobante.doc_tipo == '03') {
             this.modal.comprobante.doc_tipo1 = '01'
         }
     },
     methods: {
-        async loadDatosSistema() {
-            const qry = ['pago_comprobantes']
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
-        },
         async loadSocios(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.socios.length = 0
@@ -128,6 +121,22 @@ export default {
 
             this.modal.socios = res.data
         },
+        async loadPagoComprobantes() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre', 'estandar'],
+            }
+
+            this.vista.pago_comprobantes = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.vista.pago_comprobantes = res.data
+        },
+
         setSocio(item) {
             this.modal.socio = item
         },
@@ -147,11 +156,6 @@ export default {
             }
 
             if (this.modal.comprobante.doc_tipo1 == '03') {
-                // if (this.modal.socio.doc_numero == '00000000') {
-                //     jmsg('error', 'El cliente debe tener un DNI válido')
-                //     return true
-                // }
-
                 if (['6', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true

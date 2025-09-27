@@ -409,11 +409,9 @@ export default {
             }
 
             this.vista.pago_comprobantes = []
-            this.vista.pagoComprobantesLoaded = false
             this.useAuth.loading = { show: true, text: 'Cargando...' }
             const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
             this.useAuth.loading = { show: false, text: '' }
-            this.vista.pagoComprobantesLoaded = true
 
             if (res.code != 0) return
 
@@ -1268,11 +1266,6 @@ export default {
             }
 
             if (this.vista.comprobante.doc_tipo == '03') {
-                // if (this.vista.socio.doc_numero == '00000000') {
-                //     jmsg('error', 'El cliente debe tener un DNI válido')
-                //     return true
-                // }
-
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true

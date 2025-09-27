@@ -104,7 +104,7 @@ export default {
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vProduccionAreas:eliminar',
-                ocultar: { id: 1 },
+                ocultar: { nombre: 'CAJA' },
             },
         ],
     }),

@@ -27,8 +27,7 @@
         <vColaboradores v-if="useVistas.show.vColaboradores" />
         <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
-        <vImpresoras v-if="useVistas.show.vImpresoras" />
-        <vCajas v-if="useVistas.show.vCajas" />
+        <!-- <vCajas v-if="useVistas.show.vCajas" /> -->
         <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
         <vSalones v-if="useVistas.show.vSalones" />
     </section>
@@ -65,13 +64,12 @@ import vCajaAperturas from '@/views/reportes/caja_aperturas/vCajaAperturas.vue'
 import vDineroMovimientos from '@/views/reportes/dinero_movimientos/vDineroMovimientos.vue'
 import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 
-//----- AJSUTES --- //
+//----- AJUSTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
-import vImpresoras from '@/views/ajustes/impresoras/vImpresoras.vue'
-import vCajas from '@/views/ajustes/cajas/vCajas.vue'
+// import vCajas from '@/views/ajustes/cajas/vCajas.vue'
 import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
 import vSalones from '@/views/ajustes/salones/vSalones.vue'
 
@@ -104,8 +102,7 @@ export default {
         vColaboradores,
         VPagoComprobantes,
         vPagoMetodos,
-        vImpresoras,
-        vCajas,
+        // vCajas,
         vProduccionAreas,
         vSalones,
     },

@@ -10,14 +10,6 @@
             />
 
             <JdInput
-                label="Fecha"
-                :nec="true"
-                type="date"
-                :disabled="true"
-                v-model="articulo.asd"
-                style="grid-column: 1/5"
-            />
-            <JdInput
                 label="Nombre"
                 :nec="true"
                 v-model="articulo.nombre"
@@ -125,8 +117,6 @@ export default {
     async created() {
         this.modal = this.useModals.mArticulo
         this.articulo = this.useModals.mArticulo.item
-
-        this.articulo.asd = '2025-12-1'
 
         this.showButtons()
 

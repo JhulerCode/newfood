@@ -26,7 +26,7 @@
                     :small="true"
                     @click="loadDni"
                     style="grid-column: 3/4"
-                    v-if="colaborador.doc_tipo == 1"
+                    v-if="colaborador.doc_tipo == 1 && modal.mode != 3"
                 />
 
                 <JdInput

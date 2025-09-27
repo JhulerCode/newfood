@@ -5,7 +5,7 @@
                 label="Nombre"
                 :nec="true"
                 v-model="modal.item.nombre"
-                :disabled="modal.mode == 3"
+                :disabled="modal.mode == 3 || modal.item.nombre == 'EFECTIVO'"
             />
 
             <JdInput

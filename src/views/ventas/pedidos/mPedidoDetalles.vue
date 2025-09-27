@@ -56,7 +56,11 @@
                     :nec="true"
                     type="number"
                     v-model="modal.pedido.venta_pago_con"
-                    v-if="modal.pedido.venta_canal == 3 && modal.pedido.venta_pago_metodo == 1"
+                    v-if="
+                        modal.pedido.venta_canal == 3 &&
+                        modal.pedido.venta_pago_metodo ==
+                            `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                    "
                 />
             </template>
 
@@ -205,7 +209,10 @@ export default {
             }
         },
         shapeDatos() {
-            if (this.modal.pedido.venta_pago_metodo != 1) {
+            if (
+                this.modal.pedido.venta_pago_metodo !=
+                `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO`
+            ) {
                 this.modal.pedido.venta_pago_con = null
             }
         },

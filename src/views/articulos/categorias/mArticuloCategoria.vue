@@ -40,6 +40,7 @@
 <script>
 import { JdModal, JdSelect, JdInput, JdSwitch } from '@jhuler/components'
 
+import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
@@ -55,6 +56,7 @@ export default {
         JdSwitch,
     },
     data: () => ({
+        useAuth: useAuth(),
         useModals: useModals(),
         useVistas: useVistas(),
 

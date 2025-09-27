@@ -572,7 +572,7 @@ export default {
             let send = {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
-                socio: 1,
+                socio: `${this.useAuth.usuario.empresa.subdominio}-CLIENTES-VARIOS`,
                 venta_socio_datos: {
                     doc_tipo: '0',
                     doc_numero: '00000000',
@@ -916,6 +916,14 @@ export default {
             if (res.code != 0) return
 
             this.vista.pedidos.splice(item.i, 1, res.data)
+
+            if (item.venta_canal == 1) {
+                this.vista.mesaPendientes--
+            } else if (item.venta_canal == 2) {
+                this.vista.llevarPendientes--
+            } else if (item.venta_canal == 3) {
+                this.vista.deliveryPendientes--
+            }
         },
 
         async abrirComandaMesa(mesa) {
