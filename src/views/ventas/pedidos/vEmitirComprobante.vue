@@ -1367,6 +1367,9 @@ export default {
                 },
             }
 
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+            )
             const nuevaVentana = window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
                 '_blank',

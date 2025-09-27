@@ -409,16 +409,18 @@ export default {
 
             const datos_url = encodeURIComponent(JSON.stringify(send))
 
-            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`)
-            window.open(
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`,
+            )
+            const nuevaVentana = window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
 
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')

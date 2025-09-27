@@ -775,7 +775,9 @@ export default {
                 is_reprint: true,
                 productos: res.data.transaccion_items,
             }
-            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+            )
             window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
                 '_blank',
@@ -804,7 +806,7 @@ export default {
             }
 
             const send = {
-                empresa: this.useAuth.usuario.empresa,
+                empresa_datos: this.useAuth.usuario.empresa,
                 fecha: res.data.fecha,
                 venta_canal: res.data.venta_canal,
                 atencion,
@@ -820,6 +822,9 @@ export default {
                 },
             }
 
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
+            )
             const nuevaVentana = window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
                 '_blank',

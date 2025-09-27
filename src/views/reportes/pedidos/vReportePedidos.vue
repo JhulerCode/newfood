@@ -259,6 +259,9 @@ export default {
                 productos: res.data.transaccion_items,
             }
 
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+            )
             const nuevaVentana = window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
                 '_blank',
