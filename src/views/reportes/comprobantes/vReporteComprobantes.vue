@@ -407,15 +407,16 @@ export default {
                 },
             }
 
-            const nuevaVentana = window.open(
+            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`)
+            window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')

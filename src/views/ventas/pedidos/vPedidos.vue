@@ -775,16 +775,16 @@ export default {
                 is_reprint: true,
                 productos: res.data.transaccion_items,
             }
-
-            const nuevaVentana = window.open(
+            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`)
+            window.open(
                 `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
         async imprimirPrecuenta(item) {
             this.useAuth.setLoading(true, 'Cargando...')
