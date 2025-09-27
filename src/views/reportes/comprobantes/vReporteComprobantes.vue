@@ -407,9 +407,11 @@ export default {
                 },
             }
 
-            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`)
+            const datos_url = encodeURIComponent(JSON.stringify(send))
+
+            console.log(`http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`)
             window.open(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
