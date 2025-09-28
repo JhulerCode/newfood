@@ -70,14 +70,18 @@ export default {
         pago_comprobantes_filtered() {
             if (this.modal.pago_comprobantes == null) return []
 
-            const pago_comprobante_actual = this.modal.pago_comprobantes.find(
-                (a) => a.id == this.modal.comprobante.doc_tipo1,
-            )
-
-            if (pago_comprobante_actual.nombre == 'BOLETA DE VENTA') {
-                return this.modal.pago_comprobantes.filter((a) => a.nombre != 'NOTA DE VENTA' && a.nombre != 'BOLETA DE VENTA')
+            if (
+                this.modal.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`
+            ) {
+                return this.modal.pago_comprobantes.filter(
+                    (a) =>
+                        a.id != `${this.useAuth.usuario.empresa.subdominio}-NV` &&
+                        a.id != `${this.useAuth.usuario.empresa.subdominio}-03`,
+                )
             } else {
-                return this.modal.pago_comprobantes.filter((a) => a.nombre != 'NOTA DE VENTA')
+                return this.modal.pago_comprobantes.filter(
+                    (a) => a.id != `${this.useAuth.usuario.empresa.subdominio}-NV`,
+                )
             }
         },
     },
@@ -85,8 +89,8 @@ export default {
         this.modal = this.useModals.mComprobanteCanjear
         this.loadPagoComprobantes()
 
-        if (this.modal.comprobante.doc_tipo == '03') {
-            this.modal.comprobante.doc_tipo1 = '01'
+        if (this.modal.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`) {
+            this.modal.comprobante.doc_tipo1 = `${this.useAuth.usuario.empresa.subdominio}-01`
         }
     },
     methods: {
@@ -127,14 +131,14 @@ export default {
                 cols: ['nombre', 'estandar'],
             }
 
-            this.vista.pago_comprobantes = []
+            this.modal.pago_comprobantes = []
             this.useAuth.loading = { show: true, text: 'Cargando...' }
             const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
             this.useAuth.loading = { show: false, text: '' }
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data
+            this.modal.pago_comprobantes = res.data
         },
 
         setSocio(item) {
@@ -148,14 +152,18 @@ export default {
                 return true
             }
 
-            if (this.modal.comprobante.doc_tipo1 == '01') {
+            if (
+                this.modal.comprobante.doc_tipo1 == `${this.useAuth.usuario.empresa.subdominio}-01`
+            ) {
                 if (['0', '1', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
             }
 
-            if (this.modal.comprobante.doc_tipo1 == '03') {
+            if (
+                this.modal.comprobante.doc_tipo1 == `${this.useAuth.usuario.empresa.subdominio}-03`
+            ) {
                 if (['6', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true
