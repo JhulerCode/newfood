@@ -444,7 +444,10 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     activo: { op: 'Es', val: true },
-                    nombres: { op: 'Contiene', val: txtBuscar },
+                    or: {
+                        nombres: { op: 'Contiene', val: txtBuscar },
+                        doc_numero: { op: 'Contiene', val: txtBuscar },
+                    },
                 },
                 cols: [
                     'nombres',

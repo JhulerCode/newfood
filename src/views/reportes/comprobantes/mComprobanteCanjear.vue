@@ -23,23 +23,36 @@
                 style="grid-column: 1/3"
             />
 
-            <JdSelectQuery
-                label="Cliente"
-                :nec="true"
-                v-model="modal.comprobante.socio"
-                :spin="modal.spinSocios"
-                :lista="modal.socios || []"
-                mostrar="doc_nombres"
-                @search="loadSocios"
-                @elegir="setSocio"
-                style="grid-column: 1/3"
-            />
+            <div style="grid-column: 1/4" class="dato-cliente">
+                <JdSelectQuery
+                    label="Cliente"
+                    :nec="true"
+                    v-model="modal.comprobante.socio"
+                    :spin="modal.spinSocios"
+                    :lista="modal.socios || []"
+                    mostrar="doc_nombres"
+                    @search="loadSocios"
+                    @elegir="setSocio"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-user-plus"
+                    title="Nuevo socio"
+                    tipo="2"
+                    :small="true"
+                    @click="nuevoSocio()"
+                />
+            </div>
         </div>
     </JdModal>
+
+    <mSocio @created="setSocioCreated" v-if="useModals.show.mSocio" />
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton } from '@jhuler/components'
+
+import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -55,6 +68,8 @@ export default {
         JdInput,
         JdSelect,
         JdSelectQuery,
+        JdButton,
+        mSocio,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -104,7 +119,10 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     activo: { op: 'Es', val: true },
-                    nombres: { op: 'Contiene', val: txtBuscar },
+                    or: {
+                        nombres: { op: 'Contiene', val: txtBuscar },
+                        doc_numero: { op: 'Contiene', val: txtBuscar },
+                    },
                 },
                 cols: [
                     'nombres',
@@ -143,6 +161,17 @@ export default {
 
         setSocio(item) {
             this.modal.socio = item
+        },
+        nuevoSocio() {
+            const send = { tipo: 2, activo: true }
+
+            this.useModals.setModal('mSocio', 'Nuevo cliente', 1, send)
+        },
+        setSocioCreated(item) {
+            this.modal.socios = [item]
+            this.modal.comprobante.socio = item.id
+
+            this.setSocio(item)
         },
 
         checkDatos() {
@@ -197,7 +226,12 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 10rem 10rem;
+    grid-template-columns: 10rem 10rem 10rem;
     gap: 0.5rem;
+
+    .dato-cliente {
+        display: flex;
+        gap: 0.5rem;
+    }
 }
 </style>
