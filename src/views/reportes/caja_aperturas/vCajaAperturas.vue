@@ -196,13 +196,31 @@ export default {
 
             if (res.code != 0) return
 
+            const {
+                efectivo_ingresos_total,
+                efectivo_egresos_total,
+                comprobantes_aceptados_total,
+                comprobantes_anulados_total,
+                descuentos_total,
+                venta_canales,
+                venta_pago_metodos,
+                venta_comprobantes,
+            } = res.data
+
             const send = {
                 impresora: {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                ...res.data,
                 caja_apertura: item,
+                efectivo_ingresos_total,
+                efectivo_egresos_total,
+                comprobantes_aceptados_total,
+                comprobantes_anulados_total,
+                descuentos_total,
+                venta_canales,
+                venta_pago_metodos,
+                venta_comprobantes,
             }
 
             console.log(
