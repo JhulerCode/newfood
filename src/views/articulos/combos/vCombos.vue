@@ -85,7 +85,7 @@ export default {
                 sort: false,
             },
             {
-                id: 'foto_path',
+                id: 'foto_url',
                 title: 'Foto',
                 filtrable: false,
                 format: 'img',

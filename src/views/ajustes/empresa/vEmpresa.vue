@@ -98,14 +98,14 @@
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
                 />
 
-                <div v-if="vista.empresa.archivo || vista.empresa.logo" class="empresa-logo">
+                <div v-if="vista.empresa.archivo || vista.empresa.logo_url" class="empresa-logo">
                     <img
                         :src="vista.blob"
                         :alt="'logo-' + vista.empresa.razon_social"
                         v-if="vista.empresa.archivo"
                     />
                     <img
-                        :src="`${urls.uploads}/${vista.empresa.logo}`"
+                        :src="vista.empresa.logo_url"
                         :alt="'logo-' + vista.empresa.razon_social"
                         v-else
                     />

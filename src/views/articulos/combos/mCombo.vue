@@ -53,11 +53,11 @@
 
             <div
                 style="grid-column: 4/5; grid-row: 5/9"
-                v-if="articulo.archivo || articulo.foto_path"
+                v-if="articulo.archivo || articulo.foto_url"
                 class="producto-foto"
             >
                 <img :src="modal.blob" :alt="articulo.nombre" v-if="articulo.archivo" />
-                <img :src="`${urls.uploads}/${articulo.foto_path}`" :alt="articulo.nombre" v-else />
+                <img :src="articulo.foto_url" :alt="articulo.nombre" v-else />
             </div>
         </div>
 

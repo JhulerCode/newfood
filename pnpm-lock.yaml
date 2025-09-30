@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@jhuler/components':
-        specifier: ^1.0.2
-        version: 1.0.2(vue@3.5.17)
+        specifier: ^1.1.0
+        version: 1.1.0(vue@3.5.17)
       dayjs:
         specifier: ^1.11.13
         version: 1.11.13
@@ -877,8 +877,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@jhuler/components@1.0.2':
-    resolution: {integrity: sha512-V1NAs2gGFOVcDd0Kty+N0qA3hTZWIp5QvgRjerav783BFn5okf5krgRkvVeQ8VmbM68XtjD1re6r85miHHafng==}
+  '@jhuler/components@1.1.0':
+    resolution: {integrity: sha512-mvVJ0FD7Z4effqtGv3LZprgAAUnZrUT/iQ+0rcxy3vbsdM09FXWOhxDdAjLJg/ACbq+Wf3Dh7nC15i+qFqtLOQ==}
     peerDependencies:
       vue: ^3.0.0
 
@@ -3987,7 +3987,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@jhuler/components@1.0.2(vue@3.5.17)':
+  '@jhuler/components@1.1.0(vue@3.5.17)':
     dependencies:
       vue: 3.5.17
 
