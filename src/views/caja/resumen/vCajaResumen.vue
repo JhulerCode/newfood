@@ -256,7 +256,7 @@
                         <i class="fa-solid fa-note-sticky"></i>
                     </div>
                     <div>
-                        <span>S/ {{ redondear(vista.resumen.venta_canales_total) }}</span>
+                        <span>S/ {{ redondear(vista.resumen.pedidos_aceptados_total) }}</span>
                         <p>Pedidos</p>
                     </div>
                 </div>
@@ -381,7 +381,7 @@
             <div class="sixth" v-if="vista.resumen">
                 <div class="card">
                     <div class="card-head">
-                        <p>Pedidos anulados</p>
+                        <p>Pedidos</p>
 
                         <div class="monto-resumen">
                             <span>S/ {{ redondear(vista.resumen.pedidos_aceptados_total) }}</span>
