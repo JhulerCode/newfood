@@ -1372,6 +1372,7 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
+                subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
             console.log(

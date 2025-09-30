@@ -405,15 +405,14 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
+                subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            const datos_url = encodeURIComponent(JSON.stringify(send))
-
             console.log(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`,
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
             )
             const nuevaVentana = window.open(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${datos_url}`,
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${JSON.stringify(send)}`,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
