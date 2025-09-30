@@ -223,11 +223,10 @@ export default {
                 venta_comprobantes,
             }
 
-            console.log(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${JSON.stringify(send)}`,
-            )
+            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            console.log(uriEncoded)
             const nuevaVentana = window.open(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${JSON.stringify(send)}`,
+                uriEncoded,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )

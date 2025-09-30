@@ -775,11 +775,11 @@ export default {
                 is_reprint: true,
                 productos: res.data.transaccion_items,
             }
-            console.log(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
-            )
+
+            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            console.log(uriEncoded)
             const nuevaVentana = window.open(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${JSON.stringify(send)}`,
+                uriEncoded,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
@@ -822,11 +822,10 @@ export default {
                 },
             }
 
-            console.log(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
-            )
+            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            console.log(uriEncoded)
             const nuevaVentana = window.open(
-                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${JSON.stringify(send)}`,
+                uriEncoded,
                 '_blank',
                 'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
             )
