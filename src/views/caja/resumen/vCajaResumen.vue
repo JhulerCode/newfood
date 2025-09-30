@@ -384,6 +384,25 @@
                         <p>Pedidos anulados</p>
 
                         <div class="monto-resumen">
+                            <span>S/ {{ redondear(vista.resumen.pedidos_aceptados_total) }}</span>
+                            <p>Total</p>
+                        </div>
+                    </div>
+
+                    <JdTable
+                        :datos="vista.resumen.pedidos_aceptados || []"
+                        :columns="columnsPedidosAnulados"
+                        :seeker="false"
+                        :download="false"
+                        height="15rem"
+                    />
+                </div>
+
+                <div class="card">
+                    <div class="card-head">
+                        <p>Pedidos anulados</p>
+
+                        <div class="monto-resumen">
                             <span>S/ {{ redondear(vista.resumen.pedidos_anulados_total) }}</span>
                             <p>Total</p>
                         </div>
