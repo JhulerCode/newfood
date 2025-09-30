@@ -126,7 +126,7 @@ export default {
                 icon: 'fa-solid fa-print',
                 action: 'imprimirResumen',
                 permiso: 'vCajaAperturas:imprimirResumen',
-            }
+            },
         ],
     }),
     created() {
@@ -145,7 +145,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                incl: ['createdBy1']
+                incl: ['createdBy1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -189,8 +189,34 @@ export default {
             }
             this.useVistas.showVista('vCajaResumen', 'Caja resumen', send)
         },
-        imprimirResumen(item) {
-            console.log(item)
+        async imprimirResumen(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.caja_aperturas}/resumen/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                impresora: {
+                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
+                    nombre: this.useAuth.usuario.impresora_caja.impresora,
+                },
+                ...res.data,
+                caja_apertura: item,
+            }
+
+            console.log(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${JSON.stringify(send)}`,
+            )
+            const nuevaVentana = window.open(
+                `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${JSON.stringify(send)}`,
+                '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
         },
 
         async loadDatosSistema() {
