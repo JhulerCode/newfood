@@ -148,6 +148,7 @@ export const useAuth = defineStore('auth', {
                     {
                         label: 'Pedidos', goto: 'vReportePedidos', permisos: [
                             { id: 'vReportePedidos:listar', label: 'Listar' },
+                            { id: 'vReportePedidos:ver', label: 'Ver' },
                             { id: 'vReportePedidos:imprimirComanda', label: 'Imprimir' },
                             { id: 'vReportePedidos:verComprobantes', label: 'Ver comprobantes' },
                         ]

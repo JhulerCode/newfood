@@ -123,7 +123,7 @@
     <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
     <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
-    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @datallesModificados="loadPedidos" />
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @detallesModificados="loadPedidos" />
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
 
@@ -158,7 +158,6 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get, patch, post, delet } from '@/utils/crud'
-import { getItemFromArray, redondear } from '@/utils/mine'
 import { jqst } from '@/utils/swal'
 
 import dayjs from 'dayjs'
@@ -177,8 +176,6 @@ export default {
         useModals: useModals(),
         useAuth: useAuth(),
         useVistas: useVistas(),
-        getItemFromArray,
-        redondear,
         dayjs,
 
         vista: {},
@@ -599,20 +596,42 @@ export default {
         runMethod(method, item, item2) {
             this[method](item, item2)
         },
-        addProductos(item, mesa) {
-            let salon1
-            if (mesa) {
-                const salon_find = this.vista.salones.find((a) =>
-                    a.mesas.some((b) => b.id === mesa.id),
-                )
-                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                pedido: { ...res.data },
+                socios: [
+                    {
+                        id: item.socio,
+                        ...item.venta_socio_datos,
+                    },
+                ],
+                pago_metodos: [
+                    {
+                        id: res.data.venta_pago_metodo,
+                        ...res.data.venta_pago_metodo1,
+                    },
+                ],
             }
 
-            this.useVistas.showVista('vComanda', 'Editar comanda')
+            this.useModals.setModal(
+                'mPedidoDetalles',
+                `Pedido N° ${item.venta_codigo}`,
+                3,
+                send,
+                true,
+            )
+        },
+        addProductos(item) {
+            this.useVistas.showVista('vComanda', 'Editar pedido')
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 2
             vistaComanda.pedido = { ...item, transaccion_items: [] }
-            vistaComanda.pedido.salon1 = salon1
         },
         editarDetalles(item) {
             const send = {
@@ -634,62 +653,8 @@ export default {
                 ],
             }
 
-            this.useModals.setModal('mPedidoDetalles', 'Editar detalles', null, send, true)
+            this.useModals.setModal('mPedidoDetalles', 'Editar detalles', 2, send, true)
         },
-        async ver(item, mesa) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            let salon1
-            if (mesa) {
-                const salon_find = this.vista.salones.find((a) =>
-                    a.mesas.some((b) => b.id === mesa.id),
-                )
-                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
-            }
-
-            this.useVistas.showVista('vComanda', 'Editar comanda')
-            const vistaComanda = this.useVistas.vComanda
-            vistaComanda.mode = 3
-            vistaComanda.pedido = res.data
-            vistaComanda.pedido.salon1 = salon1
-            vistaComanda.socios = [
-                {
-                    id: res.data.socio,
-                    ...res.data.venta_socio_datos,
-                },
-            ]
-        },
-        // async editar(item, mesa) {
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.transacciones}/uno/${item.id}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     let salon1
-        //     if (mesa) {
-        //         const salon_find = this.vista.salones.find((a) =>
-        //             a.mesas.some((b) => b.id === mesa.id),
-        //         )
-        //         salon1 = { id: salon_find.id, nombre: salon_find.nombre }
-        //     }
-
-        //     this.useVistas.showVista('vComanda', 'Editar comanda')
-        //     const vistaComanda = this.useVistas.vComanda
-        //     vistaComanda.mode = 2
-        //     vistaComanda.pedido = res.data
-        //     vistaComanda.pedido.salon1 = salon1
-        //     vistaComanda.socios = [
-        //         {
-        //             id: res.data.socio,
-        //             ...res.data.venta_socio_datos,
-        //         },
-        //     ]
-        // },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
@@ -757,11 +722,7 @@ export default {
             let venta_canal = ''
 
             if (res.data.venta_canal == 1) {
-                if (res.data.venta_mesa1.salon1) {
-                    venta_canal = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
-                } else {
-                    venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
-                }
+                venta_canal = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
                 venta_canal = 'PARA LLEVAR'
             } else if (res.data.venta_canal == 3) {
@@ -834,7 +795,7 @@ export default {
                 nuevaVentana.close()
             }, 500)
         },
-        async generarComprobante(item, mesa) {
+        async generarComprobante(item) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
             this.useAuth.setLoading(false)
@@ -843,14 +804,6 @@ export default {
 
             this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante')
             const vistaEmitirComprobante = this.useVistas.vEmitirComprobante
-
-            let salon1
-            if (mesa) {
-                const salon_find = this.vista.salones.find((a) =>
-                    a.mesas.some((b) => b.id === mesa.id),
-                )
-                salon1 = { id: salon_find.id, nombre: salon_find.nombre }
-            }
 
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)
@@ -879,12 +832,12 @@ export default {
 
                 comprobante_items,
 
-                transaccion: {
+                transaccion: res.data.id,
+                transaccion1: {
                     id: res.data.id,
                     venta_codigo: res.data.venta_codigo,
                     venta_canal: res.data.venta_canal,
                     venta_mesa1: res.data.venta_mesa1,
-                    salon1,
                 },
             }
 
@@ -941,8 +894,7 @@ export default {
 
                 this.nuevo({
                     venta_mesa: mesa.id,
-                    venta_mesa1: { nombre: mesa.nombre },
-                    salon1,
+                    venta_mesa1: { nombre: mesa.nombre, salon1 },
                 })
             }
         },
@@ -966,18 +918,10 @@ export default {
 
             this.loadSalones()
         },
-        openCambiarMesa(item, mesa) {
-            const salon_find = this.vista.salones.find((a) => a.mesas.some((b) => b.id === mesa.id))
-            const salon1 = { id: salon_find.id, nombre: salon_find.nombre }
-
+        openCambiarMesa(item) {
             const send = {
                 pedido: item,
                 salones: this.vista.salones,
-                mesa1: {
-                    id: mesa.id,
-                    nombre: mesa.nombre,
-                },
-                salon1,
             }
 
             this.useModals.setModal('mCambiarMesa', `Cambiar de mesa`, null, send, true)

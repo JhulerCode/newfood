@@ -1,9 +1,20 @@
 <template>
     <JdModal modal="mPedidoDetalles" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
+            <JdInput
+                label="Atención"
+                v-model="atencion"
+                :disabled="true"
+                style="grid-column: 1/3"
+            />
+
             <div
-                v-if="modal.pedido.venta_canal == 2 || modal.pedido.venta_canal == 3"
+                v-if="
+                    modal.mode != 3 &&
+                    (modal.pedido.venta_canal == 2 || modal.pedido.venta_canal == 3)
+                "
                 class="dato-cliente"
+                style="grid-column: 1/4"
             >
                 <JdSelectQuery
                     icon="fa-solid fa-magnifying-glass"
@@ -25,30 +36,47 @@
                 />
             </div>
 
-            <JdInput label="Nombres" :nec="true" v-model="modal.pedido.venta_socio_datos.nombres" />
+            <JdInput
+                label="Nombres"
+                :nec="true"
+                v-model="modal.pedido.venta_socio_datos.nombres"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
 
             <template v-if="modal.pedido.venta_canal == 3">
                 <JdInput
                     label="Teléfono"
                     :nec="true"
                     v-model="modal.pedido.venta_socio_datos.telefono"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
+
                 <JdInput
                     label="Dirección"
                     :nec="true"
                     v-model="modal.pedido.venta_socio_datos.direccion"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
                 />
+
                 <JdSelect
                     label="Repartidor"
                     v-model="modal.pedido.repartidor"
                     :lista="modal.colaboradores || []"
                     mostrar="nombres_apellidos"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/4"
                 />
+
                 <JdSelect
                     label="Método de pago"
                     :nec="true"
                     v-model="modal.pedido.venta_pago_metodo"
                     :lista="modal.pago_metodos || []"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/3"
                 />
 
                 <JdInput
@@ -56,23 +84,58 @@
                     :nec="true"
                     type="number"
                     v-model="modal.pedido.venta_pago_con"
+                    :disabled="modal.mode == 3"
                     v-if="
                         modal.pedido.venta_canal == 3 &&
                         modal.pedido.venta_pago_metodo ==
                             `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
                     "
+                    style="grid-column: 1/3"
                 />
             </template>
 
-            <JdInput label="Observación" v-model="modal.pedido.observacion" />
+            <JdInput
+                label="Observación"
+                v-model="modal.pedido.observacion"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/4"
+            />
+
+            <JdInput
+                label="Total (S/)"
+                type="number"
+                v-model="modal.mtoImpVenta"
+                :disabled="true"
+                style="grid-column: 1/3"
+                v-if="modal.mode == 3"
+            />
         </div>
+
+        <JdTable
+            :columns="columns"
+            :datos="modal.pedido.transaccion_items || []"
+            :columnsResizable="true"
+            :seeker="false"
+            :colNro="false"
+            :download="false"
+            v-if="modal.mode == 3"
+            class="mrg-top1"
+        />
     </JdModal>
 
-    <mSocio @created="setSocioCreated" v-if="useModals.show.mSocio" />
+    <mSocio
+        @created="setSocioCreated"
+        v-if="useModals.show.mSocio"
+        :columnsResizable="true"
+        :seeker="false"
+        :colAct="true"
+        :colNro="false"
+        :download="false"
+    />
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
 
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
 
@@ -82,15 +145,17 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 import { urls, get, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
+import { redondear } from '@/utils/mine'
 
 export default {
-    emits: ['datallesModificados'],
+    emits: ['detallesModificados'],
     components: {
         JdModal,
         JdInput,
         JdSelect,
         JdSelectQuery,
         JdButton,
+        JdTable,
         mSocio,
     },
     data: () => ({
@@ -99,17 +164,71 @@ export default {
 
         buttons: [
             {
+                text: 'Imprimir',
+                action: 'modificar',
+                show: false,
+                tipo: '2',
+            },
+            {
                 text: 'Actualizar',
                 action: 'modificar',
+            },
+        ],
+
+        columns: [
+            {
+                id: 'articulo',
+                title: 'Producto',
+                prop: 'articulo1.nombre',
+                width: '13rem',
+                show: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
+                width: '5rem',
+                show: true,
+            },
+            {
+                id: 'pu',
+                title: 'Pu',
+                type: 'number',
+                toRight: true,
+                width: '5rem',
+                show: true,
+            },
+            {
+                id: 'total',
+                title: 'Importe',
+                format: 'decimal',
+                toRight: true,
+                width: '6rem',
                 show: true,
             },
         ],
     }),
+    computed: {
+        atencion() {
+            if (this.modal.pedido.venta_canal == 1) {
+                return (
+                    this.modal.pedido.venta_mesa1.salon1.nombre + ' - ' + this.modal.pedido.venta_mesa1.nombre
+                )
+            } else {
+                return this.modal.pedido.venta_canal == 2 ? 'PARA LLEVAR' : 'DELIVERY'
+            }
+        },
+    },
     created() {
         this.modal = this.useModals.mPedidoDetalles
 
         this.setSocio(this.modal.socios[0])
-        if (this.modal.pedido.venta_canal == 3) this.loadPagoMetodos()
+
+        if (this.modal.mode == 2) {
+            this.buttons[1].show = true
+            if (this.modal.pedido.venta_canal == 3) this.loadPagoMetodos()
+        } else if (this.modal.mode == 3) {
+            this.sumarItems()
+        }
     },
     methods: {
         async loadSocios(txtBuscar) {
@@ -189,6 +308,44 @@ export default {
             this.setSocio(item)
         },
 
+        sumarItems() {
+            for (const a of this.modal.pedido.transaccion_items) this.calcularUno(a)
+
+            this.calcularTotales()
+        },
+        calcularUno(item) {
+            item.vu =
+                item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
+
+            item.mtoValorVenta = item.cantidad * item.vu
+            item.igv =
+                item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
+            item.total = item.mtoValorVenta + item.igv
+        },
+        calcularTotales() {
+            this.modal.mtoOperGravadas = 0
+            this.modal.mtoOperExoneradas = 0
+            this.modal.mtoOperInafectas = 0
+            this.modal.mtoIGV = 0
+
+            for (const a of this.modal.pedido.transaccion_items) {
+                if (a.igv_afectacion == '10') {
+                    this.modal.mtoOperGravadas += a.mtoValorVenta
+                    this.modal.mtoIGV += a.igv
+                } else if (a.igv_afectacion == '20') {
+                    this.modal.mtoOperExoneradas += a.mtoValorVenta
+                } else if (a.igv_afectacion == '30') {
+                    this.modal.mtoOperInafectas += a.mtoValorVenta
+                }
+            }
+
+            this.modal.valorVenta =
+                this.modal.mtoOperGravadas +
+                this.modal.mtoOperExoneradas +
+                this.modal.mtoOperInafectas
+            this.modal.mtoImpVenta = redondear(this.modal.valorVenta + this.modal.mtoIGV)
+        },
+
         checkDatos() {
             if (this.modal.pedido.venta_canal == 2 || this.modal.pedido.venta_canal == 3) {
                 if (incompleteData(this.modal.pedido.venta_socio_datos, ['nombres'])) {
@@ -229,7 +386,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.$emit('datallesModificados')
+            this.$emit('detallesModificados')
             this.useModals.show.mPedidoDetalles = false
         },
     },
@@ -239,7 +396,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 30rem;
+    grid-template-columns: 9rem 9rem 9rem;
     gap: 0.5rem;
 
     .dato-cliente {

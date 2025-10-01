@@ -5,7 +5,7 @@
 
             <div class="container-datos mrg-btm1" v-if="modal.pedido">
                 <strong>Origen: </strong>
-                <p>{{ modal.salon1.nombre }} - {{ modal.mesa1.nombre }}</p>
+                <p>{{ modal.pedido.venta_mesa1.salon1.nombre }} - {{ modal.pedido.venta_mesa1.nombre }}</p>
             </div>
 
             <div class="container-datos">
@@ -61,7 +61,7 @@ export default {
     },
     methods: {
         async cambiar() {
-            if (this.modal.mesa1.id == this.modal.mesa) return jmsg('warning', 'Elige otra mesa')
+            if (this.modal.pedido.venta_mesa1.id == this.modal.mesa) return jmsg('warning', 'Elige otra mesa')
 
             const send = {
                 id: this.modal.pedido.id,

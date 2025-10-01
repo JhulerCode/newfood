@@ -2,15 +2,9 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                <template v-if="vista.mode == 1">Nueva comanda</template>
-                <template v-if="vista.mode == 2">Añadir a comanda N°</template>
-                <template v-if="vista.mode == 3">Comanda</template>
-                {{ vista.pedido.venta_codigo }}
-                <template v-if="vista.pedido.venta_canal == 1">
-                    ({{ vista.pedido.salon1.nombre }} - {{ vista.pedido.venta_mesa1.nombre }})
-                </template>
-                <template v-else-if="vista.pedido.venta_canal == 2">(PARA LLEVAR)</template>
-                <template v-else-if="vista.pedido.venta_canal == 3">(DELIVERY)</template>
+                <template v-if="vista.mode == 1">Nuevo pedido</template>
+                <template v-if="vista.mode == 2">Añadir al pedido N°</template>
+                {{ vista.pedido.venta_codigo }} {{ atencion }}
             </strong>
 
             <div class="buttons">
@@ -339,7 +333,7 @@ export default {
         vista: {},
 
         columns: [
-            { id: 'articulo', width: '13rem', title: 'Nombre', slot: 'cNombre', show: true },
+            { id: 'articulo', width: '13rem', title: 'Producto', slot: 'cNombre', show: true },
             { id: 'cantidad', width: '5rem', title: 'Cantidad', slot: 'cCantidad', show: true },
             { id: 'pu', width: '4rem', title: 'Pu', slot: 'cPu', show: true, toRight: true },
             {
@@ -363,12 +357,18 @@ export default {
             if (this.vista.screenWidth == null) return false
             return this.vista.screenWidth < 1000
         },
+        atencion() {
+            if (this.vista.pedido.venta_canal == 1) {
+                return `(${this.vista.pedido.venta_mesa1.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre})`
+            } else {
+                return this.vista.pedido.venta_canal == 2 ? '(PARA LLEVAR)' : '(DELIVERY)'
+            }
+        },
     },
     async created() {
         this.vista = this.useVistas.vComanda
         this.vista.detalle = 1
         this.handleResize()
-        // this.vista.screenWidth = window.innerWidth
 
         this.sumarItems()
 
@@ -729,7 +729,7 @@ export default {
             let venta_canal = ''
 
             if (this.vista.pedido.venta_canal == 1) {
-                venta_canal = `${this.vista.pedido.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre}`
+                venta_canal = `${this.vista.pedido.venta_mesa1.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre}`
             } else if (this.vista.pedido.venta_canal == 2) {
                 venta_canal = 'PARA LLEVAR'
             } else if (this.vista.pedido.venta_canal == 3) {

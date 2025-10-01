@@ -2,17 +2,7 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion.venta_codigo }}
-                <template v-if="vista.comprobante.transaccion.venta_canal == 1">
-                    ({{ vista.comprobante.transaccion.salon1.nombre }} -
-                    {{ vista.comprobante.transaccion.venta_mesa1.nombre }})
-                </template>
-                <template v-else-if="vista.comprobante.transaccion.venta_canal == 2">
-                    (PARA LLEVAR)</template
-                >
-                <template v-else-if="vista.comprobante.transaccion.venta_canal == 3">
-                    (DELIVERY)</template
-                >
+                Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion1.venta_codigo }} {{ atencion }}
             </strong>
 
             <div class="buttons">
@@ -22,12 +12,14 @@
                     tipo="2"
                     @click="regresar()"
                 />
+
                 <JdButton
                     text="Grabar"
                     @click="grabar()"
                     tipo="2"
                     v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
                 />
+
                 <JdButton
                     text="Grabar e imprimir"
                     @click="grabar(true)"
@@ -381,6 +373,17 @@ export default {
             '37', // Inafecto – Retiro por... o Transferencia gratuita
         ],
     }),
+    computed: {
+        atencion() {
+            if (this.vista.comprobante.transaccion1.venta_canal == 1) {
+                return `(${this.vista.comprobante.transaccion1.venta_mesa1.salon1.nombre} - ${this.vista.comprobante.transaccion1.venta_mesa1.nombre})`
+            } else {
+                return this.vista.comprobante.transaccion1.venta_canal == 2
+                    ? '(PARA LLEVAR)'
+                    : '(DELIVERY)'
+            }
+        },
+    },
     async created() {
         this.vista = this.useVistas.vEmitirComprobante
 

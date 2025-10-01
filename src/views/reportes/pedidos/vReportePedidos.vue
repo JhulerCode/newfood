@@ -27,6 +27,7 @@
         </JdTable>
     </div>
 
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -35,6 +36,7 @@
 <script>
 import { JdTable, mConfigFiltros } from '@jhuler/components'
 
+import mPedidoDetalles from '@/views/ventas/pedidos/mPedidoDetalles.vue'
 import mPedidoComprobantes from '@/views/ventas/pedidos/mPedidoComprobantes.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -50,6 +52,7 @@ export default {
         JdTable,
         mConfigFiltros,
 
+        mPedidoDetalles,
         mPedidoComprobantes,
     },
     data: () => ({
@@ -158,6 +161,12 @@ export default {
         ],
         tableRowOptions: [
             {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vReportePedidos:ver',
+            },
+            {
                 label: 'Imprimir',
                 icon: 'fa-solid fa-print',
                 action: 'imprimir',
@@ -233,6 +242,37 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                pedido: { ...res.data },
+                socios: [
+                    {
+                        id: res.data.socio,
+                        ...res.data.venta_socio_datos,
+                    },
+                ],
+                pago_metodos: [
+                    {
+                        id: res.data.venta_pago_metodo,
+                        ...res.data.venta_pago_metodo1,
+                    },
+                ],
+            }
+
+            this.useModals.setModal(
+                'mPedidoDetalles',
+                `Pedido N° ${res.data.venta_codigo}`,
+                3,
+                send,
+                true,
+            )
+        },
         async imprimir(item) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.transacciones}/uno/${item.id}`)
@@ -243,7 +283,6 @@ export default {
             let venta_canal = ''
 
             if (res.data.venta_canal == 1) {
-                // venta_canal = `${res.data.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
                 venta_canal = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
                 venta_canal = 'PARA LLEVAR'
