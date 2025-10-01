@@ -180,19 +180,20 @@ export default {
                 id: 'articulo',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
-                width: '13rem',
+                width: '20rem',
                 show: true,
             },
             {
                 id: 'cantidad',
                 title: 'Cantidad',
+                format: 'number',
+                toRight: true,
                 width: '5rem',
                 show: true,
             },
             {
                 id: 'pu',
                 title: 'Pu',
-                type: 'number',
                 toRight: true,
                 width: '5rem',
                 show: true,
@@ -211,7 +212,9 @@ export default {
         atencion() {
             if (this.modal.pedido.venta_canal == 1) {
                 return (
-                    this.modal.pedido.venta_mesa1.salon1.nombre + ' - ' + this.modal.pedido.venta_mesa1.nombre
+                    this.modal.pedido.venta_mesa1.salon1.nombre +
+                    ' - ' +
+                    this.modal.pedido.venta_mesa1.nombre
                 )
             } else {
                 return this.modal.pedido.venta_canal == 2 ? 'PARA LLEVAR' : 'DELIVERY'

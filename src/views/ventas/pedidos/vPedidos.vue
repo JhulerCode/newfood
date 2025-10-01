@@ -284,12 +284,6 @@ export default {
                 permiso: 'vPedidos:ver',
             },
             {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vPedidos:eliminar',
-            },
-            {
                 label: 'Añadir productos',
                 icon: 'fa-solid fa-plus',
                 action: 'addProductos',
@@ -309,6 +303,12 @@ export default {
                 action: 'anular',
                 permiso: 'vPedidos:anular',
                 ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+            },
+            {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminar',
+                permiso: 'vPedidos:eliminar',
             },
             {
                 label: 'Reimprimir pedido',
@@ -808,6 +808,7 @@ export default {
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)
                 .map((a) => ({
+                    id1: a.id,
                     articulo: a.articulo,
                     has_receta: a.has_receta,
                     receta_insumos: a.receta_insumos,

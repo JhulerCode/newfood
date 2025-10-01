@@ -2,7 +2,8 @@
     <div class="vista vista-fill">
         <div class="head">
             <strong>
-                Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion1.venta_codigo }} {{ atencion }}
+                Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion1.venta_codigo }}
+                {{ atencion }}
             </strong>
 
             <div class="buttons">
@@ -1196,10 +1197,7 @@ export default {
             this.calculateInvoiceTotals()
         },
         quitarArticulo(item) {
-            const i = this.vista.comprobante.comprobante_items.findIndex(
-                (a) => a.articulo == item.articulo,
-            )
-            this.vista.comprobante.comprobante_items.splice(i, 1)
+            this.vista.comprobante.comprobante_items.splice(item.i, 1)
 
             // this.sumarItems()
             this.calculateInvoiceTotals()

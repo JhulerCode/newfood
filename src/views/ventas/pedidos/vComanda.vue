@@ -628,10 +628,7 @@ export default {
             this.sumarUno(item)
         },
         quitar(item) {
-            const i = this.vista.pedido.transaccion_items.findIndex(
-                (a) => a.articulo == item.articulo,
-            )
-            this.vista.pedido.transaccion_items.splice(i, 1)
+            this.vista.pedido.transaccion_items.splice(item.i, 1)
 
             this.sumarItems()
         },
