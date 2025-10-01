@@ -80,7 +80,7 @@ export default {
             {
                 id: 'comprobante_tipo',
                 title: 'Tipo compr.',
-                prop: 'comprobante1.venta_tipo_documento_codigo1.nombre',
+                prop: 'comprobante1.doc_tipo1.nombre',
                 type: 'select',
                 width: '10rem',
                 show: true,
