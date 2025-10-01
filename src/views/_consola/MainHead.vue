@@ -126,13 +126,14 @@ header {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    padding: 0.5rem 1.5rem;
+    // padding: 0.5rem 1.5rem;
     height: 4.5rem;
 
     .left {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        padding: 0 0 0 1rem;
+        gap: 0.5rem;
 
         img {
             height: 2.5rem;
@@ -143,6 +144,7 @@ header {
         display: flex;
         align-items: center;
         gap: 1rem;
+        padding: 0 1.5rem 0 0;
 
         .actions {
             display: flex;
@@ -213,4 +215,3 @@ header {
     }
 }
 </style>
-
