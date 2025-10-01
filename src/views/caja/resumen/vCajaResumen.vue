@@ -56,7 +56,6 @@
                 <div class="first">
                     <div class="card caja">
                         <div class="card-head" :style="{ 'background-color': 'var(--verde)' }">
-                            <!-- <span>{{ caja }}</span> -->
                             ABIERTO
                         </div>
 
@@ -162,7 +161,8 @@
                         </div>
                     </div>
 
-                    <!-- <div class="card">
+                    <!-- <div>
+                        <div class="card"></div>
                     </div> -->
                 </div>
 
@@ -214,6 +214,43 @@
                 </div>
 
                 <div class="third">
+                    <template v-if="vista.pasado != true">
+                        <div class="card info-ventas" style="grid-column: 1/3">
+                            <div class="icon" style="background-color: var(--primary-color)">
+                                <i class="fa-solid fa-info"></i>
+                            </div>
+                            <div>
+                                <p>
+                                    - Los montos de "Ayer" y "Mes" muestran solo las ventas
+                                    cobradas.
+                                </p>
+                                <p>- Verificar que: Hoy + Anulaciones + Descuentos = Pedidos.</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--verde)">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                            </div>
+                            <div>
+                                <span
+                                    >S/ {{ redondear(vista.resumen.ventas_ayer.total || 0) }}</span
+                                >
+                                <p>Ayer</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--verde)">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                            </div>
+                            <div>
+                                <span>S/ {{ redondear(vista.resumen.ventas_mes.total) }}</span>
+                                <p>Mes</p>
+                            </div>
+                        </div>
+                    </template>
+
                     <div class="card">
                         <div class="icon" style="background-color: var(--verde)">
                             <i class="fa-solid fa-dollar-sign"></i>
@@ -223,7 +260,7 @@
                                 >S/
                                 {{ redondear(vista.resumen.comprobantes_aceptados_total) }}</span
                             >
-                            <p>Total de ventas</p>
+                            <p>{{ `${vista.pasado ? 'Ventas' : 'Hoy'}` }}</p>
                         </div>
                     </div>
 
@@ -258,7 +295,7 @@
                     </div>
 
                     <div class="card">
-                        <div class="icon" style="background-color: var(--verde)">
+                        <div class="icon" style="background-color: var(--morado)">
                             <i class="fa-solid fa-note-sticky"></i>
                         </div>
                         <div>
@@ -569,7 +606,15 @@ export default {
                 show: true,
                 sort: true,
             },
+            // {
+            //     id: 'pago_condicion',
+            //     title: 'Condición de pago',
+            //     width: '10rem',
+            //     show: true,
+            //     sort: true,
+            // },
         ],
+
         columnsComprobantesAnulados: [
             {
                 id: 'tipo',
@@ -715,6 +760,9 @@ export default {
 
         if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true) await this.loadCajaApertura()
     },
+    unmounted() {
+        this.vista.pasado = false
+    },
     methods: {
         async loadCajaApertura() {
             const qry = {
@@ -760,7 +808,9 @@ export default {
         },
         async loadResumen() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}/resumen/${this.vista.caja_apertura.id}`)
+            const res = await get(
+                `${urls.caja_aperturas}/resumen/${this.vista.caja_apertura.id}&${this.vista.caja_apertura.fecha_apertura}&${this.vista.pasado}`,
+            )
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -819,12 +869,13 @@ export default {
 .icon {
     display: grid;
     place-content: center;
+    height: 3rem;
+    width: 3rem;
     border-radius: 50%;
 
     i {
         color: var(--text-color3);
     }
-    // justify-content: center;
 }
 
 .card-head {
@@ -928,7 +979,7 @@ export default {
     .card {
         display: grid;
         grid-template-columns: 3rem 1fr;
-        height: 5rem;
+        min-height: 5rem;
         gap: 2rem;
 
         span {
@@ -971,6 +1022,12 @@ export default {
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 1rem;
+    }
+
+    .third {
+        .info-ventas {
+            grid-column: 1 !important;
+        }
     }
 }
 </style>
