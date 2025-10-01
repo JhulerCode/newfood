@@ -212,6 +212,12 @@ header {
                 display: none;
             }
         }
+
+        .user-info {
+            .user-texts {
+                width: 8rem !important;
+            }
+        }
     }
 }
 </style>
