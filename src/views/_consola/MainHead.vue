@@ -140,7 +140,7 @@ header {
         }
     }
 
-    > .right {
+    .right {
         display: flex;
         align-items: center;
         gap: 1rem;
@@ -207,15 +207,21 @@ header {
 
 @media (max-width: 540px) {
     header {
-        > .right {
-            .actions {
-                display: none;
+        .left {
+            img {
+                height: 2rem !important;
             }
         }
 
-        .user-info {
-            .user-texts {
-                width: 8rem !important;
+        .right {
+            // .actions {
+            //     display: none;
+            // }
+
+            .user-info {
+                .user-texts {
+                    display: none !important;
+                }
             }
         }
     }

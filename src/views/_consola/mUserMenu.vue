@@ -7,6 +7,18 @@
         :closeOnClickOutside="true"
         :closeOnInputEsc="true"
     >
+        <div class="user-texts">
+            <p
+                class="user-name max-1line"
+                :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
+            >
+                {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
+            </p>
+            <p class="max-1line" :title="useAuth.usuario.cargo">
+                <small>{{ useAuth.usuario.cargo }}</small>
+            </p>
+        </div>
+
         <ul>
             <li @click="openPreferenciasUsuario">
                 <i class="fa-solid fa-sliders" @click="openPreferencias"></i>
@@ -61,11 +73,19 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.user-texts {
+    border-bottom: var(--border);
+    padding-bottom: 0.5rem;
+    max-width: 12rem;
+    display: none;
+}
+
 li {
     cursor: pointer;
     padding: 0.5rem 0.8rem;
     border-radius: 0.5rem;
     display: flex;
+    align-items: center;
     gap: 0.5rem;
 
     &:hover {
@@ -74,6 +94,12 @@ li {
 
     * {
         font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 540px) {
+    .user-texts {
+        display: block !important;
     }
 }
 </style>
