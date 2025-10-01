@@ -286,6 +286,47 @@ export default {
 
             this.vista.comprobantes = res.data
         },
+        async loadDatosSistema() {
+            const qry = ['pago_condicion', 'comprobante_estados']
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+        },
+        async loadSocios() {
+            const qry = {
+                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
+                cols: ['doc_numero', 'nombres', 'doc_nombres'],
+            }
+
+            this.vista.socios = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code !== 0) return
+
+            this.vista.socios = res.data
+        },
+        async loadPagoComprobantes() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre', 'estandar'],
+            }
+
+            this.vista.pago_comprobantes = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.vista.pago_comprobantes = res.data
+        },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
@@ -488,50 +529,8 @@ export default {
         },
         comprobanteCanjedo(item) {
             const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)
-            this.vista.comprobantes[i].estado = 3
-            this.vista.comprobantes[i].estado1 = { id: 3, nombre: 'CANJEADO' }
-        },
-
-        async loadDatosSistema() {
-            const qry = ['pago_condicion', 'comprobante_estados']
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            Object.assign(this.vista, res.data)
-        },
-        async loadSocios() {
-            const qry = {
-                fltr: { tipo: { op: 'Es', val: 2 }, activo: { op: 'Es', val: true } },
-                cols: ['doc_numero', 'nombres', 'doc_nombres'],
-            }
-
-            this.vista.socios = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.socios}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code !== 0) return
-
-            this.vista.socios = res.data
-        },
-        async loadPagoComprobantes() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre', 'estandar'],
-            }
-
-            this.vista.pago_comprobantes = []
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.loading = { show: false, text: '' }
-
-            if (res.code != 0) return
-
-            this.vista.pago_comprobantes = res.data
+            this.vista.comprobantes[i].estado = 4
+            this.vista.comprobantes[i].estado1 = { id: 4, nombre: 'CANJEADO' }
         },
     },
 }

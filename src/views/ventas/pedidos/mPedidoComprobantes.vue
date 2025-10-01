@@ -4,9 +4,10 @@
             <JdTable
                 :columns="columns"
                 :datos="modal.comprobantes || []"
-                :colNro="true"
+                :colAct="true"
                 :reload="loadComprobantes"
-                class="table-pagos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
             >
             </JdTable>
         </div>
@@ -90,54 +91,100 @@ export default {
                 seek: false,
                 sort: false,
             },
-            // { id: '', width: '7rem', title: 'Deuda', slot: 'colDeuda', toRight: true },
+            {
+                id: 'pago_condicion',
+                title: 'Condición de pago',
+                type: 'select',
+                prop: 'pago_condicion1.nombre',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'pagos_monto',
+                title: 'Cobrado',
+                type: 'number',
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+        ],
+        tableRowOptions: [
+            {
+                label: 'Imprimir',
+                icon: 'fa-solid fa-print',
+                action: 'imprimir',
+                permiso: 'vReporteComprobantes:imprimir',
+            },
         ],
     }),
     async created() {
         this.modal = this.useModals.mPedidoComprobantes
 
         this.loadComprobantes()
-        // this.vista = this.useVistas.getVista('vClientePedidos')
-    },
-    beforeUnmount() {
-        // this.vista.pedidos.find(a => a.)
     },
     methods: {
-        async loadComprobantes() {
-            const qry = {
+        setQuery() {
+            this.modal.qry = {
                 fltr: {
                     transaccion: { op: 'Es', val: this.modal.transaccion.id },
                 },
+                sqls: ['pagos_monto'],
             }
 
-            this.useAuth.updateQuery(this.columns, qry)
-            qry.cols.push('serie', 'numero')
+            this.useAuth.updateQuery(this.columns, this.modal.qry)
+            this.modal.qry.cols.push('serie', 'numero')
+        },
+        async loadComprobantes() {
+            this.setQuery()
 
             this.modal.comprobantes = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.comprobantes}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.comprobantes}?qry=${JSON.stringify(this.modal.qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
             this.modal.comprobantes = res.data
         },
-        // openPagar(item) {
-        //     this.useModals.setModal('mPagarCuenta', `Pagar cuenta`, true, 1, item)
-        // },
+
+        runMethod(method, item) {
+            this[method](item)
+        },
+        async imprimir(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                ...res.data,
+                impresora: {
+                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
+                    nombre: this.useAuth.usuario.impresora_caja.impresora,
+                },
+                subdominio: this.useAuth.usuario.empresa.subdominio,
+            }
+
+            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            console.log(uriEncoded)
+            const nuevaVentana = window.open(
+                uriEncoded,
+                '_blank',
+                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            )
+
+            setTimeout(() => {
+                nuevaVentana.close()
+            }, 500)
+        },
     },
 }
 </script>
 
-<style lang="scss" scoped>
-.table-pagos {
-    .pagado {
-        width: fit-content;
-        border-radius: 0.3rem;
-        padding: 0.3rem 0.5rem;
-        background-color: var(--verde);
-        color: var(--text-color3);
-        font-size: 0.8rem;
-    }
-}
-</style>
+<style lang="scss" scoped></style>
