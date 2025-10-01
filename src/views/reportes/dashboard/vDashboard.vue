@@ -417,7 +417,7 @@ export default {
     // position: sticky;
     top: 0;
     background-color: var(--bg-color2);
-    padding: 1rem;
+    padding: 1rem 0;
     // z-index: 3;
 
     strong {
@@ -429,10 +429,6 @@ export default {
         gap: 0.5rem;
         flex-wrap: wrap;
     }
-}
-
-.tablero-body {
-    padding: 0 1rem;
 }
 
 .card {
