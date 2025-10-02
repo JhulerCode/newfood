@@ -234,7 +234,7 @@
                             </div>
                             <div>
                                 <span
-                                    >S/ {{ redondear(vista.resumen.ventas_ayer.total || 0) }}</span
+                                    >S/ {{ redondear(vista.resumen.ventas_ayer?.total || 0) }}</span
                                 >
                                 <p>Ayer</p>
                             </div>
@@ -245,7 +245,9 @@
                                 <i class="fa-solid fa-dollar-sign"></i>
                             </div>
                             <div>
-                                <span>S/ {{ redondear(vista.resumen.ventas_mes.total) }}</span>
+                                <span
+                                    >S/ {{ redondear(vista.resumen.ventas_mes?.total || 0) }}</span
+                                >
                                 <p>Mes</p>
                             </div>
                         </div>
