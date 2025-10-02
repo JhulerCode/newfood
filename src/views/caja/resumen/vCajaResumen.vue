@@ -755,12 +755,13 @@ export default {
     async created() {
         this.vista = this.useVistas.vCajaResumen
 
-        if (this.vista.caja_apertura) {
+        if (this.vista.pasado) {
             this.loadResumen()
             return
         }
-
-        if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true) await this.loadCajaApertura()
+        else {
+            if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true) await this.loadCajaApertura()
+        }
     },
     unmounted() {
         this.vista.pasado = false
