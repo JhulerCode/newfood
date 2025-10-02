@@ -287,7 +287,7 @@ export default {
             this.vista.comprobantes = res.data
         },
         async loadDatosSistema() {
-            const qry = ['pago_condicion', 'comprobante_estados']
+            const qry = ['pago_condiciones', 'comprobante_estados']
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
@@ -337,6 +337,7 @@ export default {
             cols.find((a) => a.id == 'doc_tipo').lista = this.vista.pago_comprobantes
             cols.find((a) => a.id == 'socio').lista = this.vista.socios
             cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
+            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
 
             const send = {
                 table: this.tableName,
