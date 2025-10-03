@@ -51,7 +51,7 @@ export default {
         tableName: 'vCajaAperturas',
         columns: [
             {
-                id: 'fecha_apertura',
+                id: 'createdAt',
                 title: 'Fecha apertura',
                 type: 'datetime',
                 format: 'datetime',
@@ -82,7 +82,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'fecha_cierre',
+                id: 'updatedAt',
                 title: 'Fecha cierre',
                 type: 'datetime',
                 format: 'datetime',
@@ -149,6 +149,7 @@ export default {
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('fecha_apertura', 'fecha_cierre')
         },
         async loadCajaAperturas() {
             this.setQuery()
@@ -191,7 +192,7 @@ export default {
         },
         async imprimirResumen(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.caja_aperturas}/resumen/${item.id}`)
+            const res = await get(`${urls.caja_aperturas}/resumen/${item.id}&true&undefined`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

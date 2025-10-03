@@ -68,7 +68,7 @@
                             <span>Fecha de apertura</span>
                             <p>
                                 {{
-                                    dayjs(vista.caja_apertura.fecha_apertura).format(
+                                    dayjs(vista.caja_apertura.createdAt).format(
                                         useAuth.usuario.format_date + ' HH:mm',
                                     )
                                 }}
@@ -79,7 +79,7 @@
                             <span>Fecha de cierre</span>
                             <p>
                                 {{
-                                    dayjs(vista.caja_apertura.fecha_cierre).format(
+                                    dayjs(vista.caja_apertura.updatedAt).format(
                                         useAuth.usuario.format_date + ' HH:mm',
                                     )
                                 }}
@@ -407,7 +407,9 @@
                             height="20rem"
                         />
                     </div>
+                </div>
 
+                <div class="second">
                     <div class="card">
                         <div class="card-head">
                             <p>Comprobantes canjeados</p>
@@ -418,9 +420,24 @@
                             :columns="columnsComprobantesAnulados"
                             :seeker="false"
                             :download="false"
-                            height="20rem"
+                            height="10rem"
                         />
                     </div>
+
+                    <div class="card">
+                        <div class="card-head">
+                            <p>Comprobantes anteriores cobrados</p>
+                        </div>
+
+                        <JdTable
+                            :datos="vista.resumen.comprobantes_pasados_cobrados || []"
+                            :columns="columnsComprobantesAnteriores"
+                            :seeker="false"
+                            :download="false"
+                            height="10rem"
+                        />
+                    </div>
+
                 </div>
 
                 <div class="sixth">
@@ -651,6 +668,33 @@ export default {
             },
         ],
 
+        columnsComprobantesAnteriores: [
+            {
+                id: 'doc_tipo',
+                title: 'Documento',
+                width: '10rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'serie_correlativo',
+                title: 'Número',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'monto',
+                title: 'Monto',
+                toRight: true,
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                sort: true,
+            },
+        ],
+
         columnsProductos: [
             {
                 id: 'nombre',
@@ -758,9 +802,9 @@ export default {
         if (this.vista.pasado) {
             this.loadResumen()
             return
-        }
-        else {
-            if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true) await this.loadCajaApertura()
+        } else {
+            if (this.useAuth.verifyPermiso('vCajaResumen:ver') == true)
+                await this.loadCajaApertura()
         }
     },
     unmounted() {
@@ -771,9 +815,11 @@ export default {
             const qry = {
                 fltr: { estado: { op: 'Es', val: '1' } },
                 cols: [
+                    'createdAt',
+                    'updatedAt',
                     'fecha_apertura',
-                    'monto_apertura',
                     'fecha_cierre',
+                    'monto_apertura',
                     'monto_cierre',
                     'estado',
                 ],
@@ -812,7 +858,7 @@ export default {
         async loadResumen() {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(
-                `${urls.caja_aperturas}/resumen/${this.vista.caja_apertura.id}&${this.vista.caja_apertura.fecha_apertura}&${this.vista.pasado}`,
+                `${urls.caja_aperturas}/resumen/${this.vista.caja_apertura.id}&${this.vista.pasado}&${this.vista.caja_apertura.fecha_apertura}`,
             )
             this.useAuth.setLoading(false)
 
