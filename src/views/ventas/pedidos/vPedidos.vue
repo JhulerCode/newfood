@@ -720,19 +720,25 @@ export default {
                 venta_codigo: res.data.venta_codigo,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
+                subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            console.log(uriEncoded)
-            const nuevaVentana = window.open(
-                uriEncoded,
-                '_blank',
-                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            )
+            this.useAuth.socket.emit('vComanda:imprimir', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: send,
+            })
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // console.log(uriEncoded)
+            // const nuevaVentana = window.open(
+            //     uriEncoded,
+            //     '_blank',
+            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            // )
+
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
         async imprimirPrecuenta(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -766,19 +772,25 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
+                subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            console.log(uriEncoded)
-            const nuevaVentana = window.open(
-                uriEncoded,
-                '_blank',
-                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            )
+            this.useAuth.socket.emit('vComanda:imprimirPrecuenta', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: send,
+            })
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // console.log(uriEncoded)
+            // const nuevaVentana = window.open(
+            //     uriEncoded,
+            //     '_blank',
+            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            // )
+
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
         async generarComprobante(item) {
             this.useAuth.setLoading(true, 'Cargando...')

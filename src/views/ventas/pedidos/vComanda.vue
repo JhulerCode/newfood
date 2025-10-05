@@ -746,25 +746,24 @@ export default {
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,
-                // pc_principal_colaborador: this.useAuth.usuario.empresa.pc_principal_colaborador,
             }
 
-            // this.useAuth.socket.emit('vComanda:imprimir', {
-            //     empresa: this.useAuth.usuario.empresa.id,
-            //     data: send,
-            // })
+            this.useAuth.socket.emit('vComanda:imprimir', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: send,
+            })
 
-            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            console.log(uriEncoded)
-            const nuevaVentana = window.open(
-                uriEncoded,
-                '_blank',
-                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            )
+            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // console.log(uriEncoded)
+            // const nuevaVentana = window.open(
+            //     uriEncoded,
+            //     '_blank',
+            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            // )
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
 
         runMethod(method, item) {

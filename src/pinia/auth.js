@@ -5,6 +5,7 @@ import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
 import { io } from "socket.io-client"
 import { host } from '@/utils/crud.js'
+import { jmsg } from "@/utils/swal"
 
 export const useAuth = defineStore('auth', {
     state: () => ({
@@ -289,6 +290,8 @@ export const useAuth = defineStore('auth', {
             return true
         },
         connectSocket() {
+            this.disconnectSocket()
+
             this.socket = io(host)
 
             this.socket.on('connect', () => {
@@ -297,6 +300,14 @@ export const useAuth = defineStore('auth', {
                     colaborador: this.usuario.colaborador,
                 })
                 this.listenSocket()
+            })
+
+            this.socket.on('disconnect', (reason) => {
+                console.log('Socket desconectado:', reason)
+
+                if (!this.socket.io.reconnecting) {
+                    this.disconnectSocket()
+                }
             })
         },
         listenSocket() {
@@ -353,6 +364,10 @@ export const useAuth = defineStore('auth', {
                 useVistas().vPedidos.calculatePendientes()
                 if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
             })
+
+            this.socket.on('pc_principal_socket_not_found', () => {
+                jmsg('error', 'DivergeRest Printer no iniciado')
+            })
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
@@ -366,6 +381,24 @@ export const useAuth = defineStore('auth', {
             this.initVars()
             useVistas().initVars()
             useModals().initVars()
+            this.disconnectSocket()
+        },
+        disconnectSocket() {
+            if (this.socket) {
+                // Detén intentos de reconexión
+                this.socket.io.opts.reconnection = false;
+
+                // Elimina todos los listeners
+                this.socket.removeAllListeners();
+
+                // Cierra la conexión
+                this.socket.disconnect();
+
+                // Limpia la referencia
+                this.socket = null;
+
+                console.log("🔌 Socket desconectado y limpiado completamente");
+            }
         },
         verifyPermiso(...permisos) {
             // console.log(permisos)
