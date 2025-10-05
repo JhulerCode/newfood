@@ -16,13 +16,13 @@
                 />
 
                 <template v-if="vista.mode == 1 && useAuth.verifyPermiso('vPedidos:crear')">
-                    <JdButton text="Grabar" tipo="2" @click="grabar()" />
-                    <JdButton text="Grabar e imprimir" @click="grabar(true)" />
+                    <JdButton text="Grabar" tipo="2" @click="crear()" />
+                    <JdButton text="Grabar e imprimir" @click="crear(true)" />
                 </template>
 
                 <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
-                    <JdButton text="Grabar" tipo="2" @click="modificar()" />
-                    <JdButton text="Grabar e imprimir" @click="modificar(true)" />
+                    <JdButton text="Grabar" tipo="2" @click="addProductos()" />
+                    <JdButton text="Grabar e imprimir" @click="addProductos(true)" />
                 </template>
             </div>
         </div>
@@ -684,13 +684,13 @@ export default {
                 this.vista.pedido.venta_pago_con = null
             }
         },
-        async grabar1() {
+        async crear1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.pedido)
         },
-        async grabar(print) {
+        async crear(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 
@@ -702,11 +702,14 @@ export default {
 
             if (print == true) this.imprimir()
 
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) vistaPedidos.reload = true
+            this.useAuth.socket.emit('vComanda:crear', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data,
+            })
+
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        async modificar(print) {
+        async addProductos(print) {
             if (this.checkDatos()) return
             this.vista.pedido.monto = this.vista.mtoImpVenta
 
@@ -718,8 +721,10 @@ export default {
 
             if (print == true) this.imprimir()
 
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) vistaPedidos.reload = true
+            this.useAuth.socket.emit('vComanda:addProductos', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data,
+            })
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
         imprimir() {

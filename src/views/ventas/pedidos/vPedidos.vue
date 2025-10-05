@@ -50,13 +50,23 @@
                     </li>
                 </ul>
 
-                <JdButton
-                    icon="fa-solid fa-arrows-to-dot"
-                    text="Unir mesas"
-                    tipo="2"
-                    @click="openUnirMesas()"
-                    v-if="useAuth.verifyPermiso('vPedidos:unirMesas')"
-                />
+                <div class="salones-actions">
+                    <JdButton
+                        icon="fa-solid fa-arrows-to-dot"
+                        text="Unir mesas"
+                        tipo="2"
+                        @click="openUnirMesas()"
+                        v-if="useAuth.verifyPermiso('vPedidos:unirMesas')"
+                    />
+
+                    <JdButton
+                        icon="fa-solid fa-rotate-right"
+                        text="Recargar"
+                        tipo="2"
+                        @click="loadPedidos()"
+                        v-if="useAuth.verifyPermiso('vPedidos:listar')"
+                    />
+                </div>
             </div>
 
             <ul class="container-mesas">
@@ -109,7 +119,7 @@
             <JdTable
                 :name="tableName"
                 :columns="columns"
-                :datos="vista.pedidos || []"
+                :datos="pedidosFiltered || []"
                 :colNro="true"
                 :colAct="true"
                 :reload="loadPedidos"
@@ -120,10 +130,10 @@
         </template>
     </div>
 
-    <mMesasUnir v-if="useModals.show.mMesasUnir" @mesasUnidas="loadSalones" />
-    <mCambiarMesa v-if="useModals.show.mCambiarMesa" @mesaCambiada="loadSalones" />
+    <mMesasUnir v-if="useModals.show.mMesasUnir" />
+    <mCambiarMesa v-if="useModals.show.mCambiarMesa" />
     <mPedidoComprobantes v-if="useModals.show.mPedidoComprobantes" />
-    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" @detallesModificados="loadPedidos" />
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" />
 
     <mAnular v-if="useModals.show.mAnular" @anulado="anulado" />
 
@@ -367,29 +377,27 @@ export default {
                 .filter((a) => a.unida == false)
                 .sort((a, b) => a.nombre.localeCompare(b.nombre))
         },
+        pedidosFiltered() {
+            return this.vista.pedidos.filter(
+                (a) => a.venta_canal == this.vista.venta_canal && a.estado == 1,
+            )
+        },
     },
     async created() {
         this.vista = this.useVistas.vPedidos
+        this.vista.setIntervalTimeAgo = this.setIntervalTimeAgo
+        this.vista.setMesasPedidos = this.setMesasPedidos
+        this.vista.calculatePendientes = this.calculatePendientes
+        this.vista.loadSalones = this.loadSalones
 
-        // this.loadPendientesCantidad()
+        if (this.vista.loaded) return
 
-        if (this.vista.loaded) {
-            if (this.vista.reload) {
-                // ESTO LO MANDA ACTUALIZAR COMANDA
-                if (this.vista.venta_canal == 1) {
-                    this.loadSalones()
-                } else {
-                    this.loadPedidos()
-                }
-            }
-        } else {
-            this.vista.mesaPendientes = 0
-            this.vista.llevarPendientes = 0
-            this.vista.deliveryPendientes = 0
-            this.vista.venta_canal = 1
+        this.vista.mesaPendientes = 0
+        this.vista.llevarPendientes = 0
+        this.vista.deliveryPendientes = 0
+        this.vista.venta_canal = 1
 
-            this.loadSalones()
-        }
+        if (this.useAuth.verifyPermiso('vPedidos:listar') == true) this.loadSalones()
     },
     beforeUnmount() {
         clearInterval(this.vista.intervalAgo)
@@ -404,10 +412,10 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     estado: { op: 'Es', val: '1' },
-                    venta_canal: {
-                        op: 'Es',
-                        val: this.vista.venta_canal.toString(),
-                    },
+                    // venta_canal: {
+                    //     op: 'Es',
+                    //     val: this.vista.venta_canal.toString(),
+                    // },
                 },
                 cols: [],
                 incl: ['createdBy1'],
@@ -444,8 +452,8 @@ export default {
 
             this.vista.pedidos = res.data
 
-            if (this.vista.venta_canal != 1) this.setIntervalTimeAgo()
-            this.loadPendientesCantidad()
+            this.setIntervalTimeAgo()
+            this.calculatePendientes()
         },
         setQuerySalones() {
             this.vista.qry1 = {
@@ -471,21 +479,26 @@ export default {
 
             await this.loadPedidos()
             this.setMesasPedidos()
-            this.setIntervalTimeAgo()
         },
         setMesasPedidos() {
-            if (this.vista.pedidos.length == 0) return
+            if (!this.pedidosFiltered.length) {
+                for (const salon of this.vista.salones) {
+                    for (const mesa of salon.mesas) {
+                        mesa.pedido = null
+                    }
+                }
+                return
+            }
 
-            const pedidosMesaMap = this.vista.pedidos.reduce(
-                (obj, a) => ((obj[a.venta_mesa] = a), obj),
-                {},
+            // Crear un mapa (idMesa -> pedido)
+            const pedidosMesaMap = Object.fromEntries(
+                this.pedidosFiltered.map((p) => [p.venta_mesa, p]),
             )
 
-            for (const a of this.vista.salones) {
-                for (const b of a.mesas) {
-                    if (pedidosMesaMap[b.id]) {
-                        b.pedido = pedidosMesaMap[b.id]
-                    }
+            // Asignar el pedido correspondiente o null
+            for (const salon of this.vista.salones) {
+                for (const mesa of salon.mesas) {
+                    mesa.pedido = pedidosMesaMap[mesa.id] || null
                 }
             }
         },
@@ -495,6 +508,7 @@ export default {
             clearInterval(this.vista.intervalAgo)
 
             this.vista.intervalAgo = setInterval(() => {
+                console.log(1)
                 this.setTimeAgo()
             }, 1000)
         },
@@ -538,31 +552,22 @@ export default {
             }
             return `hace ${diffInHours} horas`
         },
+        calculatePendientes() {
+            const conteoPorTipo = this.vista.pedidos
+                .filter((a) => a.estado == 1)
+                .reduce((acc, item) => {
+                    acc[item.venta_canal] = (acc[item.venta_canal] || 0) + 1
+                    return acc
+                }, {})
+
+            console.log(conteoPorTipo)
+            this.vista.mesaPendientes = conteoPorTipo[1] || 0
+            this.vista.llevarPendientes = conteoPorTipo[2] || 0
+            this.vista.deliveryPendientes = conteoPorTipo[3] || 0
+        },
 
         selTipoPedido(key) {
             this.vista.venta_canal = key
-
-            this.vista.salon = null
-            this.vista.salones = []
-            this.vista.pedidos = []
-
-            if (key == 1) {
-                this.loadSalones()
-            } else {
-                this.loadPedidos()
-            }
-        },
-
-        async loadPendientesCantidad() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/ventas-pendientes`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.mesaPendientes = res.data.find((a) => a.venta_canal == 1)?.cantidad || 0
-            this.vista.llevarPendientes = res.data.find((a) => a.venta_canal == 2)?.cantidad || 0
-            this.vista.deliveryPendientes = res.data.find((a) => a.venta_canal == 3)?.cantidad || 0
         },
 
         nuevo(datosMesa) {
@@ -665,21 +670,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vPedidos', 'pedidos', item)
-
-            if (this.vista.venta_canal == 1) {
-                const salon = this.vista.salones.find((a) => a.id == this.vista.salon)
-                const mesa = salon.mesas.find((a) => a.id == item.venta_mesa)
-                mesa.pedido = null
-            }
-
-            if (item.venta_canal == 1) {
-                this.vista.mesaPendientes--
-            } else if (item.venta_canal == 2) {
-                this.vista.llevarPendientes--
-            } else if (item.venta_canal == 3) {
-                this.vista.deliveryPendientes--
-            }
+            this.useAuth.socket.emit('vPedidos:eliminar', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: item,
+            })
         },
         anular(item) {
             const send = {
@@ -698,19 +692,10 @@ export default {
             )
         },
         async anulado(item) {
-            if (this.vista.venta_canal == 1) {
-                const salon = this.vista.salones.find((a) => a.id == this.vista.salon)
-                const mesa = salon.mesas.find((a) => a.id == item.venta_mesa)
-                mesa.pedido = null
-            }
-
-            if (item.venta_canal == 1) {
-                this.vista.mesaPendientes--
-            } else if (item.venta_canal == 2) {
-                this.vista.llevarPendientes--
-            } else if (item.venta_canal == 3) {
-                this.vista.deliveryPendientes--
-            }
+            this.useAuth.socket.emit('vPedidos:anular', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: item,
+            })
         },
         async imprimirComanda(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -873,15 +858,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.pedidos.splice(item.i, 1, res.data)
-
-            if (item.venta_canal == 1) {
-                this.vista.mesaPendientes--
-            } else if (item.venta_canal == 2) {
-                this.vista.llevarPendientes--
-            } else if (item.venta_canal == 3) {
-                this.vista.deliveryPendientes--
-            }
+            this.useAuth.socket.emit('vPedidos:entregar', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data,
+            })
         },
 
         async abrirComandaMesa(mesa) {
@@ -898,6 +878,14 @@ export default {
                     venta_mesa1: { nombre: mesa.nombre, salon1 },
                 })
             }
+        },
+        openCambiarMesa(item) {
+            const send = {
+                pedido: item,
+                salones: this.vista.salones,
+            }
+
+            this.useModals.setModal('mCambiarMesa', `Cambiar de mesa`, null, send, true)
         },
         openUnirMesas() {
             this.useModals.setModal('mMesasUnir', 'Unir mesas', true)
@@ -917,15 +905,9 @@ export default {
 
             if (res.code != 0) return
 
-            this.loadSalones()
-        },
-        openCambiarMesa(item) {
-            const send = {
-                pedido: item,
-                salones: this.vista.salones,
-            }
-
-            this.useModals.setModal('mCambiarMesa', `Cambiar de mesa`, null, send, true)
+            this.useAuth.socket.emit('mMesasUnir:unir', {
+                empresa: this.useAuth.usuario.empresa.id,
+            })
         },
 
         // --- OPTIONS DEL GRID DE MESAS --- //
@@ -1068,6 +1050,12 @@ export default {
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 1rem;
+}
+
+.salones-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
 }
 
 .container-salones {

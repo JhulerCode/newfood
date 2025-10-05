@@ -1176,16 +1176,17 @@ export default {
                 (a) => a.articulo == item.articulo,
             )
 
-            if (item.igv_afectacion == '10') {
-                this.vista.comprobante.comprobante_items[i].igv_afectacion =
-                    item.igv_afectacion == '10' ? '12' : '10'
-            } else if (item.igv_afectacion == '20') {
-                this.vista.comprobante.comprobante_items[i].igv_afectacion =
-                    item.igv_afectacion == '20' ? '21' : '20'
-            } else if (item.igv_afectacion == '30') {
-                this.vista.comprobante.comprobante_items[i].igv_afectacion =
-                    item.igv_afectacion == '30' ? '37' : '30'
+            const afectacionMap = {
+                10: '12',
+                12: '10',
+                20: '21',
+                21: '20',
+                30: '37',
+                37: '30',
             }
+
+            const newAfectacion = afectacionMap[item.igv_afectacion]
+            this.vista.comprobante.comprobante_items[i].igv_afectacion = newAfectacion
 
             this.vista.comprobante.comprobante_items[i].descuento_tipo = null
             this.vista.comprobante.comprobante_items[i].descuento_valor = null
@@ -1362,8 +1363,12 @@ export default {
 
             if (print == true) await this.imprimir(res.data)
 
-            const vistaPedidos = this.useVistas.vPedidos
-            if (vistaPedidos) vistaPedidos.reload = true
+            // const vistaPedidos = this.useVistas.vPedidos
+            // if (vistaPedidos) vistaPedidos.reload = true
+            this.useAuth.socket.emit('vEmitirComprobante:grabar', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data_transaccion,
+            })
             this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
         async imprimir(data) {

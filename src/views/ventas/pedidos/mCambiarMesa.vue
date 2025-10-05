@@ -78,7 +78,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.$emit('mesaCambiada')
+            this.useAuth.socket.emit('mCambiarMesa:cambiar', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data,
+            })
 
             this.useModals.show.mCambiarMesa = false
         },

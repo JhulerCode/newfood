@@ -48,8 +48,10 @@ export default {
     mounted() {
         window.addEventListener('keydown', this.shortCuts)
     },
-    unmounted() {
+    beforeUnmount() {
         window.removeEventListener('keydown', this.shortCuts)
+
+        if (this.useAuth.socket) this.useAuth.socket.disconnect()
     },
     methods: {
         shortCuts(event) {

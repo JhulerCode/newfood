@@ -3,11 +3,14 @@ import { urls, get, post } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
+import { io } from "socket.io-client"
+import { host } from '@/utils/crud.js'
 
 export const useAuth = defineStore('auth', {
     state: () => ({
         token: null,
         usuario: {},
+        socket: null,
 
         menu: [
             {
@@ -263,7 +266,7 @@ export const useAuth = defineStore('auth', {
             this.tables = {}
         },
 
-       // --- LOGIN --- //
+        // --- LOGIN --- //
         async login() {
             if (this.token == null) return false
 
@@ -281,7 +284,72 @@ export const useAuth = defineStore('auth', {
             // Formato de fecha
             this.showNavbar = this.usuario.menu_visible
 
+            this.connectSocket()
+
             return true
+        },
+        connectSocket() {
+            this.socket = io(host)
+
+            this.socket.on('connect', () => {
+                this.socket.emit('joinEmpresa', this.usuario.empresa.id)
+                this.listenSocket()
+            })
+        },
+        listenSocket() {
+            this.socket.on('vComanda:crear', (data) => {
+                useVistas().addItem('vPedidos', 'pedidos', data, 'first')
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+            })
+
+            this.socket.on('vComanda:addProductos', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+            })
+
+            this.socket.on('mPedidoDetalles:modificar', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+            })
+
+            this.socket.on('vPedidos:eliminar', (data) => {
+                useVistas().removeItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+            })
+
+            this.socket.on('vPedidos:anular', (data) => {
+                useVistas().removeItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+            })
+
+            this.socket.on('vPedidos:entregar', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.calculatePendientes()
+            })
+
+            this.socket.on('mCambiarMesa:cambiar', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.setMesasPedidos()
+            })
+
+            this.socket.on('mMesasUnir:unir', () => {
+                useVistas().vPedidos.loadSalones()
+            })
+
+            this.socket.on('vEmitirComprobante:grabar', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
+                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+            })
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
@@ -301,7 +369,7 @@ export const useAuth = defineStore('auth', {
             return permisos.some(p => this.usuario?.permisos?.includes(p))
         },
 
-       // --- TABLES --- //
+        // --- TABLES --- //
         updateQuery(columns, qry) {
             columns.filter(a => a.op).forEach(b => {
                 qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
@@ -328,7 +396,7 @@ export const useAuth = defineStore('auth', {
             })
         },
         setColumns(tableName, columns) {
-           // --- RECUPERA LAS COLUMNAS GUARDADAS --- //
+            // --- RECUPERA LAS COLUMNAS GUARDADAS --- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
                     Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
@@ -336,7 +404,7 @@ export const useAuth = defineStore('auth', {
             }
         },
 
-       // --- PREFERENCIAS --- //
+        // --- PREFERENCIAS --- //
         setTheme(theme) {
             if (!theme) return
 

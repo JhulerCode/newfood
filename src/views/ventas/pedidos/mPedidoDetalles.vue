@@ -389,7 +389,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.$emit('detallesModificados')
+            this.useAuth.socket.emit('mPedidoDetalles:modificar', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: res.data,
+            })
             this.useModals.show.mPedidoDetalles = false
         },
     },

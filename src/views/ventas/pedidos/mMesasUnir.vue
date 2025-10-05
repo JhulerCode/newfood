@@ -88,7 +88,7 @@ export default {
         buttons: [
             {
                 text: 'Unir mesas',
-                action: 'unirMesas',
+                action: 'unir',
                 spin: false,
                 show: true,
                 backColor: 'primary-color',
@@ -142,7 +142,7 @@ export default {
 
             return false
         },
-        async unirMesas() {
+        async unir() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -151,7 +151,10 @@ export default {
 
             if (res.code != 0) return
 
-            this.$emit('mesasUnidas')
+            this.useAuth.socket.emit('mMesasUnir:unir', {
+                empresa: this.useAuth.usuario.empresa.id,
+            })
+
             this.useModals.show.mMesasUnir = false
         },
     },
