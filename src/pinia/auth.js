@@ -292,7 +292,10 @@ export const useAuth = defineStore('auth', {
             this.socket = io(host)
 
             this.socket.on('connect', () => {
-                this.socket.emit('joinEmpresa', this.usuario.empresa.id)
+                this.socket.emit('joinEmpresa', {
+                    empresa: this.usuario.empresa.id,
+                    colaborador: this.usuario.colaborador,
+                })
                 this.listenSocket()
             })
         },

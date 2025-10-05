@@ -700,12 +700,12 @@ export default {
 
             if (res.code != 0) return
 
-            if (print == true) this.imprimir()
-
             this.useAuth.socket.emit('vComanda:crear', {
                 empresa: this.useAuth.usuario.empresa.id,
                 data: res.data,
             })
+
+            if (print == true) this.imprimir()
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
@@ -719,12 +719,13 @@ export default {
 
             if (res.code != 0) return
 
-            if (print == true) this.imprimir()
-
-            this.useAuth.socket.emit('vComanda:addProductos', {
+            this.useAuth.socket.emit('vComanda:crear', {
                 empresa: this.useAuth.usuario.empresa.id,
                 data: res.data,
             })
+
+            if (print == true) this.imprimir()
+
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
         imprimir() {
@@ -744,19 +745,25 @@ export default {
                 venta_codigo: this.vista.pedido.venta_codigo,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
+                pc_principal_colaborador: this.useAuth.usuario.empresa.pc_principal_colaborador,
             }
 
-            const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            console.log(uriEncoded)
-            const nuevaVentana = window.open(
-                uriEncoded,
-                '_blank',
-                'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            )
+            this.useAuth.socket.emit('vComanda:imprimir', {
+                empresa: this.useAuth.usuario.empresa.id,
+                data: send,
+            })
 
-            setTimeout(() => {
-                nuevaVentana.close()
-            }, 500)
+            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // console.log(uriEncoded)
+            // const nuevaVentana = window.open(
+            //     uriEncoded,
+            //     '_blank',
+            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
+            // )
+
+            // setTimeout(() => {
+            //     nuevaVentana.close()
+            // }, 500)
         },
 
         runMethod(method, item) {
