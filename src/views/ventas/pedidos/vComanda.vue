@@ -745,7 +745,8 @@ export default {
                 venta_codigo: this.vista.pedido.venta_codigo,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
-                pc_principal_colaborador: this.useAuth.usuario.empresa.pc_principal_colaborador,
+                subdominio: this.useAuth.usuario.empresa.subdominio,
+                // pc_principal_colaborador: this.useAuth.usuario.empresa.pc_principal_colaborador,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', {
