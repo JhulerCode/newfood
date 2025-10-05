@@ -704,25 +704,25 @@ export default {
 
             if (res.code != 0) return
 
-            let venta_canal = ''
+            let atencion = ''
 
             if (res.data.venta_canal == 1) {
-                venta_canal = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+                atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
-                venta_canal = 'PARA LLEVAR'
+                atencion = 'PARA LLEVAR'
             } else if (res.data.venta_canal == 3) {
-                venta_canal = 'DELIVERY'
+                atencion = 'DELIVERY'
             }
 
             const send = {
-                fecha: res.data.fecha,
-                venta_canal,
+                createdAt: res.data.createdAt,
+                atencion,
                 venta_codigo: res.data.venta_codigo,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
-
+            // console.log(send)
             this.useAuth.socket.emit('vComanda:imprimir', {
                 empresa: this.useAuth.usuario.empresa.id,
                 data: send,

@@ -705,7 +705,7 @@ export default {
                 data: res.data,
             })
 
-            if (print == true) this.imprimir()
+            if (print == true) this.imprimir(res.data)
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
@@ -724,25 +724,25 @@ export default {
                 data: res.data,
             })
 
-            if (print == true) this.imprimir()
+            if (print == true) this.imprimir(res.data)
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        imprimir() {
-            let venta_canal = ''
+        imprimir(data) {
+            console.log(data)
+            let atencion = ''
 
-            if (this.vista.pedido.venta_canal == 1) {
-                venta_canal = `${this.vista.pedido.venta_mesa1.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre}`
-            } else if (this.vista.pedido.venta_canal == 2) {
-                venta_canal = 'PARA LLEVAR'
-            } else if (this.vista.pedido.venta_canal == 3) {
-                venta_canal = 'DELIVERY'
+            if (data.venta_canal == 1) {
+                atencion = `${data.venta_mesa1.salon1.nombre} - ${data.venta_mesa1.nombre}`
+            } else if (data.venta_canal == 2) {
+                atencion = 'PARA LLEVAR'
+            } else if (data.venta_canal == 3) {
+                atencion = 'DELIVERY'
             }
-
             const send = {
-                fecha: this.vista.pedido.fecha,
-                venta_canal,
-                venta_codigo: this.vista.pedido.venta_codigo,
+                createdAt: data.createdAt,
+                atencion,
+                venta_codigo: data.venta_codigo,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,
