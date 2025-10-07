@@ -57,6 +57,13 @@
                     <div class="card caja">
                         <div class="card-head" :style="{ 'background-color': 'var(--verde)' }">
                             ABIERTO
+
+                            <i
+                                class="fa-regular fa-copy"
+                                style="cursor: pointer"
+                                title="Copiar id"
+                                @click="copyToClipboard(vista.caja_apertura.id)"
+                            ></i>
                         </div>
 
                         <div class="dato">
@@ -437,7 +444,6 @@
                             height="10rem"
                         />
                     </div>
-
                 </div>
 
                 <div class="sixth">
@@ -504,7 +510,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
-import { redondear } from '@/utils/mine'
+import { redondear, copyToClipboard } from '@/utils/mine'
 
 import dayjs from 'dayjs'
 
@@ -520,6 +526,7 @@ export default {
         useModals: useModals(),
 
         redondear,
+        copyToClipboard,
         dayjs,
 
         columnsPagoMetodos: [
@@ -958,10 +965,12 @@ export default {
             justify-content: center;
             align-items: center;
             border-radius: 0.5rem;
+            gap: 0.5rem;
 
             color: var(--text-color3);
-            // * {
-            // }
+            * {
+                color: var(--text-color3);
+            }
         }
 
         .dato {

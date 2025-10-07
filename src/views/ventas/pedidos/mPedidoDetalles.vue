@@ -2,6 +2,14 @@
     <JdModal modal="mPedidoDetalles" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdInput
+                label="Fecha"
+                :nec="true"
+                v-model="modal.pedido.fecha"
+                :disabled="modal.mode == 3"
+                style="grid-column: 1/3"
+            />
+
+            <JdInput
                 label="Atención"
                 v-model="atencion"
                 :disabled="true"
@@ -37,7 +45,7 @@
             </div>
 
             <JdInput
-                label="Nombres"
+                :label="modal.mode == 2 ? 'Nombres' : 'Cliente'"
                 :nec="true"
                 v-model="modal.pedido.venta_socio_datos.nombres"
                 :disabled="modal.mode == 3"
@@ -94,21 +102,20 @@
                 />
             </template>
 
-            <JdInput
-                label="Observación"
-                v-model="modal.pedido.observacion"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/4"
-            />
-
-            <JdInput
-                label="Total (S/)"
-                type="number"
-                v-model="modal.mtoImpVenta"
+            <JdSelect
+                label="Estado"
+                v-model="modal.pedido.estado"
+                :lista="modal.transaccion_estados"
                 :disabled="true"
                 style="grid-column: 1/3"
-                v-if="modal.mode == 3"
             />
+
+            <i
+                class="fa-regular fa-copy"
+                style="cursor: pointer"
+                title="Copiar id"
+                @click="copyToClipboard(modal.pedido.id)"
+            ></i>
         </div>
 
         <JdTable
@@ -119,8 +126,31 @@
             :colNro="false"
             :download="false"
             v-if="modal.mode == 3"
-            class="mrg-top1"
         />
+
+        <div class="datos-bottom">
+            <div class="left">
+                <JdInput
+                    label="Observación"
+                    v-model="modal.pedido.observacion"
+                    :disabled="modal.mode == 3"
+                    style="grid-column: 1/2"
+                />
+
+                <JdInput
+                    label="Motivo de anulación"
+                    v-model="modal.pedido.anulado_motivo"
+                    :disabled="true"
+                    style="grid-column: 1/2"
+                    v-if="modal.pedido.estado == 0"
+                />
+            </div>
+
+            <div class="right">
+                <strong>Total:</strong>
+                <strong class="total"> S/ {{ modal.mtoImpVenta }} </strong>
+            </div>
+        </div>
     </JdModal>
 
     <mSocio
@@ -145,7 +175,7 @@ import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
 import { urls, get, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
-import { redondear } from '@/utils/mine'
+import { redondear, copyToClipboard } from '@/utils/mine'
 
 export default {
     emits: ['detallesModificados'],
@@ -161,6 +191,7 @@ export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
+        copyToClipboard,
 
         buttons: [
             {
@@ -228,8 +259,11 @@ export default {
 
         if (this.modal.mode == 2) {
             this.buttons[1].show = true
-            if (this.modal.pedido.venta_canal == 3) this.loadPagoMetodos()
+            if (this.modal.pedido.venta_canal == 3) {
+                this.loadPagoMetodos()
+            }
         } else if (this.modal.mode == 3) {
+            this.loadDatosSistema()
             this.sumarItems()
         }
     },
@@ -282,6 +316,14 @@ export default {
             if (res.code != 0) return
 
             this.modal.pago_metodos = res.data
+        },
+        async loadDatosSistema() {
+            const qry = ['transaccion_estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.modal, res.data)
         },
 
         setSocio(item) {
@@ -395,6 +437,11 @@ export default {
             })
             this.useModals.show.mPedidoDetalles = false
         },
+
+        // copiarId() {
+        //     navigator.clipboard.writeText(this.modal.pedido.id)
+        //     jmsg('success', 'Id copiado')
+        // },
     },
 }
 </script>
@@ -404,10 +451,44 @@ export default {
     display: grid;
     grid-template-columns: 9rem 9rem 9rem;
     gap: 0.5rem;
+    margin-bottom: 2rem;
 
     .dato-cliente {
         display: flex;
         gap: 0.5rem;
+    }
+}
+
+.datos-bottom {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+
+    .left {
+        display: grid;
+        grid-template-columns: 20rem;
+        gap: 0.5rem;
+    }
+
+    .right {
+        background-color: var(--bg-color2);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        display: grid;
+        grid-template-columns: 4rem 9rem;
+        gap: 0.5rem;
+        align-items: center;
+        height: fit-content;
+
+        p {
+            text-align: right;
+        }
+
+        .total {
+            font-size: 1.4rem;
+            text-align: right;
+        }
     }
 }
 

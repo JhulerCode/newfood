@@ -33,6 +33,8 @@ const urls = {
     transaccion_items: `${host}/api/transaccion_items`,
 }
 
+const subdominio_prueba = 'irmasbrasa'
+
 async function get(url) {
     let response
 
@@ -215,7 +217,7 @@ function getSubdominio() {
 
     if (parts.length > 2) return parts[0]
 
-    return 'prueba'
+    return subdominio_prueba
 }
 
 function setFormData(item) {

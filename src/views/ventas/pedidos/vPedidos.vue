@@ -280,13 +280,6 @@ export default {
             },
         ],
         tableRowOptions: [
-            // {
-            //     label: 'Editar',
-            //     icon: 'fa-solid fa-pen-to-square',
-            //     action: 'editar',
-            //     permiso: 'vPedidos:editar',
-            //     ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
-            // },
             {
                 label: 'Ver',
                 icon: 'fa-regular fa-folder-open',
@@ -312,13 +305,14 @@ export default {
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
                 permiso: 'vPedidos:anular',
-                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+                ocultar: { estado: 0, venta_facturado: true },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vPedidos:eliminar',
+                ocultar: { estado: 0, venta_facturado: true },
             },
             {
                 label: 'Reimprimir pedido',
@@ -367,6 +361,7 @@ export default {
                 ocultar: { estado: 0, venta_canal: ['2', '3'] },
             },
         ],
+
         optionsCaseItem: {},
     }),
     computed: {
@@ -419,7 +414,7 @@ export default {
                 },
                 cols: [],
                 incl: ['createdBy1'],
-                sqls: ['comprobantes_monto', 'pagos_monto'],
+                // sqls: ['comprobantes_monto', 'pagos_monto'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

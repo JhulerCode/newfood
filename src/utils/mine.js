@@ -1,5 +1,6 @@
 import ExcelJS from 'exceljs'
 import { saveAs } from 'file-saver'
+import { jmsg } from './swal'
 
 function playAudio(source) {
     const audio = new Audio(source)
@@ -258,6 +259,11 @@ function getNestedProp(obj, prop) {
     return result === undefined || result === null ? '' : result
 }
 
+function copyToClipboard(id, val_name = 'id') {
+    navigator.clipboard.writeText(id)
+    jmsg('success', `${val_name ? `${val_name} ` : ''}copiado correctamente`)
+}
+
 export {
     playAudio,
     deepCopy,
@@ -273,5 +279,7 @@ export {
     // selectRow,
     obtenerNumeroJuliano,
     downloadExcel,
-    // runMethod
+    // runMethod,
+
+    copyToClipboard,
 }

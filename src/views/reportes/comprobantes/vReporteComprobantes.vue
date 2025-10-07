@@ -170,6 +170,26 @@ export default {
                 seek: false,
                 sort: true,
             },
+            {
+                id: 'transaccion',
+                title: 'Pedido',
+                prop: 'transaccion1.venta_codigo',
+                width: '12rem',
+                filtrable: false,
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'caja_apertura',
+                title: 'Apertura de caja',
+                prop: 'caja_apertura1.createdAt',
+                format: 'datetime',
+                width: '12rem',
+                filtrable: false,
+                show: true,
+                seek: false,
+            },
         ],
         tableRowOptions: [
             {
@@ -268,10 +288,11 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 sqls: ['pagos_monto'],
+                incl: ['transaccion1', 'caja_apertura1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('caja_apertura', 'empresa_datos')
+            this.vista.qry.cols.push('caja_apertura', 'empresa_datos', 'cliente_datos')
         },
         async loadComprobantes() {
             this.setQuery()
