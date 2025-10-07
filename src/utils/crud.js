@@ -4,6 +4,7 @@ import { jmsg } from '@/utils/swal'
 // import { saveAs } from 'file-saver'
 
 const host = import.meta.env.VITE_API_HOST
+const subdominio_prueba = import.meta.env.VITE_SUBDOMINIO_PRUEBA
 
 const urls = {
     signin: `${host}/signin`,
@@ -32,8 +33,6 @@ const urls = {
     transacciones: `${host}/api/transacciones`,
     transaccion_items: `${host}/api/transaccion_items`,
 }
-
-const subdominio_prueba = 'irmasbrasa'
 
 async function get(url) {
     let response

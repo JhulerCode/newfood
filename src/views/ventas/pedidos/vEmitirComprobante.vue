@@ -217,10 +217,10 @@
                             {{ redondear(vista.porPagar) }}
                         </p>
 
-                        <p>
+                        <!-- <p>
                             <small>Vuelto:</small>
                             {{ redondear(vista.vuelto) }}
-                        </p>
+                        </p> -->
                     </div>
 
                     <ul class="container-pago-metodos" v-if="vista.comprobante.pago_condicion == 1">
@@ -1311,6 +1311,11 @@ export default {
             if (this.vista.comprobante.pago_condicion == 1) {
                 if (redondear(this.vista.porPagar) > 0) {
                     jmsg('warning', 'Importes de pago insuficientes')
+                    return true
+                }
+
+                if (redondear(this.vista.vuelto) > 0) {
+                    jmsg('warning', 'Importes de pago exceden al total')
                     return true
                 }
             }
