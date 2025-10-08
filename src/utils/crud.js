@@ -49,6 +49,11 @@ async function get(url) {
         return { code: -2 }
     }
 
+    if (response.status == 303) {
+        jmsg('error', 'Verión antigua, recargue el sistema')
+        return { code: 303 }
+    }
+
     if (response.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
         useModals().setModal('mLogin', 'Sesión terminada', null, null)
@@ -100,6 +105,11 @@ async function post(url, item, ms) {
         return { code: -2 }
     }
 
+    if (query.status == 303) {
+        jmsg('error', 'Verión antigua, recargue el sistema')
+        return { code: 303 }
+    }
+
     if (query.status == 401) {
         jmsg('error', 'Acceso denegado: autenticación incorrecta')
         useModals().setModal('mLogin', 'Sesión terminada', null, null)
@@ -138,6 +148,11 @@ async function patch(url, item, ms) {
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
+    }
+
+    if (query.status == 303) {
+        jmsg('error', 'Verión antigua, recargue el sistema')
+        return { code: 303 }
     }
 
     if (query.status == 401) {
@@ -181,6 +196,11 @@ async function delet(url, item, ms) {
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
+    }
+
+    if (query.status == 303) {
+        jmsg('error', 'Verión antigua, recargue el sistema')
+        return { code: 303 }
     }
 
     if (query.status == 401) {
@@ -240,6 +260,8 @@ function setHeaders(item) {
 
     const subdominio = getSubdominio()
     if (subdominio) headers['x-empresa'] = subdominio
+
+    headers['x-app-version'] = useAuth().app_version
 
     return headers
 }

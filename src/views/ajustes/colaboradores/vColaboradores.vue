@@ -4,11 +4,11 @@
             <strong>Colaboradores</strong>
 
             <div class="buttons">
-                <JdButton
+                <!-- <JdButton
                     text="Actualizar todos"
                     @click="actualizarTodos()"
                     v-if="useAuth.verifyPermiso('vColaboradores:crear')"
-                />
+                /> -->
 
                 <JdButton
                     text="Nuevo"
@@ -298,9 +298,9 @@ export default {
 
             this.useVistas.removeItem('vColaboradores', 'colaboradores', item)
         },
-        actualizarTodos() {
-            this.useAuth.socket.emit('vColaboradores:actualizarTodos')
-        },
+        // actualizarTodos() {
+        //     this.useAuth.socket.emit('vColaboradores:actualizarTodos')
+        // },
 
         async loadDatosSistema() {
             const qry = [

@@ -12,6 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
+        app_version: '1.5.5',
 
         menu: [
             {
@@ -381,9 +382,9 @@ export const useAuth = defineStore('auth', {
                 jmsg('error', 'DivergeRest Printer no iniciado')
             })
 
-            this.socket.on('vColaboradores:actualizarTodos', () => {
-                window.location.reload()
-            })
+            // this.socket.on('vColaboradores:actualizarTodos', () => {
+            //     window.location.reload()
+            // })
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
