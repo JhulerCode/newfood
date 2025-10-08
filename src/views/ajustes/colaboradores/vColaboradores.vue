@@ -5,8 +5,13 @@
 
             <div class="buttons">
                 <JdButton
+                    text="Actualizar todos"
+                    @click="actualizarTodos()"
+                    v-if="useAuth.verifyPermiso('vColaboradores:crear')"
+                />
+
+                <JdButton
                     text="Nuevo"
-                    title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vColaboradores:crear')"
                 />
@@ -235,7 +240,7 @@ export default {
             const item = {
                 doc_tipo: 1,
                 activo: true,
-                has_signin: false
+                has_signin: false,
             }
 
             this.useModals.setModal('mColaborador', 'Nuevo colaborador', 1, item)
@@ -292,6 +297,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vColaboradores', 'colaboradores', item)
+        },
+        actualizarTodos() {
+            this.useAuth.socket.emit('vColaboradores:actualizarTodos')
         },
 
         async loadDatosSistema() {

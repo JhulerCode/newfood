@@ -380,6 +380,10 @@ export const useAuth = defineStore('auth', {
             this.socket.on('pc_principal_socket_not_found', () => {
                 jmsg('error', 'DivergeRest Printer no iniciado')
             })
+
+            this.socket.on('vColaboradores:actualizarTodos', () => {
+                window.location.reload()
+            })
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
