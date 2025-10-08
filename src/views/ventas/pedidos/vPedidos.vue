@@ -449,6 +449,7 @@ export default {
 
             this.setIntervalTimeAgo()
             this.calculatePendientes()
+            if (this.vista.venta_canal == 1) this.setMesasPedidos()
         },
         setQuerySalones() {
             this.vista.qry1 = {
@@ -473,7 +474,6 @@ export default {
             this.vista.salon = this.vista.salones[0].id
 
             await this.loadPedidos()
-            this.setMesasPedidos()
         },
         setMesasPedidos() {
             if (!this.pedidosFiltered.length) {
