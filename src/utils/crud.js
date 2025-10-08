@@ -42,6 +42,7 @@ async function get(url) {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${useAuth().token}`,
+                'x-app-version': useAuth().app_version
             },
         })
     } catch (error) {
@@ -190,6 +191,7 @@ async function delet(url, item, ms) {
             headers: {
                 Authorization: `Bearer ${useAuth().token}`,
                 'Content-Type': 'application/json',
+                'x-app-version': useAuth().app_version
             },
             body: JSON.stringify(item),
         })
