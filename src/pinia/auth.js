@@ -292,7 +292,12 @@ export const useAuth = defineStore('auth', {
         connectSocket() {
             this.disconnectSocket()
 
-            this.socket = io(host)
+            this.socket = io(host, {
+                transports: ['websocket'],
+                reconnection: true,
+                reconnectionAttempts: Infinity,
+                reconnectionDelay: 2000,
+            })
 
             this.socket.on('connect', () => {
                 this.socket.emit('joinEmpresa', {
@@ -314,10 +319,6 @@ export const useAuth = defineStore('auth', {
 
             this.socket.on('disconnect', (reason) => {
                 console.log('Socket desconectado:', reason)
-
-                if (!this.socket.io.reconnecting) {
-                    this.disconnectSocket()
-                }
             })
         },
         listenSocket() {
