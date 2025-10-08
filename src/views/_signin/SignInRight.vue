@@ -22,6 +22,12 @@
             class="mrg-btm2"
         />
         <JdButton text="INGRESAR" @click="signin()" class="boton-ingresar" />
+
+        <div class="actions">
+            <div class="btn" @click="reloadWindow">
+                <i class="fa-solid fa-rotate-right"></i>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -58,6 +64,10 @@ export default {
         }
     },
     methods: {
+        reloadWindow() {
+            window.location.reload()
+        },
+
         async signin() {
             if (this.usuario == '' || this.contrasena == '') {
                 return jmsg('warning', 'Ingrese usuario y contraseña')
@@ -113,17 +123,15 @@ export default {
             justify-content: center;
             align-items: center;
             cursor: pointer;
+            background-color: var(--bg-color2);
 
             i {
                 color: var(--text-color2);
             }
 
             &:hover {
-                // background-color: var(--bg-color2);
-                // border: solid 1px var(--primary-color);
-
                 * {
-                    color: var(--primary-color);
+                    color: var(--text-color);
                 }
             }
         }

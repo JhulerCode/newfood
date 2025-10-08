@@ -1,6 +1,6 @@
 <template>
     <div class="left">
-        <img src="@/assets/img/login-icon.png" alt="" />
+        <img src="@/assets/img/login-icon.webp" alt="" />
     </div>
 </template>
 

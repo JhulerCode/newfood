@@ -11,7 +11,7 @@
         <div class="right">
             <div class="actions">
                 <div class="btn" @click="reloadWindow">
-                    <i class="fa-solid fa-rotate-left"></i>
+                    <i class="fa-solid fa-rotate-right"></i>
                 </div>
 
                 <div
