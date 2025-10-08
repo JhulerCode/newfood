@@ -151,9 +151,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('mMesasUnir:unir', {
-                empresa: this.useAuth.usuario.empresa.id,
-            })
+            this.useAuth.socket.emit('mMesasUnir:unir')
 
             this.useModals.show.mMesasUnir = false
         },

@@ -471,10 +471,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            this.useAuth.socket.emit('vEmitirComprobante:imprimir', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)

@@ -225,10 +225,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            this.useAuth.socket.emit('vCajaAperturas:imprimirResumen', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vCajaAperturas:imprimirResumen', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)

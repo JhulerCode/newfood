@@ -1368,12 +1368,7 @@ export default {
 
             if (print == true) await this.imprimir(res.data)
 
-            // const vistaPedidos = this.useVistas.vPedidos
-            // if (vistaPedidos) vistaPedidos.reload = true
-            this.useAuth.socket.emit('vEmitirComprobante:grabar', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: res.data_transaccion,
-            })
+            this.useAuth.socket.emit('vEmitirComprobante:grabar', res.data_transaccion)
             this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
         },
         async imprimir(data) {
@@ -1386,10 +1381,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            this.useAuth.socket.emit('vEmitirComprobante:imprimir', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)

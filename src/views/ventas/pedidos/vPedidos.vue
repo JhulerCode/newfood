@@ -665,10 +665,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('vPedidos:eliminar', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: item,
-            })
+            this.useAuth.socket.emit('vPedidos:eliminar', item)
         },
         anular(item) {
             const send = {
@@ -687,10 +684,7 @@ export default {
             )
         },
         async anulado(item) {
-            this.useAuth.socket.emit('vPedidos:anular', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: item,
-            })
+            this.useAuth.socket.emit('vPedidos:anular', item)
         },
         async imprimirComanda(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -718,10 +712,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
             // console.log(send)
-            this.useAuth.socket.emit('vComanda:imprimir', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vComanda:imprimir', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
@@ -770,10 +761,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            this.useAuth.socket.emit('vComanda:imprimirPrecuenta', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vComanda:imprimirPrecuenta', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
@@ -865,10 +853,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('vPedidos:entregar', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: res.data,
-            })
+            this.useAuth.socket.emit('vPedidos:entregar', res.data)
         },
 
         async abrirComandaMesa(mesa) {
@@ -912,9 +897,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('mMesasUnir:unir', {
-                empresa: this.useAuth.usuario.empresa.id,
-            })
+            this.useAuth.socket.emit('mMesasUnir:unir')
         },
 
         // --- OPTIONS DEL GRID DE MESAS --- //

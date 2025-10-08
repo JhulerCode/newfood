@@ -700,10 +700,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('vComanda:crear', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: res.data,
-            })
+            this.useAuth.socket.emit('vComanda:crear', res.data)
 
             if (print == true) this.imprimir(res.data)
 
@@ -719,10 +716,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('vComanda:crear', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: res.data,
-            })
+            this.useAuth.socket.emit('vComanda:crear', res.data)
 
             if (print == true) this.imprimir(res.data)
 
@@ -748,10 +742,7 @@ export default {
                 subdominio: this.useAuth.usuario.empresa.subdominio,
             }
 
-            this.useAuth.socket.emit('vComanda:imprimir', {
-                empresa: this.useAuth.usuario.empresa.id,
-                data: send,
-            })
+            this.useAuth.socket.emit('vComanda:imprimir', send)
 
             // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)

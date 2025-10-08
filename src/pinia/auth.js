@@ -296,9 +296,19 @@ export const useAuth = defineStore('auth', {
 
             this.socket.on('connect', () => {
                 this.socket.emit('joinEmpresa', {
-                    empresa: this.usuario.empresa.id,
-                    colaborador: this.usuario.colaborador,
+                    empresa: {
+                        id: this.usuario.empresa.id,
+                        razon_social: this.usuario.empresa.razon_social,
+                        subdominio: this.usuario.empresa.subdominio,
+                    },
+                    colaborador: {
+                        id: this.usuario.colaborador,
+                        nombres: this.usuario.nombres,
+                        apellidos: this.usuario.apellidos,
+                        cargo: this.usuario.cargo,
+                    },
                 })
+
                 this.listenSocket()
             })
 
@@ -362,6 +372,7 @@ export const useAuth = defineStore('auth', {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
                 useVistas().vPedidos.setIntervalTimeAgo()
                 useVistas().vPedidos.calculatePendientes()
+                console.log(data.venta_canal)
                 if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
             })
 
