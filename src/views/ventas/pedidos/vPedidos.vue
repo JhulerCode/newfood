@@ -376,6 +376,8 @@ export default {
         this.vista.calculatePendientes = this.calculatePendientes
         this.vista.loadSalones = this.loadSalones
 
+        if (this.vista.pedidos) this.setIntervalTimeAgo()
+
         if (this.vista.loaded) return
 
         this.vista.mesaPendientes = 0
@@ -490,7 +492,7 @@ export default {
             clearInterval(this.vista.intervalAgo)
 
             this.vista.intervalAgo = setInterval(() => {
-                console.log(1)
+                console.log('setIntervalTimeAgo')
                 this.setTimeAgo()
             }, 1000)
         },

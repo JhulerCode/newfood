@@ -12,7 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
-        app_version: '1.5.8',
+        app_version: '1.5.9',
 
         menu: [
             {
