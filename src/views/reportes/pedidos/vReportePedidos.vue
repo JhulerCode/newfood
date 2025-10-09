@@ -177,7 +177,6 @@ export default {
                 icon: 'fa-solid fa-up-right-from-square',
                 action: 'verComprobantes',
                 permiso: 'vReportePedidos:verComprobantes',
-                // ocultar: { estado: 0 },
             },
         ],
     }),

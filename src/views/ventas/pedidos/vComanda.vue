@@ -665,9 +665,10 @@ export default {
                 if (
                     this.vista.pedido.venta_pago_metodo ==
                         `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
-                    this.vista.pedido.venta_pago_con < this.vista.pedido.monto
+                    (this.vista.pedido.venta_pago_con || 0) <
+                        Number(this.vista.mtoImpVenta.toFixed(2))
                 ) {
-                    jmsg('warning', 'Monto de pago no es suficiente')
+                    jmsg('warning', 'El monto de pago no es suficiente')
                     return true
                 }
             }
@@ -684,12 +685,12 @@ export default {
                 this.vista.pedido.venta_pago_con = null
             }
         },
-        async crear1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
+        // async crear1() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
 
-            console.log(this.vista.pedido)
-        },
+        //     console.log(this.vista.pedido)
+        // },
         async crear(print) {
             if (this.checkDatos()) return
             this.shapeDatos()

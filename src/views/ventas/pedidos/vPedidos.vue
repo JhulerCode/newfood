@@ -258,16 +258,6 @@ export default {
                 seek: true,
                 sort: true,
             },
-            // {
-            //     id: 'pagado',
-            //     title: 'Pagado?',
-            //     prop: 'pagado1.nombre',
-            //     format: 'yesno',
-            //     width: '6rem',
-            //     show: true,
-            //     seek: true,
-            //     sort: true,
-            // },
             {
                 id: 'estado',
                 title: 'Estado',
@@ -287,6 +277,13 @@ export default {
                 permiso: 'vPedidos:ver',
             },
             {
+                label: 'Editar detalles',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editarDetalles',
+                permiso: 'vPedidos:editarDetalles',
+                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 }, venta_canal: 1 },
+            },
+            {
                 label: 'Añadir productos',
                 icon: 'fa-solid fa-plus',
                 action: 'addProductos',
@@ -294,31 +291,25 @@ export default {
                 ocultar: { estado: 0, venta_facturado: true },
             },
             {
-                label: 'Editar detalles',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editarDetalles',
-                permiso: 'vPedidos:editarDetalles',
-                ocultar: { estado: 0, venta_facturado: true, venta_canal: 1 },
-            },
-            {
                 label: 'Anular',
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
                 permiso: 'vPedidos:anular',
-                ocultar: { estado: 0, venta_facturado: true },
+                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vPedidos:eliminar',
-                ocultar: { estado: 0, venta_facturado: true },
+                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Reimprimir pedido',
                 icon: 'fa-solid fa-print',
                 action: 'imprimirComanda',
                 permiso: 'vPedidos:imprimirComanda',
+                ocultar: { estado: 0, venta_facturado: true },
             },
             {
                 label: 'Imprimir precuenta',
@@ -407,14 +398,10 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     estado: { op: 'Es', val: '1' },
-                    // venta_canal: {
-                    //     op: 'Es',
-                    //     val: this.vista.venta_canal.toString(),
-                    // },
                 },
                 cols: [],
                 incl: ['createdBy1'],
-                // sqls: ['comprobantes_monto', 'pagos_monto'],
+                sqls: ['comprobantes_monto'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -607,16 +594,12 @@ export default {
                 pedido: { ...res.data },
                 socios: [
                     {
-                        id: item.socio,
-                        ...item.venta_socio_datos,
+                        id: res.data.socio,
+                        ...res.data.venta_socio_datos,
                     },
                 ],
-                pago_metodos: [
-                    {
-                        id: res.data.venta_pago_metodo,
-                        ...res.data.venta_pago_metodo1,
-                    },
-                ],
+                pago_metodos: [{ ...res.data.venta_pago_metodo1 }],
+                transaccion_estados: [{ ...res.data.estado1 }],
             }
 
             this.useModals.setModal(
@@ -627,33 +610,38 @@ export default {
                 true,
             )
         },
+        async editarDetalles(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                pedido: { ...res.data },
+                socios: [
+                    {
+                        id: res.data.socio,
+                        ...res.data.venta_socio_datos,
+                    },
+                ],
+                pago_metodos: [{ ...res.data.venta_pago_metodo1 }],
+                transaccion_estados: [{ ...res.data.estado1 }],
+            }
+
+            this.useModals.setModal(
+                'mPedidoDetalles',
+                `Editar pedido N° ${item.venta_codigo}`,
+                2,
+                send,
+                true,
+            )
+        },
         addProductos(item) {
             this.useVistas.showVista('vComanda', 'Editar pedido')
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 2
             vistaComanda.pedido = { ...item, transaccion_items: [] }
-        },
-        editarDetalles(item) {
-            const send = {
-                pedido: {
-                    id: item.id,
-                    socio: item.socio,
-                    venta_canal: item.venta_canal,
-                    venta_socio_datos: item.venta_socio_datos,
-                    repartidor: item.repartidor,
-                    venta_pago_metodo: item.venta_pago_metodo,
-                    venta_pago_con: item.venta_pago_con,
-                    observacion: item.observacion,
-                },
-                socios: [
-                    {
-                        id: item.socio,
-                        ...item.venta_socio_datos,
-                    },
-                ],
-            }
-
-            this.useModals.setModal('mPedidoDetalles', 'Editar detalles', 2, send, true)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

@@ -5,13 +5,28 @@
                 label="Fecha"
                 :nec="true"
                 v-model="modal.pedido.fecha"
-                :disabled="modal.mode == 3"
+                :disabled="true"
                 style="grid-column: 1/3"
             />
+
+            <i
+                class="fa-regular fa-copy"
+                style="cursor: pointer"
+                title="Copiar id"
+                @click="copyToClipboard(modal.pedido.id)"
+            ></i>
 
             <JdInput
                 label="Atención"
                 v-model="atencion"
+                :disabled="true"
+                style="grid-column: 1/3"
+            />
+
+            <JdSelect
+                label="Estado"
+                v-model="modal.pedido.estado"
+                :lista="modal.transaccion_estados"
                 :disabled="true"
                 style="grid-column: 1/3"
             />
@@ -101,21 +116,6 @@
                     style="grid-column: 1/3"
                 />
             </template>
-
-            <JdSelect
-                label="Estado"
-                v-model="modal.pedido.estado"
-                :lista="modal.transaccion_estados"
-                :disabled="true"
-                style="grid-column: 1/3"
-            />
-
-            <i
-                class="fa-regular fa-copy"
-                style="cursor: pointer"
-                title="Copiar id"
-                @click="copyToClipboard(modal.pedido.id)"
-            ></i>
         </div>
 
         <JdTable
@@ -148,7 +148,7 @@
 
             <div class="right">
                 <strong>Total:</strong>
-                <strong class="total"> S/ {{ modal.mtoImpVenta }} </strong>
+                <strong class="total"> S/ {{ redondear(modal.mtoImpVenta) }} </strong>
             </div>
         </div>
     </JdModal>
@@ -192,6 +192,7 @@ export default {
         useAuth: useAuth(),
         useModals: useModals(),
         copyToClipboard,
+        redondear,
 
         buttons: [
             {
@@ -256,15 +257,13 @@ export default {
         this.modal = this.useModals.mPedidoDetalles
 
         this.setSocio(this.modal.socios[0])
+        this.sumarItems()
 
         if (this.modal.mode == 2) {
             this.buttons[1].show = true
             if (this.modal.pedido.venta_canal == 3) {
                 this.loadPagoMetodos()
             }
-        } else if (this.modal.mode == 3) {
-            this.loadDatosSistema()
-            this.sumarItems()
         }
     },
     methods: {
@@ -317,14 +316,14 @@ export default {
 
             this.modal.pago_metodos = res.data
         },
-        async loadDatosSistema() {
-            const qry = ['transaccion_estados']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+        // async loadDatosSistema() {
+        //     const qry = ['transaccion_estados']
+        //     const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
-            if (res.code != 0) return
+        //     if (res.code != 0) return
 
-            Object.assign(this.modal, res.data)
-        },
+        //     Object.assign(this.modal, res.data)
+        // },
 
         setSocio(item) {
             if (item) {
@@ -388,7 +387,7 @@ export default {
                 this.modal.mtoOperGravadas +
                 this.modal.mtoOperExoneradas +
                 this.modal.mtoOperInafectas
-            this.modal.mtoImpVenta = redondear(this.modal.valorVenta + this.modal.mtoIGV)
+            this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
         },
 
         checkDatos() {
@@ -411,6 +410,16 @@ export default {
                     jmsg('warning', 'Ingrese el método de pago')
                     return true
                 }
+
+                if (
+                    this.modal.pedido.venta_pago_metodo ==
+                        `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
+                    (this.modal.pedido.venta_pago_con || 0) <
+                        Number(this.modal.mtoImpVenta.toFixed(2))
+                ) {
+                    jmsg('warning', 'El monto de pago no es suficiente')
+                    return true
+                }
             }
         },
         shapeDatos() {
@@ -421,6 +430,10 @@ export default {
                 this.modal.pedido.venta_pago_con = null
             }
         },
+        // async modificar1() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
+        // },
         async modificar() {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -446,7 +459,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 9rem 9rem 9rem;
+    grid-template-columns: 10rem 10rem 10rem;
     gap: 0.5rem;
     margin-bottom: 2rem;
 
