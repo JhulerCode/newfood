@@ -716,7 +716,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useAuth.socket.emit('vComanda:crear', res.data)
+            this.useAuth.socket.emit('vComanda:addProductos', res.data)
 
             if (print == true) this.imprimir(res.data)
 
