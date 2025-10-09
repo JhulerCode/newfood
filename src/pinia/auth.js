@@ -12,7 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
-        app_version: '1.5.7',
+        app_version: '1.5.8',
 
         menu: [
             {
@@ -323,68 +323,83 @@ export const useAuth = defineStore('auth', {
             })
         },
         listenSocket() {
+            // --- Pedidos --- //
             this.socket.on('vComanda:crear', (data) => {
                 useVistas().addItem('vPedidos', 'pedidos', data, 'first')
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.calculatePendientes()
-                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 
             this.socket.on('vComanda:addProductos', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos?.setIntervalTimeAgo()
             })
 
             this.socket.on('mPedidoDetalles:modificar', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
+                useVistas().vPedidos?.setIntervalTimeAgo()
             })
 
             this.socket.on('vPedidos:eliminar', (data) => {
                 useVistas().removeItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.calculatePendientes()
-                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 
             this.socket.on('vPedidos:anular', (data) => {
                 useVistas().removeItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.calculatePendientes()
-                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 
             this.socket.on('vPedidos:entregar', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.calculatePendientes()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
             })
 
             this.socket.on('mCambiarMesa:cambiar', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.setMesasPedidos()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.setMesasPedidos()
             })
 
             this.socket.on('mMesasUnir:unir', () => {
-                useVistas().vPedidos.loadSalones()
+                useVistas().vPedidos?.loadSalones()
             })
 
             this.socket.on('vEmitirComprobante:grabar', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
-                useVistas().vPedidos.setIntervalTimeAgo()
-                useVistas().vPedidos.calculatePendientes()
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
                 console.log(data.venta_canal)
-                if (data.venta_canal == 1) useVistas().vPedidos.setMesasPedidos()
+                if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 
             this.socket.on('pc_principal_socket_not_found', () => {
                 jmsg('error', 'DivergeRest Printer no iniciado')
             })
 
-            // this.socket.on('vColaboradores:actualizarTodos', () => {
-            //     window.location.reload()
-            // })
+            // --- Articulos --- //
+            this.socket.on('mArticulo:crear', () => {
+                useVistas().vComanda?.loadArticulos()
+            })
+
+            this.socket.on('mArticulo:modificar', () => {
+                useVistas().vComanda?.loadArticulos()
+            })
+
+            // --- Categorias --- //
+            this.socket.on('mArticuloCategoria:crear', () => {
+                useVistas().vComanda?.loadCategorias()
+            })
+
+            this.socket.on('mArticuloCategoria:modificar', () => {
+                useVistas().vComanda?.loadCategorias()
+            })
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')

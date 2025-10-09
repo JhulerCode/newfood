@@ -101,6 +101,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.addItem('vArticuloCategorias', 'articulo_categorias', res.data)
+
+            this.useAuth.socket.emit('mArticuloCategoria:crear')
+
             this.useModals.show.mArticuloCategoria = false
         },
         async modificar() {
@@ -113,6 +116,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.updateItem('vArticuloCategorias', 'articulo_categorias', res.data)
+
+            this.useAuth.socket.emit('mArticuloCategoria:modificar')
+
             this.useModals.show.mArticuloCategoria = false
         },
 

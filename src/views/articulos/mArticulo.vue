@@ -163,6 +163,9 @@ export default {
                 'articulos',
                 res.data,
             )
+
+            this.useAuth.socket.emit('mArticulo:crear')
+
             this.useModals.show.mArticulo = false
         },
         async modificar() {
@@ -180,6 +183,9 @@ export default {
                 'articulos',
                 res.data,
             )
+
+            this.useAuth.socket.emit('mArticulo:modificar')
+
             this.useModals.show.mArticulo = false
         },
 

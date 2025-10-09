@@ -288,6 +288,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.addItem('vCombos', 'articulos', res.data)
+
+            this.useAuth.socket.emit('mArticulo:crear')
+
             this.useModals.show.mCombo = false
         },
         async modificar() {
@@ -301,6 +304,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.updateItem('vCombos', 'articulos', res.data)
+
+            this.useAuth.socket.emit('mArticulo:modificar')
+
             this.useModals.show.mCombo = false
         },
 

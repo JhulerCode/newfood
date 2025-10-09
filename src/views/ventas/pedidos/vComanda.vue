@@ -30,51 +30,66 @@
         <div class="comanda">
             <div class="left">
                 <div class="container-categorias">
-                    <div>
-                        <strong>Categorias:</strong>
+                    <div v-if="isSmallScreen" class="container-header">
+                        <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
+
+                        <JdButton
+                            title="Recargar"
+                            icon="fa-solid fa-rotate-right"
+                            tipo="2"
+                            @click="loadCategorias"
+                        />
                     </div>
-                    <select
-                        v-model="vista.categoria"
-                        @change="loadArticulos()"
-                        class="select-categoria"
-                        v-if="isSmallScreen"
-                    >
-                        <option :value="null" v-if="this.vista.mode != 3">TODOS</option>
-                        <option v-for="(a, i) in vista.categorias" :key="i" :value="a.id">
-                            {{ a.nombre }}
-                        </option>
-                    </select>
 
-                    <ul class="categorias" v-else>
-                        <li
-                            class="categoria max-1line"
-                            :class="{ 'categoria-selected': vista.categoria == null }"
-                            @click="((vista.categoria = null), loadArticulos())"
-                            v-if="this.vista.mode != 3"
-                        >
-                            TODOS
-                        </li>
+                    <template v-else>
+                        <div class="container-header">
+                            <strong>Categorias:</strong>
+                            <JdButton
+                                title="Recargar"
+                                icon="fa-solid fa-rotate-right"
+                                tipo="2"
+                                @click="loadCategorias"
+                            />
+                        </div>
 
-                        <li
-                            v-for="(a, i) in vista.categorias || []"
-                            :key="i"
-                            class="categoria max-1line"
-                            :style="{ backgroundColor: a.color }"
-                            :class="{ 'categoria-selected': a.id == vista.categoria }"
-                            @click="((vista.categoria = a.id), loadArticulos())"
-                        >
-                            {{ a.nombre }}
-                        </li>
-                    </ul>
+                        <ul class="categorias">
+                            <li
+                                v-for="(a, i) in vista.categorias || []"
+                                :key="i"
+                                class="categoria-li"
+                                @click="vista.categoria = a.id"
+                            >
+                                <!-- <div v-if="a.id == vista.categoria">ASD</div> -->
+                                <i
+                                    class="fa-solid fa-caret-right"
+                                    v-if="a.id == vista.categoria"
+                                ></i>
+                                <div
+                                    class="categoria-box max-1line"
+                                    :style="{ backgroundColor: a.color }"
+                                    :class="{ 'categoria-selected': a.id == vista.categoria }"
+                                >
+                                    {{ a.nombre }}
+                                </div>
+                            </li>
+                        </ul>
+                    </template>
                 </div>
 
                 <div class="container-articulos">
-                    <div class="nombre">
+                    <div class="container-buscar">
                         <JdInput
                             icon="fa-solid fa-magnifying-glass"
                             type="search"
                             placeholder="Buscar por nombre..."
                             v-model="vista.txtBuscarArticulo"
+                        />
+
+                        <JdButton
+                            title="Recargar"
+                            icon="fa-solid fa-rotate-right"
+                            tipo="2"
+                            @click="loadArticulos"
                         />
                     </div>
 
@@ -348,11 +363,21 @@ export default {
     }),
     computed: {
         articulosFiltered() {
-            if (this.vista.txtBuscarArticulo == null) return this.vista.articulos
+            const { txtBuscarArticulo, categoria, articulos } = this.vista
 
-            const term = this.vista.txtBuscarArticulo.toLowerCase()
-            return this.vista.articulos.filter((a) => a.nombre.toLowerCase().includes(term))
+            if (!articulos) return []
+
+            if (!txtBuscarArticulo && categoria == 'TODOS') return articulos
+
+            const term = txtBuscarArticulo ? txtBuscarArticulo.toLowerCase() : ''
+
+            return articulos.filter((a) => {
+                const coincideTexto = term === '' || a.nombre.toLowerCase().includes(term)
+                const coincideCategoria = categoria == 'TODOS' || a.categoria == categoria
+                return coincideTexto && coincideCategoria
+            })
         },
+
         isSmallScreen() {
             if (this.vista.screenWidth == null) return false
             return this.vista.screenWidth < 1000
@@ -367,6 +392,8 @@ export default {
     },
     async created() {
         this.vista = this.useVistas.vComanda
+        this.vista.loadCategorias = this.loadCategorias
+        this.vista.loadArticulos = this.loadArticulos
         this.vista.detalle = 1
         this.handleResize()
 
@@ -377,10 +404,11 @@ export default {
             await this.loadPagoMetodos()
         }
 
-        if (this.vista.mode != 3) {
+        if (this.vista.categoriasLoaded != true) {
             await this.loadCategorias()
-            this.loadArticulos()
+            this.vista.categoria = 'TODOS'
         }
+        if (this.vista.articulosLoaded != true) await this.loadArticulos()
     },
     mounted() {
         window.addEventListener('resize', this.handleResize)
@@ -389,39 +417,6 @@ export default {
         window.removeEventListener('resize', this.handleResize)
     },
     methods: {
-        async loadColaboradores() {
-            const qry = {
-                fltr: {
-                    cargo: { op: 'Es', val: 'REPARTIDOR' },
-                    activo: { op: 'Es', val: true },
-                },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
-            }
-
-            this.vista.colaboradores = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.colaboradores = res.data
-        },
-        async loadPagoMetodos() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre'],
-            }
-
-            this.vista.pago_metodos = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.pago_metodos = res.data
-        },
         async loadCategorias() {
             const qry = {
                 fltr: {
@@ -431,13 +426,20 @@ export default {
                 cols: ['nombre', 'color'],
             }
 
+            this.vista.categoriasLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
+            this.vista.categoriasLoaded = true
             this.vista.categorias = res.data
+            this.vista.categorias.unshift({
+                id: 'TODOS',
+                nombre: 'TODOS',
+                color: 'var(--bg-color2)'
+            })
         },
         async loadArticulos() {
             const qry = {
@@ -454,14 +456,12 @@ export default {
                     'precios_semana',
                     'foto_path',
                     'foto_url',
+                    'categoria',
                 ],
                 incl: ['receta_insumos', 'combo_articulos', 'produccion_area1'],
             }
 
-            if (this.vista.categoria != null) {
-                qry.fltr.categoria = { op: 'Es', val: this.vista.categoria }
-            }
-
+            this.vista.articulosLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
@@ -469,6 +469,7 @@ export default {
 
             if (res.code != 0) return
 
+            this.vista.articulosLoaded = true
             this.vista.articulos = res.data
         },
         async loadSocios(txtBuscar) {
@@ -504,6 +505,39 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+        },
+        async loadColaboradores() {
+            const qry = {
+                fltr: {
+                    cargo: { op: 'Es', val: 'REPARTIDOR' },
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+            }
+
+            this.vista.colaboradores = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.colaboradores = res.data
+        },
+        async loadPagoMetodos() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+            }
+
+            this.vista.pago_metodos = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.pago_metodos = res.data
         },
 
         setSocio(item) {
@@ -724,7 +758,6 @@ export default {
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
         imprimir(data) {
-            console.log(data)
             let atencion = ''
 
             if (data.venta_canal == 1) {
@@ -762,7 +795,8 @@ export default {
             this[method](item)
         },
         regresar() {
-            this.useVistas.closePestana('vComanda', 'vPedidos')
+            // this.useVistas.closePestana('vComanda', 'vPedidos')
+            this.useVistas.showVista('vPedidos', 'ASD')
         },
 
         handleResize() {
@@ -793,6 +827,12 @@ export default {
             overflow: hidden;
             gap: 0.5rem;
 
+            .container-header {
+                display: flex;
+                justify-content: space-between;
+                gap: 0.5rem;
+            }
+
             select {
                 border-radius: 0.2rem;
                 border: var(--border);
@@ -801,20 +841,27 @@ export default {
             .categorias {
                 overflow-y: auto;
 
-                .categoria {
-                    padding: 0.5rem;
-                    font-size: 0.9rem;
-                    height: fit-content;
-                    border-radius: 0.3rem;
-                    cursor: pointer;
-                    margin-bottom: 0.5rem;
-                }
-            }
+                .categoria-li {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
 
-            .categoria-selected {
-                font-weight: bold;
-                // border: 1px solid var(--amarillo);
-                // box-shadow: 0 0 0.5rem var(--shadow-color);
+                    .categoria-box {
+                        padding: 0.5rem;
+                        font-size: 0.9rem;
+                        height: fit-content;
+                        border-radius: 0.3rem;
+                        cursor: pointer;
+                        margin-bottom: 0.5rem;
+                        width: 100%;
+                    }
+                }
+
+                // .categoria-selected {
+                //     font-weight: bold;
+                //     // border: 1px solid var(--amarillo);
+                //     // box-shadow: 0 0 0.5rem var(--shadow-color);
+                // }
             }
         }
 
@@ -827,7 +874,7 @@ export default {
             border-radius: 0 0.5rem 0.5rem 0;
             background-color: var(--bg-color2);
 
-            .nombre {
+            .container-buscar {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
@@ -1018,6 +1065,7 @@ export default {
 
             .container-categorias {
                 height: fit-content;
+                margin-bottom: 1rem;
             }
         }
     }
