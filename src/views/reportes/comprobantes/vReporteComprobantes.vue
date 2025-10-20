@@ -139,6 +139,17 @@ export default {
                 sort: true,
             },
             {
+                id: 'igv',
+                title: 'Igv',
+                type: 'number',
+                format: 'currency',
+                moneda: 'S/',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
                 id: 'estado',
                 title: 'Estado',
                 type: 'select',
@@ -293,6 +304,7 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('caja_apertura', 'empresa_datos', 'cliente_datos')
+            // this.vista.qry.incl.push('comprobante_items')
         },
         async loadComprobantes() {
             this.setQuery()
