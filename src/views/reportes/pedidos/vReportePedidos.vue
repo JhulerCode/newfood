@@ -256,12 +256,8 @@ export default {
                         ...res.data.venta_socio_datos,
                     },
                 ],
-                pago_metodos: [
-                    {
-                        id: res.data.venta_pago_metodo,
-                        ...res.data.venta_pago_metodo1,
-                    },
-                ],
+                pago_metodos: [{ ...res.data.venta_pago_metodo1 }],
+                transaccion_estados: [{ ...res.data.estado1 }],
             }
 
             this.useModals.setModal(

@@ -244,8 +244,21 @@ function getSubdominio() {
 function setFormData(item) {
     const formData = new FormData()
 
-    const { archivo, ...resto } = item
-    formData.append('archivo', archivo)
+    const { archivo, archivos, ...resto } = item
+
+    // Si hay un solo archivo (propiedad archivo)
+    if (archivo) {
+        formData.append('archivo', archivo)
+    }
+
+    // Si hay múltiples archivos (propiedad archivos como array)
+    if (archivos && Array.isArray(archivos)) {
+        archivos.forEach((file) => {
+            formData.append('archivos', file) // backend recibirá como array
+        })
+    }
+
+    // Agregar el resto de datos como JSON
     formData.append("datos", JSON.stringify(resto))
 
     return formData
