@@ -1,29 +1,11 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>
-                <template v-if="vista.mode == 1">Nuevo pedido</template>
-                <template v-if="vista.mode == 2">Añadir al pedido N°</template>
-                {{ vista.pedido.venta_codigo }} {{ atencion }}
-            </strong>
+            <strong>Nuevo pedido</strong>
 
             <div class="buttons">
-                <JdButton
-                    text="Regresar"
-                    icon="fa-solid fa-arrow-left"
-                    tipo="2"
-                    @click="regresar()"
-                />
-
-                <template v-if="vista.mode == 1 && useAuth.verifyPermiso('vPedidos:crear')">
-                    <JdButton text="Grabar" tipo="2" @click="crear()" />
-                    <JdButton text="Grabar e imprimir" @click="crear(true)" />
-                </template>
-
-                <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
-                    <JdButton text="Grabar" tipo="2" @click="addProductos()" />
-                    <JdButton text="Grabar e imprimir" @click="addProductos(true)" />
-                </template>
+                <JdButton text="Continuar" icon="fa-solid fa-arrow-right" @click="continuar()" />
+                <!-- <JdButton text="Grabar e imprimir" @click="crear(true)" /> -->
             </div>
         </div>
 
@@ -122,152 +104,72 @@
                 </div>
             </div>
 
-            <div
-                class="right"
-                :style="{
-                    'grid-template-rows': `${vista.mode != 2 ? 'auto 1fr auto' : '1fr auto'}`,
-                }"
-            >
-                <ul class="pedido-head" v-if="vista.mode != 2">
-                    <li @click="vista.detalle = 1" :class="{ activo: vista.detalle == 1 }">
-                        Pedido
-                    </li>
-                    <li @click="vista.detalle = 2" :class="{ activo: vista.detalle == 2 }">
-                        Detalles
-                    </li>
-                </ul>
-
-                <template v-if="vista.detalle == 1">
-                    <JdTable
-                        :columns="columns"
-                        :datos="vista.pedido.transaccion_items || []"
-                        height="100%"
-                        :columnsResizable="true"
-                        :seeker="false"
-                        :colAct="true"
-                        :colNro="false"
-                        :download="false"
-                        class="pedido-items"
-                        @onInput="runMethod"
-                    >
-                        <template v-slot:cAction="{ item }">
-                            <JdButton
-                                title="Quitar"
-                                icon="fa-solid fa-trash-can"
-                                tipo="2"
-                                :small="true"
-                                @click="quitar(item)"
-                                v-if="vista.mode != 3"
-                            />
-                        </template>
-
-                        <template v-slot:cNombre="{ item }">
-                            <div class="nombre">
-                                <p @click="openNotas(item)">
-                                    {{ item.articulo1.nombre }}
-                                </p>
-                                <ul v-if="item.is_combo" class="combo_items">
-                                    <li v-for="(a, i) in item.combo_articulos" :key="i">
-                                        <small>- ({{ a.cantidad }}) {{ a.articulo1.nombre }}</small>
-                                    </li>
-                                </ul>
-                            </div>
-                        </template>
-
-                        <template v-slot:cCantidad="{ item }">
-                            <div class="cantidad" v-if="vista.mode != 3">
-                                <ul>
-                                    <li @click="sumarRestar(1, item)">
-                                        <i class="fa-solid fa-plus"></i>
-                                    </li>
-                                    <li @click="sumarRestar(2, item)">
-                                        <i class="fa-solid fa-minus"></i>
-                                    </li>
-                                </ul>
-
-                                <JdInput
-                                    tipo="number"
-                                    v-model="item.cantidad"
-                                    :toRight="true"
-                                    @input="sumarUno(item)"
-                                />
-                            </div>
-
-                            <template v-else>
-                                {{ item.cantidad }}
-                            </template>
-                        </template>
-
-                        <template v-slot:cPu="{ item }">
-                            <template v-if="item.descuento_tipo">
-                                {{ item.pu_desc }}
-                            </template>
-
-                            <template v-else>
-                                {{ item.pu }}
-                            </template>
-                        </template>
-                    </JdTable>
-                </template>
-
-                <div class="pedido-detalles" v-if="vista.detalle == 2">
-                    <div
-                        v-if="vista.pedido.venta_canal == 2 || vista.pedido.venta_canal == 3"
-                        class="dato-cliente"
-                    >
-                        <JdSelectQuery
-                            icon="fa-solid fa-magnifying-glass"
-                            placeholder="Buscar cliente"
-                            v-model="vista.pedido.socio"
-                            :spin="vista.spinSocios"
-                            :lista="vista.socios || []"
-                            mostrar="doc_nombres"
-                            @search="loadSocios"
-                            @elegir="setSocio"
-                        />
-
+            <div class="right" style="grid-template-rows: 1fr auto">
+                <JdTable
+                    :columns="columns"
+                    :datos="vista.pedido?.transaccion_items || []"
+                    height="100%"
+                    :columnsResizable="true"
+                    :seeker="false"
+                    :colAct="true"
+                    :colNro="false"
+                    :download="false"
+                    class="pedido-items"
+                    @onInput="runMethod"
+                >
+                    <template v-slot:cAction="{ item }">
                         <JdButton
-                            icon="fa-solid fa-user-plus"
-                            title="Nuevo socio"
+                            title="Quitar"
+                            icon="fa-solid fa-trash-can"
                             tipo="2"
                             :small="true"
-                            @click="nuevoSocio()"
-                        />
-                    </div>
-
-                    <JdInput
-                        label="Nombres"
-                        :nec="true"
-                        v-model="vista.pedido.venta_socio_datos.nombres"
-                    />
-
-                    <template v-if="vista.pedido.venta_canal == 3">
-                        <JdInput
-                            label="Teléfono"
-                            :nec="true"
-                            v-model="vista.pedido.venta_socio_datos.telefono"
-                        />
-                        <JdInput
-                            label="Dirección"
-                            :nec="true"
-                            v-model="vista.pedido.venta_socio_datos.direccion"
-                        />
-                        <JdSelect
-                            label="Repartidor"
-                            v-model="vista.pedido.repartidor"
-                            :lista="vista.colaboradores || []"
-                            mostrar="nombres_apellidos"
-                        />
-                        <JdSelect
-                            label="Método de pago"
-                            :nec="true"
-                            v-model="vista.pedido.venta_pago_metodo"
-                            :lista="vista.pago_metodos || []"
+                            @click="quitar(item)"
                         />
                     </template>
 
-                    <JdInput label="Observación" v-model="vista.pedido.observacion" />
-                </div>
+                    <template v-slot:cNombre="{ item }">
+                        <div class="nombre">
+                            <p @click="openNotas(item)">
+                                {{ item.articulo1.nombre }}
+                            </p>
+                            <ul v-if="item.is_combo" class="combo_items">
+                                <li v-for="(a, i) in item.combo_articulos" :key="i">
+                                    <small>- ({{ a.cantidad }}) {{ a.articulo1.nombre }}</small>
+                                </li>
+                            </ul>
+                        </div>
+                    </template>
+
+                    <template v-slot:cCantidad="{ item }">
+                        <div class="cantidad">
+                            <ul>
+                                <li @click="sumarRestar(1, item)">
+                                    <i class="fa-solid fa-plus"></i>
+                                </li>
+                                <li @click="sumarRestar(2, item)">
+                                    <i class="fa-solid fa-minus"></i>
+                                </li>
+                            </ul>
+
+                            <JdInput
+                                tipo="number"
+                                v-model="item.cantidad"
+                                :toRight="true"
+                                @input="sumarUno(item)"
+                            />
+                        </div>
+                    </template>
+
+                    <template v-slot:cPu="{ item }">
+                        <template v-if="item.descuento_tipo">
+                            {{ item.pu_desc }}
+                        </template>
+
+                        <template v-else>
+                            {{ item.pu }}
+                        </template>
+                    </template>
+                </JdTable>
 
                 <div class="pedido-foot">
                     <div class="pedido-total">
@@ -313,7 +215,7 @@
 </template>
 
 <script>
-import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from '@jhuler/components'
+import { JdTable, JdButton, JdInput, JdSelect } from '@jhuler/components'
 
 import mPedidoItemNota from '@/views/ventas/pedidos/mPedidoItemNota.vue'
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
@@ -322,7 +224,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post, patch } from '@/utils/crud'
+import { urls, get } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
 import dayjs from 'dayjs'
@@ -333,7 +235,6 @@ export default {
         JdButton,
         JdTable,
         JdSelect,
-        JdSelectQuery,
         mPedidoItemNota,
         mSocio,
     },
@@ -385,24 +286,25 @@ export default {
         atencion() {
             if (this.vista.pedido.venta_canal == 1) {
                 return `(${this.vista.pedido.venta_mesa1.salon1.nombre} - ${this.vista.pedido.venta_mesa1.nombre})`
+            } else if (this.vista.pedido.venta_canal == 2) {
+                return '(PARA LLEVAR)'
+            } else if (this.vista.pedido.venta_canal == 3) {
+                return '(DELIVERY)'
             } else {
-                return this.vista.pedido.venta_canal == 2 ? '(PARA LLEVAR)' : '(DELIVERY)'
+                return ''
             }
         },
     },
     async created() {
-        this.vista = this.useVistas.vComanda
-        this.vista.loadCategorias = this.loadCategorias
-        this.vista.loadArticulos = this.loadArticulos
-        this.vista.detalle = 1
         this.handleResize()
 
-        this.sumarItems()
+        this.vista = this.useVistas.vPos
+        this.vista.loadCategorias = this.loadCategorias
+        this.vista.loadArticulos = this.loadArticulos
+        this.vista.initPedido = this.initPedido
 
-        if (this.vista.pedido.venta_canal == 3) {
-            await this.loadColaboradores()
-            await this.loadPagoMetodos()
-        }
+        if (this.vista.pedido == null) this.initPedido()
+        this.sumarItems()
 
         if (this.vista.categoriasLoaded != true) {
             await this.loadCategorias()
@@ -506,65 +408,23 @@ export default {
 
             this.vista.socios = res.data
         },
-        async loadColaboradores() {
-            const qry = {
-                fltr: {
-                    cargo: { op: 'Es', val: 'REPARTIDOR' },
-                    activo: { op: 'Es', val: true },
+
+        initPedido() {
+            this.vista.pedido = {
+                tipo: 2,
+                venta_canal: 4,
+                socio: `${this.useAuth.usuario.empresa.subdominio}-CLIENTES-VARIOS`,
+                venta_socio_datos: {
+                    doc_tipo: '0',
+                    doc_numero: '00000000',
+                    doc_nombres: '00000000 - CLIENTES VARIOS',
+                    nombres: 'CLIENTES VARIOS',
                 },
-                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+                pago_condicion: 1,
+                estado: 1,
+                venta_entregado: false,
+                transaccion_items: [],
             }
-
-            this.vista.colaboradores = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.colaboradores = res.data
-        },
-        async loadPagoMetodos() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre'],
-            }
-
-            this.vista.pago_metodos = []
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.vista.pago_metodos = res.data
-        },
-
-        setSocio(item) {
-            if (item) {
-                this.vista.pedido.venta_socio_datos = {
-                    doc_tipo: item.doc_tipo,
-                    doc_numero: item.doc_numero,
-                    doc_nombres: item.doc_nombres,
-                    nombres: item.nombres,
-                    telefono: item.telefono,
-                    direccion: item.direccion,
-                    referencia: item.referencia,
-                }
-            } else {
-                this.vista.pedido.venta_socio_datos = {}
-            }
-        },
-        nuevoSocio() {
-            const send = { tipo: 2, activo: true }
-
-            this.useModals.setModal('mSocio', 'Nuevo cliente', 1, send)
-        },
-        setSocioCreated(item) {
-            this.vista.socios = [item]
-            this.vista.pedido.socio = item.id
-
-            this.setSocio(item)
         },
         showPrecio(item) {
             const numeroDiaSemana = dayjs().day()
@@ -682,49 +542,11 @@ export default {
                     return true
                 }
             }
-
-            if (this.vista.pedido.venta_canal == 2 || this.vista.pedido.venta_canal == 3) {
-                if (incompleteData(this.vista.pedido.venta_socio_datos, ['nombres'])) {
-                    jmsg('warning', 'Ingrese los datos del cliente en Detalles')
-                    return true
-                }
-            }
-
-            if (this.vista.pedido.venta_canal == 3) {
-                if (
-                    incompleteData(this.vista.pedido.venta_socio_datos, ['direccion', 'telefono'])
-                ) {
-                    jmsg('warning', 'Ingrese los datos del cliente en Detalles')
-                    return true
-                }
-
-                if (incompleteData(this.vista.pedido, ['venta_pago_metodo'])) {
-                    jmsg('warning', 'Ingrese el método de pago en Detalles')
-                    return true
-                }
-
-                if (
-                    this.vista.pedido.venta_pago_metodo ==
-                        `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
-                    (this.vista.pedido.venta_pago_con || 0) <
-                        Number(this.vista.mtoImpVenta.toFixed(2))
-                ) {
-                    jmsg('warning', 'El monto de pago no es suficiente')
-                    return true
-                }
-            }
         },
         shapeDatos() {
-            this.vista.pedido.fecha = dayjs().format('YYYY-MM-DD')
+            // this.vista.pedido.fecha = dayjs().format('YYYY-MM-DD')
             this.vista.pedido.venta_codigo = genId()
-            this.vista.pedido.monto = this.vista.mtoImpVenta
-
-            if (
-                this.vista.pedido.venta_pago_metodo !=
-                `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO`
-            ) {
-                this.vista.pedido.venta_pago_con = null
-            }
+            // this.vista.pedido.monto = this.vista.mtoImpVenta
         },
         // async crear1() {
         //     if (this.checkDatos()) return
@@ -732,77 +554,36 @@ export default {
 
         //     console.log(this.vista.pedido)
         // },
-        async crear(print) {
+        async continuar() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await post(urls.transacciones, this.vista.pedido)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useAuth.socket.emit('vComanda:crear', res.data)
-
-            if (print == true) this.imprimir(res.data)
-
-            this.useVistas.closePestana('vComanda', 'vPedidos')
-        },
-        async addProductos(print) {
-            if (this.checkDatos()) return
-            this.vista.pedido.monto = this.vista.mtoImpVenta
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(`${urls.transacciones}/add-productos`, this.vista.pedido)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.useAuth.socket.emit('vComanda:addProductos', res.data)
-
-            if (print == true) this.imprimir(res.data)
-
-            this.useVistas.closePestana('vComanda', 'vPedidos')
-        },
-        imprimir(data) {
-            let atencion = ''
-
-            if (data.venta_canal == 1) {
-                atencion = `${data.venta_mesa1.salon1.nombre} - ${data.venta_mesa1.nombre}`
-            } else if (data.venta_canal == 2) {
-                atencion = 'PARA LLEVAR'
-            } else if (data.venta_canal == 3) {
-                atencion = 'DELIVERY'
-            }
             const send = {
-                createdAt: data.createdAt,
-                atencion,
-                venta_codigo: data.venta_codigo,
-                is_reprint: false,
-                productos: this.vista.pedido.transaccion_items,
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                comprobante: {
+                    socio: this.vista.pedido.socio,
+                    pago_condicion: this.vista.pedido.pago_condicion,
+                    estado: 1,
+                    fecha_emision: dayjs().format('YYYY-MM-DD'),
+
+                    comprobante_items: this.vista.pedido.transaccion_items,
+
+                    transaccion1: {
+                        tipo: this.vista.pedido.tipo,
+                        venta_canal: this.vista.pedido.venta_canal,
+                        venta_codigo: this.vista.pedido.venta_codigo,
+                    },
+                },
+                socio: { id: this.vista.pedido.socio, ...this.vista.pedido.venta_socio_datos },
+                socios: [{ id: this.vista.pedido.socio, ...this.vista.pedido.venta_socio_datos }],
             }
-
-            this.useAuth.socket.emit('vComanda:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
+            this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante', send)
         },
 
         runMethod(method, item) {
             this[method](item)
         },
         regresar() {
-            // this.useVistas.closePestana('vComanda', 'vPedidos')
+            // this.useVistas.closePestana('vPos', 'vPedidos')
             this.useVistas.showVista('vPedidos', 'ASD')
         },
 
@@ -981,6 +762,10 @@ export default {
 
                 p {
                     cursor: pointer;
+                }
+
+                &:hover {
+                    text-decoration: underline;
                 }
             }
 

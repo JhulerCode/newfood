@@ -238,9 +238,19 @@ export default {
     }),
     computed: {
         vistas() {
-            return this.useAuth.menu
+            let vistas = this.useAuth.menu
                 .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
+
+            const tipo = this.useAuth.usuario.empresa?.tipo
+
+            if (tipo === 1) {
+                vistas = vistas.filter((c) => c.id !== 'vPos')
+            } else {
+                vistas = vistas.filter((c) => c.id !== 'vPedidos')
+            }
+
+            return vistas
         },
     },
     created() {

@@ -5,6 +5,7 @@
                 Emitir comprobante - Pedido N° {{ vista.comprobante.transaccion1.venta_codigo }}
                 {{ atencion }}
             </strong>
+            <!-- ASD {{ vista.comprobante.transaccion1 }} -->
 
             <div class="buttons">
                 <JdButton
@@ -303,7 +304,13 @@ export default {
         reloadSocio: false,
 
         columnsArticulos: [
-            { id: 'nombre', width: '15rem', title: 'Producto', show: true },
+            {
+                id: 'nombre',
+                prop: 'articulo1.nombre',
+                width: '15rem',
+                title: 'Producto',
+                show: true,
+            },
             {
                 id: 'cantidad',
                 title: 'Cantidad',
@@ -378,10 +385,12 @@ export default {
         atencion() {
             if (this.vista.comprobante.transaccion1.venta_canal == 1) {
                 return `(${this.vista.comprobante.transaccion1.venta_mesa1.salon1.nombre} - ${this.vista.comprobante.transaccion1.venta_mesa1.nombre})`
+            } else if (this.vista.comprobante.transaccion1.venta_canal == 2) {
+                return '(PARA LLEVAR)'
+            } else if (this.vista.comprobante.transaccion1.venta_canal == 3) {
+                return '(DELIVERY)'
             } else {
-                return this.vista.comprobante.transaccion1.venta_canal == 2
-                    ? '(PARA LLEVAR)'
-                    : '(DELIVERY)'
+                return ''
             }
         },
     },
@@ -1294,8 +1303,8 @@ export default {
             for (const a of this.vista.comprobante.comprobante_items) {
                 const props1 = [
                     'articulo',
-                    'nombre',
-                    'unidad',
+                    // 'nombre',
+                    // 'unidad',
                     'cantidad',
                     'pu',
                     'igv',
@@ -1374,7 +1383,14 @@ export default {
             if (print == true) await this.imprimir(res.data)
 
             this.useAuth.socket.emit('vEmitirComprobante:grabar', res.data_transaccion)
-            this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
+            if (this.vista.comprobante.transaccion1.venta_canal == '4') {
+                this.useVistas.closePestana('vEmitirComprobante', 'vPos')
+                this.useVistas.vPos.initPedido()
+            } else {
+                this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
+            }
+
+            this.vista.comprobante.transaccion1.venta_canal = null
         },
         async imprimir(data) {
             const send = {
@@ -1405,7 +1421,13 @@ export default {
             this[method](item)
         },
         regresar() {
-            this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
+            if (this.vista.comprobante.transaccion1.venta_canal == '4') {
+                this.useVistas.closePestana('vEmitirComprobante', 'vPos')
+            } else {
+                this.useVistas.closePestana('vEmitirComprobante', 'vPedidos')
+            }
+
+            this.vista.comprobante.transaccion1.venta_canal = null
         },
     },
 }

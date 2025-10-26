@@ -123,7 +123,7 @@
                         v-model="vista.empresa.igv_porcentaje"
                     />
 
-                    <JdInput label="Usuario SOL" :nec="true" v-model="vista.empresa.sol_usuario" />
+                    <!-- <JdInput label="Usuario SOL" :nec="true" v-model="vista.empresa.sol_usuario" />
 
                     <JdInputPassword
                         label="Clave SOL"
@@ -131,7 +131,7 @@
                         v-model="vista.empresa.sol_clave"
                     />
 
-                    <JdButton text="Subir certificado" tipo="2" @click="subirCdt" />
+                    <JdButton text="Subir certificado" tipo="2" @click="subirCdt" /> -->
 
                     <!-- <JdInputFile
                         label="Certificado (CDT)"
@@ -145,7 +145,7 @@
                     /> -->
                 </div>
 
-                <div class="datos-secundarios mrg-top2">
+                <!-- <div class="datos-secundarios mrg-top2">
                     <strong>Impresión</strong>
 
                     <JdInput
@@ -153,7 +153,7 @@
                         :nec="true"
                         v-model="vista.empresa.pc_principal_ip"
                     />
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
@@ -162,7 +162,7 @@
 </template>
 
 <script>
-import { JdButton, JdInput, JdInputFile, JdInputPassword } from '@jhuler/components'
+import { JdButton, JdInput, JdInputFile } from '@jhuler/components'
 import mEmpresaCdt from './mEmpresaCdt.vue'
 
 import { useAuth } from '@/pinia/auth'
@@ -178,7 +178,7 @@ export default {
         JdButton,
         JdInput,
         JdInputFile,
-        JdInputPassword,
+        // JdInputPassword,
         mEmpresaCdt,
     },
     data: () => ({
@@ -226,10 +226,10 @@ export default {
                 'logo',
 
                 'igv_porcentaje',
-                'sol_usuario',
-                'sol_clave',
+                // 'sol_usuario',
+                // 'sol_clave',
 
-                'pc_principal_ip',
+                // 'pc_principal_ip',
             ]
 
             if (incompleteData(this.vista.empresa, props)) {

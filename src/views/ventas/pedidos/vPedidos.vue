@@ -772,9 +772,6 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante')
-            const vistaEmitirComprobante = this.useVistas.vEmitirComprobante
-
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)
                 .map((a) => ({
@@ -787,33 +784,37 @@ export default {
                     venta_entregado: a.venta_entregado,
                     cantidadMax: a.cantidad - a.venta_entregado,
 
-                    nombre: a.articulo1.nombre,
-                    unidad: a.articulo1.unidad,
+                    // nombre: a.articulo1.nombre,
+                    // unidad: a.articulo1.unidad,
+                    articulo1: a.articulo1,
                     cantidad: a.cantidad - a.venta_entregado,
                     pu: a.pu,
                     igv_afectacion: a.igv_afectacion,
                     igv_porcentaje: a.igv_porcentaje,
                 }))
 
-            vistaEmitirComprobante.comprobante = {
-                socio: res.data.socio,
-                pago_condicion: res.data.pago_condicion,
-                estado: 1,
-                fecha_emision: dayjs().format('YYYY-MM-DD'),
+            const send = {
+                comprobante: {
+                    socio: res.data.socio,
+                    pago_condicion: res.data.pago_condicion,
+                    estado: 1,
+                    fecha_emision: dayjs().format('YYYY-MM-DD'),
 
-                comprobante_items,
+                    comprobante_items,
 
-                transaccion: res.data.id,
-                transaccion1: {
-                    id: res.data.id,
-                    venta_codigo: res.data.venta_codigo,
-                    venta_canal: res.data.venta_canal,
-                    venta_mesa1: res.data.venta_mesa1,
+                    transaccion: res.data.id,
+                    transaccion1: {
+                        id: res.data.id,
+                        venta_codigo: res.data.venta_codigo,
+                        venta_canal: res.data.venta_canal,
+                        venta_mesa1: res.data.venta_mesa1,
+                    },
                 },
+                socio: { id: res.data.socio, ...res.data.venta_socio_datos },
+                socios: [{ id: res.data.socio, ...res.data.venta_socio_datos }],
             }
 
-            vistaEmitirComprobante.socio = { id: res.data.socio, ...res.data.venta_socio_datos }
-            vistaEmitirComprobante.socios = [vistaEmitirComprobante.socio]
+            this.useVistas.showVista('vEmitirComprobante', 'Emitir comprobante', send)
         },
         async verComprobantes(item) {
             const send = {

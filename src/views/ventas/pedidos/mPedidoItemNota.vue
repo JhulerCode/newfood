@@ -1,6 +1,10 @@
 <template>
     <JdModal modal="mPedidoItemNota" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
+            <p>
+                <small>Para:</small>
+                {{ modal.item.articulo1.nombre }}
+            </p>
             <JdTextArea v-model="modal.item.observacion" />
         </div>
     </JdModal>

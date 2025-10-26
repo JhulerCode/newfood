@@ -35,7 +35,7 @@
             />
 
             <JdSelect
-                label="Área de producción"
+                label="Área de impresión"
                 :nec="true"
                 v-model="articulo.produccion_area"
                 :lista="modal.produccion_areas || []"

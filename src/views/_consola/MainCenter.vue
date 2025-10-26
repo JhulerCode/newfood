@@ -7,6 +7,7 @@
         <vPedidos v-if="useVistas.show.vPedidos" />
         <vComanda v-if="useVistas.show.vComanda" />
         <vEmitirComprobante v-if="useVistas.show.vEmitirComprobante" />
+        <vPos v-if="useVistas.show.vPos" />
 
         <vCajaResumen v-if="useVistas.show.vCajaResumen" />
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
@@ -39,12 +40,13 @@ import { useVistas } from '@/pinia/vistas.js'
 //----- COMPRAS --- //
 import vProveedores from '@/views/compras/proveedores/vProveedores.vue'
 import vCompras from '@/views/compras/compras/vCompras.vue'
-import vEmitirComprobante from '@/views/ventas/pedidos/vEmitirComprobante.vue'
 
 //----- VENTAS --- //
 import vClientes from '@/views/ventas/clientes/vClientes.vue'
 import vPedidos from '@/views/ventas/pedidos/vPedidos.vue'
 import vComanda from '@/views/ventas/pedidos/vComanda.vue'
+import vEmitirComprobante from '@/views/ventas/pedidos/vEmitirComprobante.vue'
+import vPos from '@/views/ventas/pedidos/vPos.vue'
 
 //----- CAJA --- //
 import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
@@ -82,6 +84,7 @@ export default {
         vPedidos,
         vComanda,
         vEmitirComprobante,
+        vPos,
 
         vCajaResumen,
         vCajaMovimientos,

@@ -5,7 +5,8 @@
         </div>
 
         <div class="container-logo">
-            <img src="@/assets/img/logo.webp" />
+            <!-- <img src="@/assets/img/logo-dark.webp" v-if="useAuth.isDarkMode"/> -->
+            <img src="@/assets/img/logo.webp"/>
         </div>
 
         <div class="info">
@@ -105,7 +106,6 @@ export default {
     align-items: center;
     flex-direction: column;
     border-radius: 0 2rem 2rem 0;
-    background-color: rgba(250, 250, 250, 0.5);
     backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
 
@@ -139,13 +139,13 @@ export default {
 
     .container-logo {
         height: 8rem;
-        width: 100%;
+        max-width: 20rem;
         margin-bottom: 2rem;
 
         img {
-            background-color: white;
             border-radius: 1rem;
             max-height: 100%;
+            max-width: 100%;
         }
     }
 
@@ -167,11 +167,4 @@ export default {
         height: 3rem;
     }
 }
-
-// @media (max-width: 900px) {
-//     .right {
-//         width: 100vw !important;
-//         max-width: 100vw !important;
-//     }
-// }
 </style>

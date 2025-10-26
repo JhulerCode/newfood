@@ -12,7 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
-        app_version: '1.6.1',
+        app_version: '1.6.2',
 
         menu: [
             {
@@ -68,6 +68,11 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vPedidos:unirMesas', label: 'Unir mesas' },
                             { id: 'vPedidos:cambiarMesa', label: 'Cambiar mesa' },
+                        ]
+                    },
+                    {
+                        label: 'Punto de venta', goto: 'vPos', permisos: [
+                            { id: 'vPos:crear', label: 'Crear' },
                         ]
                     }
                 ]
