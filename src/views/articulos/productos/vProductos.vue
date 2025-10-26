@@ -297,6 +297,7 @@ export default {
         hideColumns() {
             if (this.useAuth.usuario.empresa.tipo == 2) {
                 this.columns[7].show = false
+                this.columns[8].show = false
             }
         },
         setQuery() {

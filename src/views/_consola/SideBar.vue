@@ -62,8 +62,8 @@ export default {
                 .filter((seccion) => seccion !== null)
 
             const tipo = this.useAuth.usuario.empresa?.tipo
-            const ventas = menu.find((s) => s.id === 'ventas')
 
+            const ventas = menu.find((s) => s.id === 'ventas')
             if (ventas && Array.isArray(ventas.children)) {
                 if (tipo === 1) {
                     ventas.children = ventas.children.filter((c) => c.goto !== 'vPos')
@@ -72,11 +72,19 @@ export default {
                 }
             }
 
-            const ajustes = menu.find((s) => s.id === 'ajustes')
+            const articulos = menu.find((s) => s.id === 'articulos')
+            if (articulos && Array.isArray(articulos.children)) {
+                if (tipo === 2) {
+                    articulos.children = articulos.children.filter((c) => c.goto !== 'vInsumos')
+                }
+            }
 
+            const ajustes = menu.find((s) => s.id === 'ajustes')
             if (ajustes && Array.isArray(ajustes.children)) {
                 if (tipo === 2) {
-                    ajustes.children = ajustes.children.filter((c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas')
+                    ajustes.children = ajustes.children.filter(
+                        (c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas',
+                    )
                 }
             }
 
