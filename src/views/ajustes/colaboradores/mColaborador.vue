@@ -247,7 +247,10 @@ export default {
             if (tipo === 1) {
                 vistas = vistas.filter((c) => c.id !== 'vPos')
             } else {
-                vistas = vistas.filter((c) => c.id !== 'vPedidos')
+                vistas = vistas.filter(
+                    (c) =>
+                        c.id !== 'vPedidos' && c.id !== 'vSalones' && c.id !== 'vProduccionAreas',
+                )
             }
 
             return vistas

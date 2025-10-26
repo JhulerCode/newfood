@@ -235,7 +235,7 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        label: 'Áreas de producción', goto: 'vProduccionAreas', permisos: [
+                        label: 'Áreas de impresión', goto: 'vProduccionAreas', permisos: [
                             { id: 'vProduccionAreas:listar', label: 'Listar' },
                             { id: 'vProduccionAreas:crear', label: 'Crear' },
                             { id: 'vProduccionAreas:editar', label: 'Editar' },

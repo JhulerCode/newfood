@@ -12,13 +12,13 @@
                     @change="importar"
                 />
 
-                <JdButton
+                <!-- <JdButton
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
                     @click="this.$refs.excel.click()"
                     v-if="useAuth.verifyPermiso('vProductos:crearBulk')"
-                />
+                /> -->
 
                 <JdButton
                     text="Nuevo"
@@ -177,8 +177,8 @@ export default {
             },
             {
                 id: 'produccion_area',
-                title: 'Área de producción',
-                prop: 'produccion_area1.nombre',
+                title: 'Área de impresión',
+                prop: 'produccion_area1.impresora',
                 type: 'select',
                 editable: true,
                 width: '10rem',
@@ -286,6 +286,7 @@ export default {
         this.vista = this.useVistas.vProductos
         this.useAuth.setColumns(this.tableName, this.columns)
         this.columns[1].host = urls.uploads
+        this.hideColumns()
 
         this.verifyRowSelectIsActive()
 
@@ -293,6 +294,11 @@ export default {
         if (this.useAuth.verifyPermiso('vProductos:listar') == true) this.loadArticulos()
     },
     methods: {
+        hideColumns() {
+            if (this.useAuth.usuario.empresa.tipo == 2) {
+                this.columns[7].show = false
+            }
+        },
         setQuery() {
             this.vista.qry = {
                 fltr: {

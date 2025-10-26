@@ -34,14 +34,16 @@
                 style="grid-column: 1/4"
             />
 
-            <JdSelect
-                label="Área de impresión"
-                :nec="true"
-                v-model="articulo.produccion_area"
-                :lista="modal.produccion_areas || []"
-                style="grid-column: 1/3"
-                v-if="articulo.tipo == 2"
-            />
+            <template v-if="useAuth.usuario.empresa.tipo == 1">
+                <JdSelect
+                    label="Área de impresión"
+                    :nec="true"
+                    v-model="articulo.produccion_area"
+                    :lista="modal.produccion_areas || []"
+                    style="grid-column: 1/3"
+                    v-if="articulo.tipo == 2"
+                />
+            </template>
 
             <JdInput
                 label="Precio de venta"
@@ -61,12 +63,14 @@
                 style="grid-column: 1/3"
             />
 
-            <JdSwitch
-                label="Es producto transformado?"
-                v-model="articulo.has_receta"
-                style="grid-column: 1/3"
-                v-if="articulo.tipo == 2"
-            />
+            <template v-if="useAuth.usuario.empresa.tipo == 1">
+                <JdSwitch
+                    label="Es producto transformado?"
+                    v-model="articulo.has_receta"
+                    style="grid-column: 1/3"
+                    v-if="articulo.tipo == 2"
+                />
+            </template>
 
             <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
 
@@ -136,7 +140,11 @@ export default {
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'unidad', 'igv_afectacion']
 
-            if (this.articulo.tipo == 2) props.push('produccion_area', 'has_receta', 'precio_venta')
+            if (this.useAuth.usuario.empresa.tipo == 1) {
+                if (this.articulo.tipo == 2) props.push('produccion_area', 'has_receta')
+            }
+
+            if (this.articulo.tipo == 2) props.push('precio_venta')
 
             if (incompleteData(this.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

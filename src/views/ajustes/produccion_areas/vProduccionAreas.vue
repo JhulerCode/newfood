@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Áreas de producción</strong>
+            <strong>Áreas de impresión</strong>
 
             <div class="buttons">
                 <JdButton
@@ -141,7 +141,7 @@ export default {
         nuevo() {
             const item = { activo: true }
 
-            this.useModals.setModal('mProduccionArea', 'Nueva área de producción', 1, item)
+            this.useModals.setModal('mProduccionArea', 'Nueva área de impresión', 1, item)
         },
 
         runMethod(method, item) {
@@ -154,7 +154,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mProduccionArea', 'Editar área de producción', 2, res.data)
+            this.useModals.setModal('mProduccionArea', 'Editar área de impresión', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

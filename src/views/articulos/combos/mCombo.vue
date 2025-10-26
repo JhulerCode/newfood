@@ -24,13 +24,15 @@
                 style="grid-column: 1/4"
             />
 
-            <JdSelect
-                label="Área de producción"
-                :nec="true"
-                v-model="articulo.produccion_area"
-                :lista="modal.produccion_areas || []"
-                style="grid-column: 1/4"
-            />
+            <template v-if="useAuth.usuario.empresa.tipo == 1">
+                <JdSelect
+                    label="Área de impresión"
+                    :nec="true"
+                    v-model="articulo.produccion_area"
+                    :lista="modal.produccion_areas || []"
+                    style="grid-column: 1/4"
+                />
+            </template>
 
             <JdInput
                 label="Precio de venta"
@@ -254,6 +256,10 @@ export default {
 
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'igv_afectacion']
+
+            if (this.useAuth.usuario.empresa.tipo == 1) {
+                if (this.articulo.tipo == 2) props.push('produccion_area')
+            }
 
             if (incompleteData(this.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')

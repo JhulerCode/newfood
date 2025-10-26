@@ -439,6 +439,8 @@ export default {
             if (i === -1) {
                 this.vista.pedido.transaccion_items.push({
                     articulo: item.id,
+                    nombre: item.nombre,
+                    unidad: item.unidad,
                     articulo1: {
                         nombre: item.nombre,
                         unidad: item.unidad,

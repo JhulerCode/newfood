@@ -140,7 +140,7 @@ export default {
             },
             {
                 id: 'produccion_area',
-                title: 'Área de producción',
+                title: 'Área de impresión',
                 prop: 'produccion_area1.nombre',
                 type: 'select',
                 editable: true,
@@ -186,11 +186,17 @@ export default {
         this.vista = this.useVistas.vCombos
         this.useAuth.setColumns(this.tableName, this.columns)
         this.columns[1].host = urls.uploads
+        this.hideColumns()
 
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vCombos:listar') == true) this.loadArticulos()
     },
     methods: {
+        hideColumns() {
+            if (this.useAuth.usuario.empresa.tipo == 2) {
+                this.columns[6].show = false
+            }
+        },
         setQuery() {
             this.vista.qry = {
                 fltr: {

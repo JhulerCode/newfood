@@ -72,6 +72,14 @@ export default {
                 }
             }
 
+            const ajustes = menu.find((s) => s.id === 'ajustes')
+
+            if (ajustes && Array.isArray(ajustes.children)) {
+                if (tipo === 2) {
+                    ajustes.children = ajustes.children.filter((c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas')
+                }
+            }
+
             return menu
         },
     },

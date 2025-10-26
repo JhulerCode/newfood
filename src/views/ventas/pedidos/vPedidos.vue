@@ -784,9 +784,9 @@ export default {
                     venta_entregado: a.venta_entregado,
                     cantidadMax: a.cantidad - a.venta_entregado,
 
-                    // nombre: a.articulo1.nombre,
-                    // unidad: a.articulo1.unidad,
                     articulo1: a.articulo1,
+                    nombre: a.articulo1.nombre,
+                    unidad: a.articulo1.unidad,
                     cantidad: a.cantidad - a.venta_entregado,
                     pu: a.pu,
                     igv_afectacion: a.igv_afectacion,

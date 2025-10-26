@@ -12,13 +12,13 @@
                     @change="importar"
                 />
 
-                <JdButton
+                <!-- <JdButton
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
                     @click="this.$refs.excel.click()"
                     v-if="useAuth.verifyPermiso('vInsumos:crearBulk')"
-                />
+                /> -->
 
                 <JdButton
                     text="Nuevo"
