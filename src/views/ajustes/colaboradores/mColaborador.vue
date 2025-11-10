@@ -259,7 +259,7 @@ export default {
             return vistas
         },
         menuFiltrado() {
-            const menu = this.useAuth.menu
+            const menu = JSON.parse(JSON.stringify(this.useAuth.menu))
 
             const tipo = this.useAuth.usuario.empresa?.tipo
 
@@ -326,8 +326,6 @@ export default {
                 return true
             }
 
-            this.colaborador.permisos = this.recolectarPermisosSeleccionados()
-
             // if (this.colaborador.has_signin) {
             //     const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
 
@@ -339,12 +337,12 @@ export default {
 
             return false
         },
-        // shapeDatos() {
-        //     this.colaborador.permisos = this.recolectarPermisosSeleccionados()
-        // },
+        shapeDatos() {
+            this.colaborador.permisos = this.recolectarPermisosSeleccionados()
+        },
         async crear() {
             if (this.checkDatos()) return
-            // this.shapeDatos()
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Creando...')
             const res = await post(urls.colaboradores, this.colaborador)
@@ -358,7 +356,7 @@ export default {
         },
         async modificar() {
             if (this.checkDatos()) return
-            // this.shapeDatos()
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.colaboradores, this.colaborador)
@@ -427,6 +425,7 @@ export default {
                     }
                 }
             }
+
             return permisos
         },
         toggleGrupo(id) {

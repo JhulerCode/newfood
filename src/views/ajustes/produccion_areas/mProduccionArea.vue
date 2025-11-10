@@ -17,7 +17,7 @@
             />
 
             <JdInput
-                :label="impresora_tipo == 1 ? 'Impresora nombre' : 'Impresora ip'"
+                :label="modal.item.impresora_tipo == 1 ? 'Impresora nombre' : 'Impresora ip'"
                 :nec="true"
                 v-model="modal.item.impresora"
                 :disabled="modal.mode == 3"
