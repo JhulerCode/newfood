@@ -136,7 +136,7 @@
                         <strong>--- Permisos ---</strong>
                     </div>
 
-                    <div v-for="a in menuFiltrado || []" :key="a.id">
+                    <div v-for="a in useAuth.menu || []" :key="a.id">
                         <div class="grupo-header" @click="toggleGrupo(a.id)">
                             {{ a.label }}
 
@@ -258,38 +258,6 @@ export default {
 
             return vistas
         },
-        menuFiltrado() {
-            const menu = JSON.parse(JSON.stringify(this.useAuth.menu))
-
-            const tipo = this.useAuth.usuario.empresa?.tipo
-
-            const ventas = menu.find((s) => s.id === 'ventas')
-            if (ventas && Array.isArray(ventas.children)) {
-                if (tipo === 1) {
-                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPos')
-                } else {
-                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPedidos')
-                }
-            }
-
-            const articulos = menu.find((s) => s.id === 'articulos')
-            if (articulos && Array.isArray(articulos.children)) {
-                if (tipo === 2) {
-                    articulos.children = articulos.children.filter((c) => c.goto !== 'vInsumos')
-                }
-            }
-
-            const ajustes = menu.find((s) => s.id === 'ajustes')
-            if (ajustes && Array.isArray(ajustes.children)) {
-                if (tipo === 2) {
-                    ajustes.children = ajustes.children.filter(
-                        (c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas',
-                    )
-                }
-            }
-
-            return menu
-        },
     },
     created() {
         this.modal = this.useModals.mColaborador
@@ -297,6 +265,7 @@ export default {
 
         this.showButtons()
         this.loadDatosSistema()
+        this.menuFiltradoPorTipoNegocio()
         this.sincronizarChecksConPermisos()
     },
     methods: {
@@ -325,15 +294,6 @@ export default {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
-
-            // if (this.colaborador.has_signin) {
-            //     const asd = this.colaborador.permisos.includes(this.colaborador.vista_inicial)
-
-            //     if (!asd) {
-            //         jmsg('error', 'Seleccione una vista inicial que tenga permiso')
-            //         return true
-            //     }
-            // }
 
             return false
         },
@@ -539,6 +499,39 @@ export default {
 
             this.colaborador.permisos = permisos[this.colaborador.cargo]
             this.sincronizarChecksConPermisos()
+        },
+
+        menuFiltradoPorTipoNegocio() {
+            const menu = JSON.parse(JSON.stringify(this.useAuth.menu))
+
+            const tipo = this.useAuth.usuario.empresa?.tipo
+
+            const ventas = menu.find((s) => s.id === 'ventas')
+            if (ventas && Array.isArray(ventas.children)) {
+                if (tipo === 1) {
+                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPos')
+                } else {
+                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPedidos')
+                }
+            }
+
+            const articulos = menu.find((s) => s.id === 'articulos')
+            if (articulos && Array.isArray(articulos.children)) {
+                if (tipo === 2) {
+                    articulos.children = articulos.children.filter((c) => c.goto !== 'vInsumos')
+                }
+            }
+
+            const ajustes = menu.find((s) => s.id === 'ajustes')
+            if (ajustes && Array.isArray(ajustes.children)) {
+                if (tipo === 2) {
+                    ajustes.children = ajustes.children.filter(
+                        (c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas',
+                    )
+                }
+            }
+
+            this.useAuth.menu = menu
         },
     },
 }
