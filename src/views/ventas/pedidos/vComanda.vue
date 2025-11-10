@@ -3,7 +3,8 @@
         <div class="head">
             <strong>
                 <template v-if="vista.mode == 1">Nuevo pedido</template>
-                <template v-if="vista.mode == 2">Añadir al pedido N°</template>
+                <template v-if="vista.mode == 2">Editar pedido N°</template>
+                <template v-if="vista.mode == 2.1">Añadir al pedido N°</template>
                 {{ vista.pedido.venta_codigo }} {{ atencion }}
             </strong>
 
@@ -20,7 +21,12 @@
                     <JdButton text="Grabar e imprimir" @click="crear(true)" />
                 </template>
 
-                <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:addProductos')">
+                <template v-if="vista.mode == 2 && useAuth.verifyPermiso('vPedidos:editar')">
+                    <JdButton text="Modificar" tipo="2" @click="modificar()" />
+                    <JdButton text="Modificar e imprimir" @click="modificar(true)" />
+                </template>
+
+                <template v-if="vista.mode == 2.1 && useAuth.verifyPermiso('vPedidos:addProductos')">
                     <JdButton text="Grabar" tipo="2" @click="addProductos()" />
                     <JdButton text="Grabar e imprimir" @click="addProductos(true)" />
                 </template>
@@ -125,10 +131,10 @@
             <div
                 class="right"
                 :style="{
-                    'grid-template-rows': `${vista.mode != 2 ? 'auto 1fr auto' : '1fr auto'}`,
+                    'grid-template-rows': `${vista.mode != 2.1 ? 'auto 1fr auto' : '1fr auto'}`,
                 }"
             >
-                <ul class="pedido-head" v-if="vista.mode != 2">
+                <ul class="pedido-head" v-if="vista.mode != 2.1">
                     <li @click="vista.detalle = 1" :class="{ activo: vista.detalle == 1 }">
                         Pedido
                     </li>
@@ -748,6 +754,22 @@ export default {
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
+        async modificar(print) {
+            if (this.checkDatos()) return
+            this.shapeDatos()
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await patch(urls.transacciones, this.vista.pedido)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useAuth.socket.emit('vComanda:editar', res.data)
+
+            if (print == true) this.imprimir(res.data)
+
+            this.useVistas.closePestana('vComanda', 'vPedidos')
+        },
         async addProductos(print) {
             if (this.checkDatos()) return
             this.vista.pedido.monto = this.vista.mtoImpVenta
@@ -774,6 +796,7 @@ export default {
             } else if (data.venta_canal == 3) {
                 atencion = 'DELIVERY'
             }
+
             const send = {
                 createdAt: data.createdAt,
                 atencion,

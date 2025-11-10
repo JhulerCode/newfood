@@ -429,6 +429,8 @@ export default {
             ) {
                 this.modal.pedido.venta_pago_con = null
             }
+
+            this.modal.pedido.edit_type = 'detalles'
         },
         // async modificar1() {
         //     if (this.checkDatos()) return

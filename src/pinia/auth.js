@@ -54,6 +54,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vPedidos:listar', label: 'Listar' },
                             { id: 'vPedidos:crear', label: 'Crear' },
                             { id: 'vPedidos:ver', label: 'Ver' },
+                            { id: 'vPedidos:editar', label: 'Editar' },
                             { id: 'vPedidos:addProductos', label: 'Añadir productos' },
                             { id: 'vPedidos:editarDetalles', label: 'Editar detalles' },
                             { id: 'vPedidos:anular', label: 'Anular' },
@@ -331,6 +332,13 @@ export const useAuth = defineStore('auth', {
             // --- Pedidos --- //
             this.socket.on('vComanda:crear', (data) => {
                 useVistas().addItem('vPedidos', 'pedidos', data, 'first')
+                useVistas().vPedidos?.setIntervalTimeAgo()
+                useVistas().vPedidos?.calculatePendientes()
+                if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
+            })
+
+            this.socket.on('vComanda:editar', (data) => {
+                useVistas().updateItem('vPedidos', 'pedidos', data)
                 useVistas().vPedidos?.setIntervalTimeAgo()
                 useVistas().vPedidos?.calculatePendientes()
                 if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
