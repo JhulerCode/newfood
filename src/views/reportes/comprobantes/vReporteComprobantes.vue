@@ -3,16 +3,18 @@
         <div class="head">
             <strong>Comprobantes</strong>
 
-            <div class="buttons"></div>
+            <div class="buttons">
+                <JdCheckBox label="Incluir detalle" v-model="vista.incluir_detalle" />
+            </div>
         </div>
 
         <JdTable
             :name="tableName"
             :columns="columns"
             :datos="vista.comprobantes || []"
-            :colAct="true"
             :configFiltros="openConfigFiltros"
             :reload="loadComprobantes"
+            :colAct="true"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
         >
@@ -41,7 +43,14 @@
 </template>
 
 <script>
-import { JdTable, mConfigCols, mConfigFiltros, mAnular, mPdfViewer } from '@jhuler/components'
+import {
+    JdTable,
+    JdCheckBox,
+    mConfigCols,
+    mConfigFiltros,
+    mAnular,
+    mPdfViewer,
+} from '@jhuler/components'
 
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
@@ -59,6 +68,7 @@ import { saveAs } from 'file-saver'
 export default {
     components: {
         JdTable,
+        JdCheckBox,
         mAnular,
         mConfigCols,
         mConfigFiltros,
@@ -304,7 +314,9 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('caja_apertura', 'empresa_datos', 'cliente_datos')
-            // this.vista.qry.incl.push('comprobante_items')
+            if (this.vista.incluir_detalle) {
+                this.vista.qry.incl.push('comprobante_items')
+            }
         },
         async loadComprobantes() {
             this.setQuery()
