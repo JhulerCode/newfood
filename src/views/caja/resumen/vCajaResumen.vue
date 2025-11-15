@@ -55,8 +55,16 @@
             <template v-if="vista.resumen">
                 <div class="first">
                     <div class="card caja">
-                        <div class="card-head" :style="{ 'background-color': 'var(--verde)' }">
-                            ABIERTO
+                        <div
+                            class="card-head"
+                            :style="{
+                                'background-color':
+                                    vista.caja_apertura.estado == 2
+                                        ? 'var(--verde)'
+                                        : 'var(--amarillo)',
+                            }"
+                        >
+                            {{ vista.caja_apertura.estado == 2 ? 'CERRADO' : 'ABIERTO' }}
 
                             <i
                                 class="fa-regular fa-copy"
