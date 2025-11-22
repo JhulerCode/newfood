@@ -1,7 +1,6 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
-// import { saveAs } from 'file-saver'
 
 const host = import.meta.env.VITE_API_HOST
 const subdominio_prueba = import.meta.env.VITE_SUBDOMINIO_PRUEBA
@@ -40,208 +39,96 @@ async function get(url) {
     try {
         response = await fetch(url, {
             method: 'GET',
-            headers: {
-                Authorization: `Bearer ${useAuth().token}`,
-                'x-app-version': useAuth().app_version
-            },
+            headers: setHeaders(),
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    if (response.status == 303) {
-        jmsg('error', 'Verión antigua, recargue el sistema')
-        return { code: 303 }
-    }
-
-    if (response.status == 401) {
-        jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-        return { code: 401 }
-    }
-
-    if (response.status == 403) {
-        jmsg('error', 'Acceso denegado: permisos insuficientes')
-        return { code: 403 }
-    }
-
-    if (response.status == 404) {
-        jmsg('error', 'Recurso no encontrado')
-        return { code: 404 }
-    }
-
-    const contentType = response.headers.get("Content-Type")
-    if (contentType && contentType.includes("application/json")) {
-        const data = await response.json()
-
-        if (data.code == -1) jmsg('error', 'Algo salió mal')
-
-        if (data.code > 0) jmsg('error', data.msg)
-
-        return data
-    }
-    else {
-        const blob = await response.blob()
-        return blob
-        // const fileName = response.headers
-        //     .get("Content-Disposition")
-        //     ?.split("filename=")[1]
-        //     ?.replace(/"/g, "")
-        // saveAs(blob, fileName)
-    }
+    return await process(response, false)
 }
 
 async function post(url, item, ms) {
-    let query
+    let response
 
     try {
-        query = await fetch(url, {
+        response = await fetch(url, {
             method: 'POST',
             headers: setHeaders(item),
-            body: item.formData ? setFormData(item) : JSON.stringify(item),
+            body: setBody(item),
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    if (query.status == 303) {
-        jmsg('error', 'Verión antigua, recargue el sistema')
-        return { code: 303 }
+    if (ms !== false && ms == null) {
+        ms = 'Creado con éxito'
     }
 
-    if (query.status == 401) {
-        jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-        return { code: 401 }
-    }
-
-    if (query.status == 403) {
-        jmsg('error', 'Acceso denegado: permisos insuficientes')
-        return { code: 403 }
-    }
-
-    const res = await query.json()
-
-    if (res.code == -1) jmsg('error', 'Algo salió mal')
-
-    if (res.code > 0) jmsg('error', res.msg)
-
-    if (res.code == 0) {
-        if (ms != false) {
-            jmsg('success', ms == undefined ? 'Creado con éxito' : ms)
-        }
-    }
-
-    return res
+    return await process(response, ms)
 }
 
 async function patch(url, item, ms) {
-    let query
+    let response
 
     try {
-        query = await fetch(`${url}/${item.id}`, {
+        response = await fetch(`${url}/${item.id}`, {
             method: 'PATCH',
             headers: setHeaders(item),
-            body: item.formData ? setFormData(item) : JSON.stringify(item),
+            body: setBody(item),
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    if (query.status == 303) {
-        jmsg('error', 'Verión antigua, recargue el sistema')
-        return { code: 303 }
+    if (ms !== false && ms == null) {
+        ms = 'Actualizado con éxito'
     }
 
-    if (query.status == 401) {
-        jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-        return { code: 401 }
-    }
-
-    if (query.status == 403) {
-        jmsg('error', 'Acceso denegado: permisos insuficientes')
-        return { code: 403 }
-    }
-
-    const res = await query.json()
-
-    if (res.code == -1) jmsg('error', 'Algo salió mal')
-
-    if (res.code > 0) jmsg('error', res.msg)
-
-    if (res.code == 0) {
-        if (ms != false) {
-            jmsg('success', ms == undefined ? 'Actualizado con éxito' : ms)
-        }
-    }
-
-    return res
+    return await process(response, ms)
 }
 
 async function delet(url, item, ms) {
-    let query
+    let response
 
     try {
-        query = await fetch(`${url}/${item.id}`, {
+        response = await fetch(`${url}/${item.id}`, {
             method: 'DELETE',
-            headers: {
-                Authorization: `Bearer ${useAuth().token}`,
-                'Content-Type': 'application/json',
-                'x-app-version': useAuth().app_version
-            },
-            body: JSON.stringify(item),
+            headers: setHeaders(item),
+            body: setBody(item),
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    if (query.status == 303) {
-        jmsg('error', 'Verión antigua, recargue el sistema')
-        return { code: 303 }
+    if (ms !== false && ms == null) {
+        ms = 'Eliminado con éxito'
     }
 
-    if (query.status == 401) {
-        jmsg('error', 'Acceso denegado: autenticación incorrecta')
-        useModals().setModal('mLogin', 'Sesión terminada', null, null)
-        return { code: 401 }
-    }
-
-    if (query.status == 403) {
-        jmsg('error', 'Acceso denegado: permisos insuficientes')
-        return { code: 403 }
-    }
-
-    const res = await query.json()
-
-    if (res.code == -1) jmsg('error', 'Algo salió mal')
-
-    if (res.code > 0) jmsg('error', res.msg)
-
-    if (res.code == 0) {
-        if (ms != false) {
-            jmsg('success', ms == undefined ? 'Eliminado con éxito' : ms)
-        }
-    }
-
-    return res
+    return await process(response, ms)
 }
 
-function getSubdominio() {
-    const hostname = window.location.hostname
+function setHeaders(item) {
+    const headers = {
+        Authorization: `Bearer ${useAuth().token}`,
+    }
 
-    const parts = hostname.split(".")
+    if (item && !item.formData) headers['Content-Type'] = 'application/json'
 
-    if (parts.length > 2) return parts[0]
+    headers['x-app-version'] = useAuth().app_version
 
-    return subdominio_prueba
+    headers['x-empresa'] = getSubdominio()
+
+    return headers
 }
 
-function setFormData(item) {
+function setBody(item) {
+    if (!item.formData) return JSON.stringify(item)
+
     const formData = new FormData()
 
     const { archivo, archivos, ...resto } = item
@@ -264,21 +151,41 @@ function setFormData(item) {
     return formData
 }
 
-function setHeaders(item) {
-    const headers = {
-        Authorization: `Bearer ${useAuth().token}`,
+async function process(response, ms) {
+    const res = await response.json()
+
+    if ([401, 403, 404, 426].includes(response.status)) {
+        jmsg('error', res.msg)
+
+        if (response.status == 401) useModals().setModal('mLogin', 'Sesión terminada', null, null)
+
+        return { code: response.status }
     }
 
-    if (!item.formData) {
-        headers['Content-Type'] = 'application/json'
+    const contentType = response.headers.get("Content-Type")
+    if (contentType && contentType.includes("application/json")) {
+        if (res.code == -1) jmsg('error', 'Algo salió mal')
+
+        if (res.code > 0) jmsg('error', res.msg)
+
+        if (res.code == 0 && ms != false) jmsg('success', ms)
+
+        return res
     }
+    else {
+        const blob = await response.blob()
+        return blob
+    }
+}
 
-    const subdominio = getSubdominio()
-    if (subdominio) headers['x-empresa'] = subdominio
+function getSubdominio() {
+    const hostname = window.location.hostname
 
-    headers['x-app-version'] = useAuth().app_version
+    const parts = hostname.split(".")
 
-    return headers
+    if (parts.length > 2) return parts[0]
+
+    return subdominio_prueba
 }
 
 export {
