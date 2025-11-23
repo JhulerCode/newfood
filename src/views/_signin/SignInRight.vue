@@ -1,12 +1,13 @@
 <template>
     <div class="right">
         <div class="actions">
-            <!-- <ThemeConfig /> -->
+            <div class="btn" @click="reloadWindow">
+                <i class="fa-solid fa-rotate-right"></i>
+            </div>
         </div>
 
         <div class="container-logo">
-            <!-- <img src="@/assets/img/logo-dark.webp" v-if="useAuth.isDarkMode"/> -->
-            <img src="@/assets/img/logo.webp"/>
+            <img src="@/assets/img/logo.webp" />
         </div>
 
         <div class="info">
@@ -15,6 +16,7 @@
         </div>
 
         <JdInput :nec="true" label="Usuario" v-model="usuario" height="3" class="mrg-btm1" />
+
         <JdInputPassword
             :nec="true"
             label="Contraseña"
@@ -23,12 +25,6 @@
             class="mrg-btm2"
         />
         <JdButton text="INGRESAR" @click="signin()" class="boton-ingresar" />
-
-        <div class="actions">
-            <div class="btn" @click="reloadWindow">
-                <i class="fa-solid fa-rotate-right"></i>
-            </div>
-        </div>
     </div>
 </template>
 

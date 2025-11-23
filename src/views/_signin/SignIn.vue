@@ -9,7 +9,6 @@
 </template>
 
 <script>
-// import ThemeConfig from './ThemeConfig.vue'
 import SignInLeft from './SignInLeft.vue'
 import SignInRight from './SignInRight.vue'
 
@@ -17,7 +16,6 @@ import { useAuth } from '@/pinia/auth'
 
 export default {
     components: {
-        // ThemeConfig,
         SignInLeft,
         SignInRight,
     },

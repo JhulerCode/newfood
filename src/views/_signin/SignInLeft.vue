@@ -18,7 +18,7 @@ export default {}
     justify-content: center;
     flex-direction: column;
     // background: linear-gradient(135deg, #0f4c75, #2492c2);
-    background: linear-gradient(135deg, #2492c2, #6acbe0);
+    background: linear-gradient(135deg, var(--primary-color), #6acbe0);
     // background: linear-gradient(135deg, #0f4c75, #6acbe0);
     // background: linear-gradient(135deg, #2492c2e6, #6acbe0b3);
     // backdrop-filter: blur(3px);
