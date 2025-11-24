@@ -514,8 +514,8 @@ export default {
             const res = await get(`${urls.comprobantes}/pdf/${item.id}`, true)
             this.useAuth.setLoading(false)
 
-            this.vista.pdfUrl = URL.createObjectURL(res)
-            this.useModals.setModal('mPdfViewer', 'Comprobante', null, this.vista.pdfUrl)
+            const pdfUrl = URL.createObjectURL(res)
+            this.useModals.setModal('mPdfViewer', 'Comprobante', null, pdfUrl)
         },
         async descargarXml(item) {
             const send = {
