@@ -102,7 +102,8 @@ export default {
     },
     created() {
         this.modal = this.useModals.mComprobanteCanjear
-        this.loadPagoComprobantes()
+        // this.loadPagoComprobantes()
+        this.loadComprobanteTipos()
 
         if (this.modal.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`) {
             this.modal.comprobante.doc_tipo1 = `${this.useAuth.usuario.empresa.subdominio}-01`
@@ -143,20 +144,31 @@ export default {
 
             this.modal.socios = res.data
         },
-        async loadPagoComprobantes() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre', 'estandar'],
-            }
+        // async loadPagoComprobantes() {
+        //     const qry = {
+        //         fltr: { activo: { op: 'Es', val: true } },
+        //         cols: ['nombre', 'estandar'],
+        //     }
 
-            this.modal.pago_comprobantes = []
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.loading = { show: false, text: '' }
+        //     this.modal.pago_comprobantes = []
+        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
+        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     this.useAuth.loading = { show: false, text: '' }
+
+        //     if (res.code != 0) return
+
+        //     this.modal.pago_comprobantes = res.data
+        // },
+        async loadComprobanteTipos() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.modal.comprobanteTiposLoaded = false
+            const res = await get(urls.empresa)
+            this.useAuth.setLoading(false)
+            this.modal.comprobanteTiposLoaded = true
 
             if (res.code != 0) return
 
-            this.modal.pago_comprobantes = res.data
+            this.modal.pago_comprobantes = res.data.comprobante_tipos
         },
 
         setSocio(item) {

@@ -47,6 +47,8 @@
                         :nec="true"
                         v-model="vista.comprobante.doc_tipo"
                         :lista="vista.pago_comprobantes"
+                        :loaded="vista.comprobanteTiposLoaded"
+                        @reload="loadComprobanteTipos"
                         style="grid-column: 1/4"
                     />
 
@@ -402,7 +404,8 @@ export default {
         await this.loadPagoMetodos()
         this.calculateInvoiceTotals()
 
-        await this.loadPagoComprobantes()
+        // await this.loadPagoComprobantes()
+        await this.loadComprobanteTipos()
         const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
         this.vista.comprobante.doc_tipo = asd.id
     },
@@ -415,20 +418,31 @@ export default {
 
             Object.assign(this.vista, res.data)
         },
-        async loadPagoComprobantes() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre', 'estandar'],
-            }
+        // async loadPagoComprobantes() {
+        //     const qry = {
+        //         fltr: { activo: { op: 'Es', val: true } },
+        //         cols: ['nombre', 'estandar'],
+        //     }
 
-            this.vista.pago_comprobantes = []
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.loading = { show: false, text: '' }
+        //     this.vista.pago_comprobantes = []
+        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
+        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     this.useAuth.loading = { show: false, text: '' }
+
+        //     if (res.code != 0) return
+
+        //     this.vista.pago_comprobantes = res.data
+        // },
+        async loadComprobanteTipos() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.comprobanteTiposLoaded = false
+            const res = await get(urls.empresa)
+            this.useAuth.setLoading(false)
+            this.vista.comprobanteTiposLoaded = true
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data
+            this.vista.pago_comprobantes = res.data.comprobante_tipos
         },
         async loadPagoMetodos() {
             const qry = {
@@ -1364,13 +1378,13 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        // async grabar1() {
-        //     if (this.checkDatos()) return
-        //     this.shapeDatos()
+        async grabar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
 
-        //     console.log(this.vista.comprobante)
-        // },
-        async grabar(print) {
+            console.log(this.vista.comprobante)
+        },
+        async grabar1(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 

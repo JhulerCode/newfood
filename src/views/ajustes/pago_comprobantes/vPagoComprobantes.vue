@@ -4,12 +4,12 @@
             <strong>Comprobantes de pago</strong>
 
             <div class="buttons">
-                <JdButton
+                <!-- <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vPagoComprobantes:crear')"
-                />
+                /> -->
             </div>
         </div>
 
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { JdButton, JdTable } from '@jhuler/components'
+import { JdTable } from '@jhuler/components'
 
 import mPagoComprobante from './mPagoComprobante.vue'
 
@@ -41,7 +41,7 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     components: {
-        JdButton,
+        // JdButton,
         JdTable,
 
         mPagoComprobante,
@@ -153,8 +153,6 @@ export default {
 
             this.vista.pago_comprobantes = res.data
         },
-
-
 
         runMethod(method, item) {
             this[method](item)

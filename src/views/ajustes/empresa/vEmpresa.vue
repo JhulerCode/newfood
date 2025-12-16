@@ -58,7 +58,7 @@
                     style="grid-column: 1/4"
                 />
 
-                <JdInput
+                <!-- <JdInput
                     label="Distrito"
                     :nec="true"
                     v-model="vista.empresa.distrito"
@@ -77,7 +77,7 @@
                     :nec="true"
                     v-model="vista.empresa.departamento"
                     style="grid-column: 1/4"
-                />
+                /> -->
             </div>
 
             <div class="datos-secundarios">
@@ -216,10 +216,6 @@ export default {
                 'nombre_comercial',
                 'domicilio_fiscal',
                 'ubigeo',
-                // 'urbanizacion',
-                'distrito',
-                'provincia',
-                'departamento',
 
                 'telefono',
                 'correo',

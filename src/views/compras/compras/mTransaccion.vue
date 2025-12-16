@@ -161,13 +161,13 @@ export default {
         this.showButtons()
 
         this.loadDatosSistema()
-        this.loadPagoComprobantes()
+        // this.loadPagoComprobantes()
+        this.loadComprobanteTipos()
 
         if (this.modal.mode == 1) {
             this.setTotalesCero()
             this.loadSocios()
-        }
-        else if (this.modal.mode == 2) {
+        } else if (this.modal.mode == 2) {
             this.modal.sociosLoaded = true
         }
     },
@@ -329,19 +329,30 @@ export default {
             //     )
             // }
         },
-        async loadPagoComprobantes() {
-            const qry = {
-                fltr: {},
-                cols: ['nombre', 'serie', 'correlativo'],
-            }
+        // async loadPagoComprobantes() {
+        //     const qry = {
+        //         fltr: {},
+        //         cols: ['nombre', 'serie', 'correlativo'],
+        //     }
 
+        //     this.useAuth.setLoading(true, 'Cargando...')
+        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     this.useAuth.setLoading(false)
+
+        //     if (res.code != 0) return
+
+        //     this.modal.pago_comprobantes = res.data
+        // },
+        async loadComprobanteTipos() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+            this.modal.comprobanteTiposLoaded = false
+            const res = await get(urls.empresa)
             this.useAuth.setLoading(false)
+            this.modal.comprobanteTiposLoaded = true
 
             if (res.code != 0) return
-
-            this.modal.pago_comprobantes = res.data
+            console.log(res.data)
+            this.modal.pago_comprobantes = res.data.comprobante_tipos
         },
         async loadDatosSistema() {
             const qry = ['transaccion_estados', 'pago_condiciones']

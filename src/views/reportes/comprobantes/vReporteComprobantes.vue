@@ -296,8 +296,8 @@ export default {
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vReporteComprobantes:listar') == true)
-            this.loadComprobantes()
+        // if (this.useAuth.verifyPermiso('vReporteComprobantes:listar') == true)
+        //     this.loadComprobantes()
     },
     methods: {
         initFiltros() {
@@ -357,26 +357,38 @@ export default {
 
             this.vista.socios = res.data
         },
-        async loadPagoComprobantes() {
-            const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
-                cols: ['nombre', 'estandar'],
-            }
+        // async loadPagoComprobantes() {
+        //     const qry = {
+        //         fltr: { activo: { op: 'Es', val: true } },
+        //         cols: ['nombre', 'estandar'],
+        //     }
 
-            this.vista.pago_comprobantes = []
-            this.useAuth.loading = { show: true, text: 'Cargando...' }
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.loading = { show: false, text: '' }
+        //     this.vista.pago_comprobantes = []
+        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
+        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     this.useAuth.loading = { show: false, text: '' }
+
+        //     if (res.code != 0) return
+
+        //     this.vista.pago_comprobantes = res.data
+        // },
+        async loadComprobanteTipos() {
+            this.useAuth.setLoading(true, 'Cargando...')
+            this.vista.comprobanteTiposLoaded = false
+            const res = await get(urls.empresa)
+            this.useAuth.setLoading(false)
+            this.vista.comprobanteTiposLoaded = true
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data
+            this.vista.pago_comprobantes = res.data.comprobante_tipos
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
             await this.loadSocios()
-            await this.loadPagoComprobantes()
+            // await this.loadPagoComprobantes()
+            await this.loadComprobanteTipos()
 
             const cols = this.columns
             cols.find((a) => a.id == 'doc_tipo').lista = this.vista.pago_comprobantes

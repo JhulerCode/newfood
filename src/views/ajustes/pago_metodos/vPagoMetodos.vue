@@ -18,7 +18,7 @@
             :columns="columns"
             :datos="vista.pago_metodos || []"
             :colAct="true"
-            :reload="loadPagoComprobantes"
+            :reload="loadPagoMetodos"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
         >
@@ -85,12 +85,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            {
-                label: 'Editar',
-                icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vPagoMetodos:editar',
-            },
+            // {
+            //     label: 'Editar',
+            //     icon: 'fa-solid fa-pen-to-square',
+            //     action: 'editar',
+            //     permiso: 'vPagoMetodos:editar',
+            // },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
@@ -106,7 +106,7 @@ export default {
         if (this.vista.loaded) return
 
         if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true)
-            this.loadPagoComprobantes()
+            this.loadPagoMetodos()
     },
     methods: {
         setQuery() {
@@ -116,7 +116,7 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
-        async loadPagoComprobantes() {
+        async loadPagoMetodos() {
             this.setQuery()
 
             this.vista.pago_metodos = []
