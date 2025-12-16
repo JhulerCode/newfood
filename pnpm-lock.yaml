@@ -9,7 +9,7 @@ importers:
   .:
     dependencies:
       '@jhuler/components':
-        specifier: 1.2.1
+        specifier: ^1.2.1
         version: 1.2.1(vue@3.5.13)
       dayjs:
         specifier: 1.11.13
