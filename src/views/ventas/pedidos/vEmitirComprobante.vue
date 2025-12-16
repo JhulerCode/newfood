@@ -1378,13 +1378,13 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        async grabar() {
+        async grabar1() {
             if (this.checkDatos()) return
             this.shapeDatos()
 
             console.log(this.vista.comprobante)
         },
-        async grabar1(print) {
+        async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 
