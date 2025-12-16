@@ -406,7 +406,6 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     estado: { op: 'Es', val: '1' },
-                    sucursal: { op: 'Es', val: this.useAuth.usuario.sucursal },
                 },
                 cols: [],
                 incl: ['createdBy1'],
@@ -451,7 +450,6 @@ export default {
             this.vista.qry1 = {
                 fltr: {
                     activo: { op: 'Es', val: true },
-                    sucursal: { op: 'Es', val: this.useAuth.usuario.sucursal },
                 },
                 cols: ['nombre'],
                 incl: ['mesas'],
