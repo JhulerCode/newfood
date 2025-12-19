@@ -370,6 +370,8 @@ export default {
                 .sort((a, b) => a.nombre.localeCompare(b.nombre))
         },
         pedidosFiltered() {
+            if (!this.vista.pedidos || this.vista.pedidos.length == 0) return []
+
             return this.vista.pedidos.filter(
                 (a) => a.venta_canal == this.vista.venta_canal && a.estado == 1,
             )
@@ -466,7 +468,9 @@ export default {
             if (res.code != 0) return
 
             this.vista.salones = res.data
-            this.vista.salon = this.vista.salones[0].id
+            if (this.vista.salones.length > 0) {
+                this.vista.salon = this.vista.salones[0].id
+            }
 
             await this.loadPedidos()
         },

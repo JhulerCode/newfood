@@ -46,7 +46,7 @@
                         label="Tipo comprobante"
                         :nec="true"
                         v-model="vista.comprobante.doc_tipo"
-                        :lista="vista.pago_comprobantes"
+                        :lista="vista.pago_comprobantes || []"
                         :loaded="vista.comprobanteTiposLoaded"
                         @reload="loadComprobanteTipos"
                         style="grid-column: 1/4"
@@ -406,8 +406,10 @@ export default {
 
         // await this.loadPagoComprobantes()
         await this.loadComprobanteTipos()
-        const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
-        this.vista.comprobante.doc_tipo = asd.id
+        if (this.vista.pago_comprobantes && this.vista.pago_comprobantes.length > 0) {
+            const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
+            this.vista.comprobante.doc_tipo = asd.id
+        }
     },
     methods: {
         async loadDatosSistema() {
