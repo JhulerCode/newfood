@@ -19,6 +19,7 @@ const urls = {
     colaboradores: `${host}/api/colaboradores`,
     comprobante_items: `${host}/api/comprobante_items`,
     comprobantes: `${host}/api/comprobantes`,
+    combo_articulos: `${host}/api/combo_articulos`,
     dinero_movimientos: `${host}/api/dinero_movimientos`,
     empresa: `${host}/api/empresa`,
     mesas: `${host}/api/mesas`,

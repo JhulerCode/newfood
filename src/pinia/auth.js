@@ -12,7 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
-        app_version: '1.6.5',
+        app_version: '1.6.6',
 
         menu: [
             {
@@ -150,6 +150,9 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCombos:crear', label: 'Crear' },
                             { id: 'vCombos:editar', label: 'Editar' },
                             { id: 'vCombos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vCombos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vCombos:crearComponentesBulk', label: 'Crear componentes masivo' },
                         ]
                     },
                 ]

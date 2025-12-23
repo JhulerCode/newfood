@@ -4,6 +4,38 @@
             <strong>Combos</strong>
 
             <div class="buttons">
+                <input
+                    type="file"
+                    ref="excel"
+                    accept=".xlsx, .xls, .csv"
+                    hidden
+                    @change="importar"
+                />
+
+                <input
+                    type="file"
+                    ref="excel"
+                    accept=".xlsx, .xls, .csv"
+                    hidden
+                    @change="importarComponentes"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    text="Importar"
+                    tipo="2"
+                    @click="this.$refs.excel.click()"
+                    v-if="useAuth.verifyPermiso('vCombos:crearBulk')"
+                />
+
+                <JdButton
+                    icon="fa-solid fa-file-excel"
+                    text="Importar componentes"
+                    tipo="2"
+                    @click="this.$refs.excel.click()"
+                    v-if="useAuth.verifyPermiso('vCombos:crearComponentesBulk')"
+                />
+
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
@@ -28,6 +60,7 @@
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
+    <mImportarComboComponentes v-if="useModals.show.mImportarComboComponentes" />
     <mCombo v-if="useModals.show.mCombo" />
     <mKardex v-if="useModals.show.mKardex" />
     <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
@@ -44,13 +77,15 @@ import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
 import mCombo from '@/views/articulos/combos/mCombo.vue'
 import mKardex from '@/views/articulos/mKardex.vue'
 import mArticuloPreciosSemana from '@/views/articulos/productos/mArticuloPreciosSemana.vue'
+import mImportarComboComponentes from '@/views/articulos/mImportarComboComponentes.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get, delet } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
+import { tryOficialExcel } from '@/utils/mine'
+import { jqst, jmsg } from '@/utils/swal'
 
 export default {
     components: {
@@ -62,6 +97,7 @@ export default {
         mEditar,
 
         mImportarArticulos,
+        mImportarComboComponentes,
         mCombo,
         mKardex,
         mArticuloPreciosSemana,
@@ -203,6 +239,7 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     is_combo: { op: 'Es', val: true },
                 },
+                incl: ['produccion_area1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -236,6 +273,144 @@ export default {
             }
 
             this.useModals.setModal('mCombo', 'Nuevo Combo', 1, item)
+        },
+        importar(event) {
+            this.useAuth.setLoading(true, 'Cargando archivo...')
+
+            const file = event.target.files[0]
+            const reader = new FileReader()
+
+            reader.onload = async () => {
+                const headers = [
+                    'Nombre',
+                    'Categoría',
+                    'Tributo',
+                    'Precio de venta',
+                    'Área de impresión',
+                ]
+                const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
+
+                if (res.code != 0) {
+                    this.useAuth.setLoading(false)
+                    return jmsg('error', res.msg)
+                }
+
+                await this.loadDatosSistema()
+                const igv_afectacionesMap = this.vista.igv_afectaciones.reduce(
+                    (obj, a) => ((obj[a.id] = a), obj),
+                    {},
+                )
+
+                await this.loadCategorias()
+                const categoriasMap = this.vista.articulo_categorias.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+
+                await this.loadProduccionAreas()
+                const produccion_areasMap = this.vista.produccion_areas.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+
+                for (const a of res.data) {
+                    if (categoriasMap[a.Categoría]) {
+                        a.categoria = categoriasMap[a.Categoría].id
+                        a.categoria1 = categoriasMap[a.Categoría]
+                    } else {
+                        a.categoria = null
+                    }
+
+                    if (igv_afectacionesMap[a.Tributo]) {
+                        a.tributo = igv_afectacionesMap[a.Tributo].id
+                        a.tributo1 = { ...igv_afectacionesMap[a.Tributo] }
+                    } else {
+                        a.tributo = null
+                    }
+
+                    if (produccion_areasMap[a['Área de impresión']]) {
+                        a.produccion_area = produccion_areasMap[a['Área de impresión']].id
+                        a.produccion_area1 = { ...produccion_areasMap[a['Área de impresión']] }
+                    } else {
+                        a.produccion_area = null
+                    }
+
+                    a.nombre = a.Nombre
+                    a.precio_venta = a['Precio de venta']
+                    a.is_combo = true
+                }
+
+                this.useAuth.setLoading(false)
+
+                const send = {
+                    tipo: 2,
+                    is_combo: true,
+                    articulos: res.data,
+                }
+                this.useModals.setModal(
+                    'mImportarArticulos',
+                    'Importar productos',
+                    null,
+                    send,
+                    true,
+                )
+            }
+            reader.readAsArrayBuffer(file)
+        },
+        importarComponentes(event) {
+            this.useAuth.setLoading(true, 'Cargando archivo...')
+
+            const file = event.target.files[0]
+            const reader = new FileReader()
+
+            reader.onload = async () => {
+                const headers = ['Combo', 'Componente', 'Cantidad']
+                const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
+
+                if (res.code != 0) {
+                    this.useAuth.setLoading(false)
+                    return jmsg('error', res.msg)
+                }
+
+                await this.loadProductos()
+                const productosMap = this.vista.productos.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+
+                for (const a of res.data) {
+                    if (productosMap[a.Combo]) {
+                        a.articulo_principal = productosMap[a.Combo].id
+                        a.articulo_principal1 = { ...productosMap[a.Combo] }
+                    } else {
+                        a.articulo_principal = null
+                    }
+
+                    if (productosMap[a.Componente]) {
+                        a.articulo = productosMap[a.Componente].id
+                        a.articulo1 = { ...productosMap[a.Componente] }
+                    } else {
+                        a.articulo = null
+                    }
+
+                    a.cantidad = a.Cantidad
+                }
+
+                this.useAuth.setLoading(false)
+
+                const send = {
+                    tipo: 2,
+                    articulos: res.data,
+                }
+                this.useModals.setModal(
+                    'mImportarComboComponentes',
+                    'Importar componentes de combos',
+                    null,
+                    send,
+                    true,
+                )
+            }
+            reader.readAsArrayBuffer(file)
         },
 
         async openConfigFiltros() {
@@ -294,7 +469,10 @@ export default {
 
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: '1' }, activo: { op: 'Es', val: true } },
+                fltr: {
+                    tipo: { op: 'Es', val: '2' },
+                    activo: { op: 'Es', val: true },
+                },
             }
 
             this.vista.articulo_categorias = []
@@ -320,6 +498,24 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_areas = res.data
+        },
+        async loadProductos() {
+            this.vista.qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: '2' },
+                },
+                cols: ['nombre'],
+            }
+
+            this.vista.productos = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
+            this.useAuth.setLoading(false)
+            this.vista.loaded = true
+
+            if (res.code != 0) return
+
+            this.vista.productos = res.data
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'activo_estados']

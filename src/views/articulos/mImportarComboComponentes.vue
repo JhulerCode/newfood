@@ -1,6 +1,6 @@
 <template>
     <JdModal
-        modal="mImportarArticulos"
+        modal="mImportarComboComponentes"
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
@@ -31,37 +31,23 @@ export default {
         modal: {},
 
         columns: [
-            { id: 'nombre', title: 'Nombre', width: '25rem', show: true, seek: true },
             {
-                id: 'categoria',
+                id: 'articulo_principal',
+                title: 'Combo',
+                prop: 'articulo_principal1.nombre',
                 show: true,
-                width: '10rem',
-                title: 'Categoría',
-                prop: 'categoria1.nombre',
-            },
-            {
-                id: 'tributo',
-                prop: 'tributo1.nombre',
-                title: 'Tributo',
                 width: '18rem',
-                show: true,
             },
             {
-                id: 'has_receta',
-                title: 'Es transformado?',
-                width: '8rem',
+                id: 'articulo',
+                title: 'Componente',
+                prop: 'articulo1.nombre',
                 show: true,
+                width: '18rem',
             },
             {
-                id: 'precio_venta',
-                title: 'Precio de venta',
-                width: '8rem',
-                show: true,
-            },
-            {
-                id: 'produccion_area',
-                title: 'Área de impresión',
-                prop: 'produccion_area1.nombre',
+                id: 'cantidad',
+                title: 'Cantidad',
                 width: '8rem',
                 show: true,
             },
@@ -70,13 +56,7 @@ export default {
         buttons: [{ text: 'Grabar', action: 'grabar', spin: false, show: true }],
     }),
     created() {
-        this.modal = this.useModals.mImportarArticulos
-
-        if (this.modal.tipo == 2) {
-            if (this.modal.is_combo == true) {
-                this.columns[3].show = false
-            }
-        }
+        this.modal = this.useModals.mImportarComboComponentes
     },
     methods: {
         eliminar(item) {
@@ -84,17 +64,16 @@ export default {
         },
         async grabar() {
             const send = {
-                tipo: this.modal.tipo,
                 articulos: this.modal.articulos,
             }
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(`${urls.articulos}/bulk`, send)
+            const res = await post(`${urls.combo_articulos}/bulk`, send)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.show.mImportarArticulos = false
+            this.useModals.show.mImportarComboComponentes = false
         },
     },
 }

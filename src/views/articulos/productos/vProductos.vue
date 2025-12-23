@@ -12,13 +12,13 @@
                     @change="importar"
                 />
 
-                <!-- <JdButton
+                <JdButton
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
                     @click="this.$refs.excel.click()"
                     v-if="useAuth.verifyPermiso('vProductos:crearBulk')"
-                /> -->
+                />
 
                 <JdButton
                     text="Nuevo"
@@ -178,7 +178,7 @@ export default {
             {
                 id: 'produccion_area',
                 title: 'Área de impresión',
-                prop: 'produccion_area1.impresora',
+                prop: 'produccion_area1.nombre',
                 type: 'select',
                 editable: true,
                 width: '10rem',
@@ -352,7 +352,14 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = ['Nombre', 'Categoria', 'Unidad', 'Tributo']
+                const headers = [
+                    'Nombre',
+                    'Categoría',
+                    'Tributo',
+                    'Es transformado?',
+                    'Precio de venta',
+                    'Área de impresión',
+                ]
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -372,20 +379,38 @@ export default {
                     {},
                 )
 
+                await this.loadProduccionAreas()
+                const produccion_areasMap = this.vista.produccion_areas.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+
                 for (const a of res.data) {
-                    if (categoriasMap[a.Categoria]) {
-                        a.Categoria1 = categoriasMap[a.Categoria]
-                        a.Categoria = categoriasMap[a.Categoria].id
+                    if (categoriasMap[a.Categoría]) {
+                        a.categoria = categoriasMap[a.Categoría].id
+                        a.categoria1 = categoriasMap[a.Categoría]
                     } else {
-                        a.Categoria = null
+                        a.categoria = null
                     }
 
                     if (igv_afectacionesMap[a.Tributo]) {
-                        a.Tributo = igv_afectacionesMap[a.Tributo].id
-                        a.Tributo1 = { ...igv_afectacionesMap[a.Tributo] }
+                        a.tributo = igv_afectacionesMap[a.Tributo].id
+                        a.tributo1 = { ...igv_afectacionesMap[a.Tributo] }
                     } else {
-                        a.Tributo = null
+                        a.tributo = null
                     }
+
+                    if (produccion_areasMap[a['Área de impresión']]) {
+                        a.produccion_area = produccion_areasMap[a['Área de impresión']].id
+                        a.produccion_area1 = { ...produccion_areasMap[a['Área de impresión']] }
+                    } else {
+                        a.produccion_area = null
+                    }
+
+                    a.nombre = a.Nombre
+                    a.precio_venta = a['Precio de venta']
+                    a.has_receta = a['Es transformado?'] == 'SI' ? true : false
+                    a.is_combo = false
                 }
 
                 this.useAuth.setLoading(false)
