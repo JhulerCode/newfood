@@ -217,7 +217,6 @@ export default {
                 title: 'Tiempo transcurrido',
                 width: '12rem',
                 show: true,
-                seek: true,
                 sort: true,
             },
             {
@@ -245,8 +244,6 @@ export default {
                 format: 'yesno',
                 width: '7rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
                 id: 'venta_entregado',
@@ -255,8 +252,6 @@ export default {
                 format: 'yesno',
                 width: '7rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
                 id: 'estado',
@@ -265,8 +260,6 @@ export default {
                 format: 'estado',
                 width: '10rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
         ],
         tableRowOptions: [
@@ -736,6 +729,7 @@ export default {
                 createdAt: res.data.createdAt,
                 atencion,
                 venta_codigo: res.data.venta_codigo,
+                cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,

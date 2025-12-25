@@ -289,6 +289,7 @@ export default {
                 createdAt: res.data.createdAt,
                 atencion,
                 venta_codigo: res.data.venta_codigo,
+                cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,

@@ -801,6 +801,7 @@ export default {
                 createdAt: data.createdAt,
                 atencion,
                 venta_codigo: data.venta_codigo,
+                cliente_datos: data.venta_socio_datos,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
                 subdominio: this.useAuth.usuario.empresa.subdominio,
