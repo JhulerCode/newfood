@@ -101,6 +101,18 @@
                         autoresize
                     />
                 </div>
+
+                <div class="card"></div>
+
+                <div class="card"></div>
+
+                <div class="card">
+                    <v-chart
+                        :option="pieOptCanalesCantidad"
+                        style="width: 100%; height: 15rem"
+                        autoresize
+                    />
+                </div>
             </div>
         </div>
     </div>
@@ -356,6 +368,57 @@ export default {
                             show: false,
                         },
                         data: this.vista?.data?.ventas?.canales || [],
+                    },
+                ],
+            }
+        },
+        pieOptCanalesCantidad() {
+            return {
+                title: {
+                    text: 'Canales',
+                    left: 'center',
+                    top: 0,
+                    padding: 0,
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: '{b}: {c} ({d}%)',
+                },
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 0,
+                    left: 'center',
+                    itemGap: 5,
+                },
+                series: [
+                    {
+                        type: 'pie',
+                        radius: ['40%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 10,
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                        },
+                        label: {
+                            show: false,
+                            position: 'center',
+                        },
+                        emphasis: {
+                            label: {
+                                show: true,
+                                fontSize: 20,
+                                fontWeight: 'bold',
+                            },
+                        },
+                        labelLine: {
+                            show: false,
+                        },
+                        data:
+                            this.vista?.data?.ventas?.canales.map((c) => ({
+                                ...c,
+                                value: c.cantidad,
+                            })) || [],
                     },
                 ],
             }
