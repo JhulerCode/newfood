@@ -211,6 +211,25 @@ export default {
                 show: true,
                 seek: false,
             },
+            {
+                id: 'createdBy',
+                title: 'Creado por',
+                prop: 'createdBy1.nombres_apellidos',
+                width: '12rem',
+                filtrable: false,
+                show: true,
+                seek: false,
+            },
+            {
+                id: 'createdAt',
+                title: 'Fecha de creación',
+                width: '12rem',
+                format: 'datetime',
+                filtrable: false,
+                show: true,
+                seek: false,
+                sort: true,
+            },
         ],
         tableRowOptions: [
             {
@@ -309,7 +328,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 sqls: ['pagos_monto'],
-                incl: ['transaccion1', 'caja_apertura1'],
+                incl: ['transaccion1', 'caja_apertura1', 'createdBy1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
