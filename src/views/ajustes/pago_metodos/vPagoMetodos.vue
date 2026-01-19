@@ -85,12 +85,12 @@ export default {
             },
         ],
         tableRowOptions: [
-            // {
-            //     label: 'Editar',
-            //     icon: 'fa-solid fa-pen-to-square',
-            //     action: 'editar',
-            //     permiso: 'vPagoMetodos:editar',
-            // },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vPagoMetodos:editar',
+            },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
@@ -112,6 +112,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

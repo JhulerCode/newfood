@@ -4,6 +4,15 @@
             <div class="btn" @click="reloadWindow">
                 <i class="fa-solid fa-rotate-right"></i>
             </div>
+
+            <div
+                class="btn"
+                @click="darkLigthMode"
+                :title="`Modo ${!useAuth.isDarkMode ? 'oscuro' : 'claro'}`"
+            >
+                <i class="fa-regular fa-moon" v-if="!useAuth.isDarkMode"></i>
+                <i class="fa-regular fa-sun" v-else></i>
+            </div>
         </div>
 
         <div class="container-logo">
@@ -64,6 +73,14 @@ export default {
         reloadWindow() {
             window.location.reload()
         },
+        async darkLigthMode() {
+            const send = {
+                id: this.useAuth.usuario.id,
+                theme: this.useAuth.isDarkMode == true ? '1' : '2',
+            }
+
+            this.useAuth.setTheme(send.theme)
+        },
 
         async signin() {
             if (this.usuario == '' || this.contrasena == '') {
@@ -82,8 +99,10 @@ export default {
             if (code != 0) return
 
             this.useAuth.token = token
-
             await this.useAuth.login()
+
+            this.useAuth.setLoading(true, 'Preparando vista...')
+            localStorage.setItem('remember-usuario', this.usuario)
             this.$router.replace({ name: 'ConsolaView' })
             this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
         },

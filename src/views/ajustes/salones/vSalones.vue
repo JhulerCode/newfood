@@ -184,6 +184,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -240,6 +241,7 @@ export default {
         setQuery1() {
             this.vista.qry1 = {
                 fltr: { salon: { op: 'Es', val: this.vista.salon.id } },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns1, this.vista.qry1)

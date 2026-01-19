@@ -111,7 +111,7 @@
                     v-if="
                         modal.pedido.venta_canal == 3 &&
                         modal.pedido.venta_pago_metodo ==
-                            `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                            `${useAuth.empresa.subdominio}-EFECTIVO`
                     "
                     style="grid-column: 1/3"
                 />
@@ -413,7 +413,7 @@ export default {
 
                 if (
                     this.modal.pedido.venta_pago_metodo ==
-                        `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
+                        `${this.useAuth.empresa.subdominio}-EFECTIVO` &&
                     (this.modal.pedido.venta_pago_con || 0) <
                         Number(this.modal.mtoImpVenta.toFixed(2))
                 ) {
@@ -425,12 +425,12 @@ export default {
         shapeDatos() {
             if (
                 this.modal.pedido.venta_pago_metodo !=
-                `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                `${this.useAuth.empresa.subdominio}-EFECTIVO`
             ) {
                 this.modal.pedido.venta_pago_con = null
             }
 
-            this.modal.pedido.edit_type = 'detalles'
+            this.modal.pedido.edit_type = 'only_detalles'
         },
         // async modificar1() {
         //     if (this.checkDatos()) return

@@ -285,7 +285,7 @@
                         v-if="
                             vista.pedido.venta_canal == 3 &&
                             vista.pedido.venta_pago_metodo ==
-                                `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                                `${useAuth.empresa.subdominio}-EFECTIVO`
                         "
                     >
                         <div class="pedido-paga">
@@ -430,6 +430,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'color'],
+                order: [['nombre', 'ASC']],
             }
 
             this.vista.categoriasLoaded = false
@@ -597,7 +598,7 @@ export default {
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
                         item.igv_afectacion == '10'
-                            ? this.useAuth.usuario.empresa.igv_porcentaje
+                            ? this.useAuth.empresa.igv_porcentaje
                             : 0,
 
                     observacion: '',
@@ -711,7 +712,7 @@ export default {
 
                 if (
                     this.vista.pedido.venta_pago_metodo ==
-                        `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO` &&
+                        `${this.useAuth.empresa.subdominio}-EFECTIVO` &&
                     (this.vista.pedido.venta_pago_con || 0) <
                         Number(this.vista.mtoImpVenta.toFixed(2))
                 ) {
@@ -727,7 +728,7 @@ export default {
 
             if (
                 this.vista.pedido.venta_pago_metodo !=
-                `${this.useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                `${this.useAuth.empresa.subdominio}-EFECTIVO`
             ) {
                 this.vista.pedido.venta_pago_con = null
             }
@@ -804,12 +805,12 @@ export default {
                 cliente_datos: data.venta_socio_datos,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,

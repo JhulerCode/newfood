@@ -112,16 +112,16 @@ export default {
                 seek: false,
                 sort: false,
             },
-            {
-                id: 'foto_url',
-                title: 'Foto',
-                filtrable: false,
-                format: 'img',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
+            // {
+            //     id: 'foto_url',
+            //     title: 'Foto',
+            //     filtrable: false,
+            //     format: 'img',
+            //     width: '5rem',
+            //     show: true,
+            //     seek: true,
+            //     sort: true,
+            // },
             {
                 id: 'nombre',
                 title: 'Nombre',
@@ -295,7 +295,7 @@ export default {
     },
     methods: {
         hideColumns() {
-            if (this.useAuth.usuario.empresa.tipo == 2) {
+            if (this.useAuth.empresa.tipo == 2) {
                 this.columns[7].show = false
                 this.columns[8].show = false
             }
@@ -306,9 +306,11 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     is_combo: { op: 'Es', val: false },
                 },
+                incl: ['categoria1', 'produccion_area1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('unidad')
         },
         async loadArticulos() {
             this.setQuery()
@@ -471,14 +473,15 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
 
+            for (const a of this.columns) {
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
+                if (a.id == 'has_receta') a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+            }
             const cols = this.columns.filter((a) => a.editable == true)
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            // cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
@@ -587,6 +590,8 @@ export default {
         async loadCategorias() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: '2' }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                order: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []
@@ -597,6 +602,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async loadProduccionAreas() {
             const qry = {
@@ -612,9 +618,10 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_areas = res.data
+            return res.data
         },
         async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'activo_estados']
+            const qry = ['igv_afectaciones', 'unidades', 'activo_estados', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

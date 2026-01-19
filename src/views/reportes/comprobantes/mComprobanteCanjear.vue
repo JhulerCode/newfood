@@ -83,19 +83,19 @@ export default {
     }),
     computed: {
         pago_comprobantes_filtered() {
-            if (this.modal.pago_comprobantes == null) return []
+            if (this.modal.comprobante_tipos == null) return []
 
             if (
-                this.modal.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`
+                this.modal.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`
             ) {
-                return this.modal.pago_comprobantes.filter(
+                return this.modal.comprobante_tipos.filter(
                     (a) =>
-                        a.id != `${this.useAuth.usuario.empresa.subdominio}-NV` &&
-                        a.id != `${this.useAuth.usuario.empresa.subdominio}-03`,
+                        a.id != `${this.useAuth.empresa.subdominio}-NV` &&
+                        a.id != `${this.useAuth.empresa.subdominio}-03`,
                 )
             } else {
-                return this.modal.pago_comprobantes.filter(
-                    (a) => a.id != `${this.useAuth.usuario.empresa.subdominio}-NV`,
+                return this.modal.comprobante_tipos.filter(
+                    (a) => a.id != `${this.useAuth.empresa.subdominio}-NV`,
                 )
             }
         },
@@ -105,8 +105,8 @@ export default {
         // this.loadPagoComprobantes()
         this.loadComprobanteTipos()
 
-        if (this.modal.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`) {
-            this.modal.comprobante.doc_tipo1 = `${this.useAuth.usuario.empresa.subdominio}-01`
+        if (this.modal.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`) {
+            this.modal.comprobante.doc_tipo1 = `${this.useAuth.empresa.subdominio}-01`
         }
     },
     methods: {
@@ -150,14 +150,14 @@ export default {
         //         cols: ['nombre', 'estandar'],
         //     }
 
-        //     this.modal.pago_comprobantes = []
+        //     this.modal.comprobante_tipos = []
         //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
         //     this.useAuth.loading = { show: false, text: '' }
 
         //     if (res.code != 0) return
 
-        //     this.modal.pago_comprobantes = res.data
+        //     this.modal.comprobante_tipos = res.data
         // },
         async loadComprobanteTipos() {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -168,7 +168,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.modal.pago_comprobantes = res.data.comprobante_tipos
+            this.modal.comprobante_tipos = res.data.comprobante_tipos
         },
 
         setSocio(item) {
@@ -194,7 +194,7 @@ export default {
             }
 
             if (
-                this.modal.comprobante.doc_tipo1 == `${this.useAuth.usuario.empresa.subdominio}-01`
+                this.modal.comprobante.doc_tipo1 == `${this.useAuth.empresa.subdominio}-01`
             ) {
                 if (['0', '1', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
@@ -203,7 +203,7 @@ export default {
             }
 
             if (
-                this.modal.comprobante.doc_tipo1 == `${this.useAuth.usuario.empresa.subdominio}-03`
+                this.modal.comprobante.doc_tipo1 == `${this.useAuth.empresa.subdominio}-03`
             ) {
                 if (['6', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')

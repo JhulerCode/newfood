@@ -46,7 +46,7 @@
                         label="Tipo comprobante"
                         :nec="true"
                         v-model="vista.comprobante.doc_tipo"
-                        :lista="vista.pago_comprobantes || []"
+                        :lista="vista.comprobante_tipos || []"
                         :loaded="vista.comprobanteTiposLoaded"
                         @reload="loadComprobanteTipos"
                         style="grid-column: 1/4"
@@ -406,8 +406,8 @@ export default {
 
         // await this.loadPagoComprobantes()
         await this.loadComprobanteTipos()
-        if (this.vista.pago_comprobantes && this.vista.pago_comprobantes.length > 0) {
-            const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
+        if (this.vista.comprobante_tipos && this.vista.comprobante_tipos.length > 0) {
+            const asd = this.vista.comprobante_tipos.find((a) => a.estandar == true)
             this.vista.comprobante.doc_tipo = asd.id
         }
     },
@@ -426,14 +426,14 @@ export default {
         //         cols: ['nombre', 'estandar'],
         //     }
 
-        //     this.vista.pago_comprobantes = []
+        //     this.vista.comprobante_tipos = []
         //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
         //     this.useAuth.loading = { show: false, text: '' }
 
         //     if (res.code != 0) return
 
-        //     this.vista.pago_comprobantes = res.data
+        //     this.vista.comprobante_tipos = res.data
         // },
         async loadComprobanteTipos() {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -444,7 +444,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data.comprobante_tipos
         },
         async loadPagoMetodos() {
             const qry = {
@@ -1289,21 +1289,21 @@ export default {
             }
 
             if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-01`
+                this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-01`
             ) {
                 if (['0', '1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
 
-                if (this.vista.socio.doc_numero == this.useAuth.usuario.empresa.ruc) {
+                if (this.vista.socio.doc_numero == this.useAuth.empresa.ruc) {
                     jmsg('error', 'El cliente no puede ser el mismo que la empresa')
                     return true
                 }
             }
 
             if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`
+                this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`
             ) {
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
@@ -1415,12 +1415,12 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,

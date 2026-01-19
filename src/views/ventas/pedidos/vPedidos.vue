@@ -561,7 +561,7 @@ export default {
             let send = {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
-                socio: `${this.useAuth.usuario.empresa.subdominio}-CLIENTES-VARIOS`,
+                socio: `${this.useAuth.empresa.subdominio}-CLIENTES-VARIOS`,
                 venta_socio_datos: {
                     doc_tipo: '0',
                     doc_numero: '00000000',
@@ -732,12 +732,12 @@ export default {
                 cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
             // console.log(send)
             this.useAuth.socket.emit('vComanda:imprimir', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,
@@ -767,7 +767,7 @@ export default {
             }
 
             const send = {
-                empresa_datos: this.useAuth.usuario.empresa,
+                empresa_datos: this.useAuth.empresa,
                 fecha: res.data.fecha,
                 venta_canal: res.data.venta_canal,
                 atencion,
@@ -781,12 +781,12 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
 
             this.useAuth.socket.emit('vComanda:imprimirPrecuenta', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,

@@ -6,15 +6,13 @@ const host = import.meta.env.VITE_API_HOST
 const subdominio_prueba = import.meta.env.VITE_SUBDOMINIO_PRUEBA
 
 const urls = {
-    signin: `${host}/signin`,
-    uploads: `${host}/uploads`,
-    decolecta: `${host}/api/decolecta`,
+    signin: `${host}/api/auth`,
 
     sistema: `${host}/api/sistema`,
+    empresas: `${host}/api/empresas`,
 
     articulo_categorias: `${host}/api/articulo_categorias`,
     articulos: `${host}/api/articulos`,
-    // cajas: `${host}/api/cajas`,
     caja_aperturas: `${host}/api/caja_aperturas`,
     colaboradores: `${host}/api/colaboradores`,
     comprobante_items: `${host}/api/comprobante_items`,
@@ -24,7 +22,7 @@ const urls = {
     empresa: `${host}/api/empresa`,
     mesas: `${host}/api/mesas`,
     kardex: `${host}/api/kardex`,
-    pago_comprobantes: `${host}/api/pago_comprobantes`,
+    comprobante_tipos: `${host}/api/comprobante_tipos`,
     pago_metodos: `${host}/api/pago_metodos`,
     produccion_areas: `${host}/api/produccion_areas`,
     receta_insumos: `${host}/api/receta_insumos`,
@@ -32,6 +30,8 @@ const urls = {
     socios: `${host}/api/socios`,
     transacciones: `${host}/api/transacciones`,
     transaccion_items: `${host}/api/transaccion_items`,
+
+    decolecta: `${host}/api/decolecta`,
 }
 
 async function get(url) {

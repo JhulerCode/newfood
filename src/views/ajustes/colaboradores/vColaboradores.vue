@@ -4,12 +4,6 @@
             <strong>Colaboradores</strong>
 
             <div class="buttons">
-                <!-- <JdButton
-                    text="Actualizar todos"
-                    @click="actualizarTodos()"
-                    v-if="useAuth.verifyPermiso('vColaboradores:crear')"
-                /> -->
-
                 <JdButton
                     text="Nuevo"
                     @click="nuevo()"
@@ -18,13 +12,13 @@
             </div>
         </div>
 
-        <!-- :configCols="true" -->
         <JdTable
             :name="tableName"
             :columns="columns"
             :datos="vista.colaboradores || []"
             :colAct="true"
             :configFiltros="openConfigFiltros"
+            :configCols="true"
             :reload="loadColaboradores"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
@@ -218,6 +212,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

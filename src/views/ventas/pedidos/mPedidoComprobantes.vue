@@ -168,12 +168,12 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,

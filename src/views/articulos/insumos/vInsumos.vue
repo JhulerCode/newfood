@@ -229,6 +229,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: '1' } },
+                incl: ['categoria1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -361,14 +362,14 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
 
+            for (const a of this.columns) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
             const cols = this.columns.filter((a) => a.editable == true)
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            // cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
@@ -460,6 +461,8 @@ export default {
         async loadCategorias() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: '1' }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                order: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []
@@ -470,6 +473,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'activo_estados']

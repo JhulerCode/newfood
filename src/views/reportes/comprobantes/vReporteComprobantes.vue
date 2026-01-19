@@ -382,14 +382,14 @@ export default {
         //         cols: ['nombre', 'estandar'],
         //     }
 
-        //     this.vista.pago_comprobantes = []
+        //     this.vista.comprobante_tipos = []
         //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
         //     this.useAuth.loading = { show: false, text: '' }
 
         //     if (res.code != 0) return
 
-        //     this.vista.pago_comprobantes = res.data
+        //     this.vista.comprobante_tipos = res.data
         // },
         async loadComprobanteTipos() {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -400,7 +400,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data.comprobante_tipos
         },
 
         async openConfigFiltros() {
@@ -410,7 +410,7 @@ export default {
             await this.loadComprobanteTipos()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.pago_comprobantes
+            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.comprobante_tipos
             cols.find((a) => a.id == 'socio').lista = this.vista.socios
             cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
             cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
@@ -523,12 +523,12 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                subdominio: this.useAuth.empresa.subdominio,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
 
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
+            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
             // console.log(uriEncoded)
             // const nuevaVentana = window.open(
             //     uriEncoded,

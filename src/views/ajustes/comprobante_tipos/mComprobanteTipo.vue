@@ -1,5 +1,5 @@
 <template>
-    <JdModal modal="mPagoComprobante" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal modal="mComprobanteTipo" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdInput label="Nombre" :nec="true" v-model="modal.item.nombre" :disabled="true" />
 
@@ -58,7 +58,7 @@ export default {
         ],
     }),
     created() {
-        this.modal = this.useModals.mPagoComprobante
+        this.modal = this.useModals.mComprobanteTipo
     },
     methods: {
         checkDatos() {
@@ -81,13 +81,13 @@ export default {
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.pago_comprobantes, this.modal.item)
+            const res = await patch(urls.comprobante_tipos, this.modal.item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vPagoComprobantes', 'pago_comprobantes', res.data)
-            this.useModals.show.mPagoComprobante = false
+            this.useVistas.updateItem('vPagoComprobantes', 'comprobante_tipos', res.data)
+            this.useModals.show.mComprobanteTipo = false
         },
     },
 }

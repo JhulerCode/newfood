@@ -1,14 +1,14 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Comprobantes de pago</strong>
+            <strong>Tipos de comprobante</strong>
 
             <div class="buttons">
                 <!-- <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vPagoComprobantes:crear')"
+                    v-if="useAuth.verifyPermiso('vComprobanteTipos:crear')"
                 /> -->
             </div>
         </div>
@@ -16,7 +16,7 @@
         <JdTable
             :name="tableName"
             :columns="columns"
-            :datos="vista.pago_comprobantes || []"
+            :datos="vista.comprobante_tipos || []"
             :colAct="true"
             :reload="loadPagoComprobantes"
             :rowOptions="tableRowOptions"
@@ -25,13 +25,13 @@
         </JdTable>
     </div>
 
-    <mPagoComprobante v-if="useModals.show.mPagoComprobante" />
+    <mComprobanteTipo v-if="useModals.show.mComprobanteTipo" />
 </template>
 
 <script>
 import { JdTable } from '@jhuler/components'
 
-import mPagoComprobante from './mPagoComprobante.vue'
+import mComprobanteTipo from './mComprobanteTipo.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -44,7 +44,7 @@ export default {
         // JdButton,
         JdTable,
 
-        mPagoComprobante,
+        mComprobanteTipo,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -53,7 +53,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vPagoComprobantes',
+        tableName: 'vComprobanteTipos',
         columns: [
             {
                 id: 'nombre',
@@ -119,23 +119,24 @@ export default {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vPagoComprobantes:editar',
+                permiso: 'vComprobanteTipos:editar',
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vPagoComprobantes
+        this.vista = this.useVistas.vComprobanteTipos
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vPagoComprobantes:listar') == true)
+        if (this.useAuth.verifyPermiso('vComprobanteTipos:listar') == true)
             this.loadPagoComprobantes()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['serie', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -143,15 +144,15 @@ export default {
         async loadPagoComprobantes() {
             this.setQuery()
 
-            this.vista.pago_comprobantes = []
+            this.vista.comprobante_tipos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data
+            this.vista.comprobante_tipos = res.data
         },
 
         runMethod(method, item) {
@@ -159,12 +160,12 @@ export default {
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_comprobantes}/uno/${item.id}`)
+            const res = await get(`${urls.comprobante_tipos}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mPagoComprobante', 'Editar método de pago', 2, res.data)
+            this.useModals.setModal('mComprobanteTipo', 'Editar método de pago', 2, res.data)
         },
     },
 }

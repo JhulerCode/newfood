@@ -214,7 +214,7 @@ export default {
             await this.loadComprobanteTipos()
 
             const cols = this.columns
-            cols.find((a) => a.id == 'comprobante_tipo').lista = this.vista.pago_comprobantes
+            cols.find((a) => a.id == 'comprobante_tipo').lista = this.vista.comprobante_tipos
             cols.find((a) => a.id == 'comprobante_estado').lista = this.vista.comprobante_estados
 
             const send = {
@@ -243,14 +243,14 @@ export default {
         //         cols: ['nombre', 'estandar'],
         //     }
 
-        //     this.vista.pago_comprobantes = []
+        //     this.vista.comprobante_tipos = []
         //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
+        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
         //     this.useAuth.loading = { show: false, text: '' }
 
         //     if (res.code != 0) return
 
-        //     this.vista.pago_comprobantes = res.data
+        //     this.vista.comprobante_tipos = res.data
         // },
         async loadComprobanteTipos() {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -261,7 +261,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data.comprobante_tipos
         },
     },
 }

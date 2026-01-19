@@ -50,10 +50,14 @@
             :columns="columns"
             :datos="vista.articulos || []"
             :colAct="true"
+            :configRowSelect="true"
             :configFiltros="openConfigFiltros"
             :reload="loadArticulos"
+            :actions="tableActions"
+            @actionClick="runMethod"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
+            ref="jdtable"
         >
         </JdTable>
         <!-- :configCols="true" -->
@@ -120,16 +124,16 @@ export default {
                 seek: false,
                 sort: false,
             },
-            {
-                id: 'foto_url',
-                title: 'Foto',
-                filtrable: false,
-                format: 'img',
-                width: '5rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
+            // {
+            //     id: 'foto_url',
+            //     title: 'Foto',
+            //     filtrable: false,
+            //     format: 'img',
+            //     width: '5rem',
+            //     show: true,
+            //     seek: true,
+            //     sort: true,
+            // },
             {
                 id: 'nombre',
                 title: 'Nombre',
@@ -197,6 +201,20 @@ export default {
                 sort: true,
             },
         ],
+        tableActions: [
+            {
+                icon: 'fa-solid fa-pen-to-square',
+                text: 'Editar',
+                action: 'editarBulk',
+                permiso: 'vCombos:editarBulk',
+            },
+            {
+                icon: 'fa-solid fa-trash-can',
+                text: 'Eliminar',
+                action: 'eliminarBulk',
+                permiso: 'vCombos:eliminarBulk',
+            },
+        ],
         tableRowOptions: [
             {
                 label: 'Editar',
@@ -224,12 +242,14 @@ export default {
         this.columns[1].host = urls.uploads
         this.hideColumns()
 
+        this.verifyRowSelectIsActive()
+
         if (this.vista.loaded) return
         if (this.useAuth.verifyPermiso('vCombos:listar') == true) this.loadArticulos()
     },
     methods: {
         hideColumns() {
-            if (this.useAuth.usuario.empresa.tipo == 2) {
+            if (this.useAuth.empresa.tipo == 2) {
                 this.columns[6].show = false
             }
         },
@@ -239,7 +259,7 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     is_combo: { op: 'Es', val: true },
                 },
-                incl: ['produccion_area1'],
+                incl: ['produccion_area1', 'categoria1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -257,6 +277,13 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulos = res.data
+        },
+        verifyRowSelectIsActive() {
+            if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
+                setTimeout(() => {
+                    this.$refs['jdtable'].toogleSelectItems()
+                }, 0)
+            }
         },
 
         nuevo() {
@@ -436,9 +463,68 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+        async eliminarBulk() {
+            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
+
+            const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
+            if (resQst.isConfirmed == false) return
+
+            const send = { id: 'bulk', ids }
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(`${urls.articulos}/bulk`, send)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.articulos = this.vista.articulos.filter((a) => !a.selected)
+            this.$refs['jdtable'].toogleSelectItems()
+        },
+        async editarBulk() {
+            await this.loadDatosSistema()
+
+            for (const a of this.columns) {
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+            }
+            const cols = this.columns.filter((a) => a.editable == true)
+
+            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
+
+            const send = {
+                uri: 'articulos',
+                nuevo: {},
+                cols,
+                ids,
+            }
+
+            this.useModals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
+        },
+        updatedBulk(item) {
+            for (const a of this.vista.articulos) {
+                if (!item.ids.includes(a.id)) continue
+
+                a.selected = false
+                a[item.prop] = item.val
+                if (item.val1) a[`${item.prop}1`] = item.val1
+            }
+
+            this.$refs['jdtable'].toogleSelectItems()
+        },
+
         async editar(item) {
+            const qry = {
+                incl: ['combo_articulos'],
+                iccl: {
+                    combo_articulos: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -473,6 +559,8 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     activo: { op: 'Es', val: true },
                 },
+                cols: ['nombre'],
+                order: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []
@@ -483,6 +571,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async loadProduccionAreas() {
             const qry = {
@@ -498,6 +587,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.produccion_areas = res.data
+            return res.data
         },
         async loadProductos() {
             this.vista.qry = {

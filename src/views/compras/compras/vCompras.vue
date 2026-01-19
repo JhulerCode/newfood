@@ -247,11 +247,28 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['socio1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            res.data.transaccion_items = res1.data
 
             const send = {
                 transaccion: res.data,
@@ -262,11 +279,28 @@ export default {
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
         },
         async editar(item) {
+            const qry = {
+                incl: ['socio1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            res.data.transaccion_items = res1.data
 
             const send = {
                 transaccion: res.data,

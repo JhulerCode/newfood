@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { urls, get, post } from '@/utils/crud.js'
+import { urls, get, post, patch } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
@@ -12,6 +12,7 @@ export const useAuth = defineStore('auth', {
         token: null,
         usuario: {},
         socket: null,
+        empresa: {},
         app_version: '1.6.7',
 
         menu: [
@@ -31,7 +32,6 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
-                            // { id: 'vCompras:anular', label: 'Anular' },
                             { id: 'vCompras:editar', label: 'Editar' },
                             { id: 'vCompras:eliminar', label: 'Eliminar' },
                         ]
@@ -152,6 +152,8 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCombos:eliminar', label: 'Eliminar' },
 
                             { id: 'vCombos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vCombos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vCombos:eliminarBulk', label: 'Eliminar masivo' },
                             { id: 'vCombos:crearComponentesBulk', label: 'Crear componentes masivo' },
                         ]
                     },
@@ -225,9 +227,9 @@ export const useAuth = defineStore('auth', {
                         ]
                     },
                     {
-                        label: 'Comprobantes de pago', goto: 'vPagoComprobantes', permisos: [
-                            { id: 'vPagoComprobantes:listar', label: 'Listar' },
-                            { id: 'vPagoComprobantes:editar', label: 'Editar' },
+                        label: 'Tipos de comprobante', goto: 'vComprobanteTipos', permisos: [
+                            { id: 'vComprobanteTipos:listar', label: 'Listar' },
+                            { id: 'vComprobanteTipos:editar', label: 'Editar' },
                         ]
                     },
                     {
@@ -287,17 +289,34 @@ export const useAuth = defineStore('auth', {
 
             if (result.code != 0) return false
 
+            this.setSessionDatos(result)
+
+            // this.usuario = deepCopy(result.data)
+            // this.permisos = this.usuario.permisos
+
+            // this.setTheme(this.usuario.theme)
+            // this.setPrimaryColor(this.usuario.color)
+            // // Formato de fecha
+            // this.showNavbar = this.usuario.menu_visible
+
+            this.connectSocket()
+
+            return true
+        },
+        setSessionDatos(result) {
             this.usuario = deepCopy(result.data)
             this.permisos = this.usuario.permisos
 
             this.setTheme(this.usuario.theme)
             this.setPrimaryColor(this.usuario.color)
+            this.setInicialTables(this.usuario.tables)
+            this.setInicialAvances(this.usuario.avances)
             // Formato de fecha
             this.showNavbar = this.usuario.menu_visible
 
-            this.connectSocket()
-
-            return true
+            if (result.empresa) {
+                this.empresa = deepCopy(result.empresa)
+            }
         },
         connectSocket() {
             this.disconnectSocket()
@@ -312,9 +331,9 @@ export const useAuth = defineStore('auth', {
             this.socket.on('connect', () => {
                 this.socket.emit('joinEmpresa', {
                     empresa: {
-                        id: this.usuario.empresa.id,
-                        razon_social: this.usuario.empresa.razon_social,
-                        subdominio: this.usuario.empresa.subdominio,
+                        id: this.empresa.id,
+                        razon_social: this.empresa.razon_social,
+                        subdominio: this.empresa.subdominio,
                     },
                     colaborador: {
                         id: this.usuario.colaborador,
@@ -486,6 +505,28 @@ export const useAuth = defineStore('auth', {
                     Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
                 }
             }
+        },
+        setInicialTables(tables) {
+            this.tables = tables
+        },
+
+        // ----- AVANCES ----- //
+        async saveAvances(card, data) {
+            this.avances[card] = data
+
+            const send = {
+                id: this.usuario.colaborador,
+                avances: this.avances
+            }
+
+            this.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.colaboradores}/avances`, send, false)
+            this.setLoading(false)
+
+            if (res.code != 0) return
+        },
+        setInicialAvances(avances) {
+            this.avances = avances
         },
 
         // --- PREFERENCIAS --- //

@@ -26,7 +26,7 @@
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
-        <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
+        <vComprobanteTipos v-if="useVistas.show.vComprobanteTipos" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
         <!-- <vCajas v-if="useVistas.show.vCajas" /> -->
         <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
@@ -69,9 +69,8 @@ import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 //----- AJUSTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
-import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
+import vComprobanteTipos from '@/views/ajustes/comprobante_tipos/vComprobanteTipos.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
-// import vCajas from '@/views/ajustes/cajas/vCajas.vue'
 import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
 import vSalones from '@/views/ajustes/salones/vSalones.vue'
 
@@ -103,7 +102,7 @@ export default {
 
         vEmpresa,
         vColaboradores,
-        VPagoComprobantes,
+        vComprobanteTipos,
         vPagoMetodos,
         // vCajas,
         vProduccionAreas,
