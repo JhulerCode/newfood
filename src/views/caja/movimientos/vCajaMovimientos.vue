@@ -168,7 +168,7 @@ export default {
                     caja_apertura: { op: 'Es', val: this.vista.caja_apertura.id },
                     operacion: { op: 'No es', val: '1' },
                 },
-                incl: ['pago_metodo1', 'comprobante1'],
+                incl: ['pago_metodo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -193,7 +193,6 @@ export default {
             const item = {
                 fecha: dayjs().format('YYYY-MM-DD'),
                 caja_apertura: this.vista.caja_apertura.id,
-                pago_metodo: 1,
             }
 
             this.useModals.setModal('mCajaMovimiento', 'Nueva categoría', 1, item)

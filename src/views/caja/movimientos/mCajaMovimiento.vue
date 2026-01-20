@@ -114,8 +114,12 @@ export default {
 
             return false
         },
+        shapeDatos(){
+            this.dinero_movimiento.pago_metodo = `${this.useAuth.empresa.subdominio}-EFECTIVO`
+        },
         async crear() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.dinero_movimientos, this.dinero_movimiento)
