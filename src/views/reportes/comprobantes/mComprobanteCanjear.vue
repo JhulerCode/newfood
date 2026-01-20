@@ -134,6 +134,7 @@ export default {
                     'direccion',
                     'referencia',
                 ],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.modal.spinSocios = true
@@ -160,15 +161,7 @@ export default {
         //     this.modal.comprobante_tipos = res.data
         // },
         async loadComprobanteTipos() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.comprobanteTiposLoaded = false
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
-            this.modal.comprobanteTiposLoaded = true
-
-            if (res.code != 0) return
-
-            this.modal.comprobante_tipos = res.data.comprobante_tipos
+            this.modal.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
         },
 
         setSocio(item) {

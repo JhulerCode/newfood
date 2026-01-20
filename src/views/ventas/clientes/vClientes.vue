@@ -135,12 +135,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vClientes:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS`}
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vClientes:eliminar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS`}
             },
         ],
     }),

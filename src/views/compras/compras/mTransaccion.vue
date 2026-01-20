@@ -161,8 +161,6 @@ export default {
         this.showButtons()
 
         this.loadDatosSistema()
-        // this.loadPagoComprobantes()
-        // this.loadComprobanteTipos()
 
         if (this.modal.mode == 1) {
             this.setTotalesCero()
@@ -199,7 +197,6 @@ export default {
             }
 
             this.modal.mode = 1
-            // this.modal.socio = {}
             this.setTotalesCero()
         },
         async nuevo() {
@@ -212,19 +209,6 @@ export default {
                 if (resQst.isConfirmed) this.initPedido()
             }
         },
-
-        // changeDate() {
-        //     for (const a of this.modal.transaccion.transaccion_items) {
-        //         a.lote = this.setLote()
-        //     }
-        // },
-        // setLote() {
-        //     return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
-        // },
-
-        // setSocio(item) {
-        //     this.modal.socio = { ...item }
-        // },
 
         checkDatos() {
             const props = [
@@ -322,38 +306,7 @@ export default {
             if (res.code !== 0) return
 
             this.modal.socios = res.data
-
-            // if (this.modal.transaccion.socio) {
-            //     this.modal.socio = this.modal.socios.find(
-            //         (a) => a.id == this.modal.transaccion.socio,
-            //     )
-            // }
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: {},
-        //         cols: ['nombre', 'serie', 'correlativo'],
-        //     }
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.modal.comprobante_tipos = res.data
-        // },
-        // async loadComprobanteTipos() {
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     this.modal.comprobanteTiposLoaded = false
-        //     const res = await get(urls.empresa)
-        //     this.useAuth.setLoading(false)
-        //     this.modal.comprobanteTiposLoaded = true
-
-        //     if (res.code != 0) return
-        //     console.log(res.data)
-        //     this.modal.comprobante_tipos = res.data.comprobante_tipos
-        // },
         async loadDatosSistema() {
             const qry = ['transaccion_estados', 'pago_condiciones', 'comprobante_tipos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)

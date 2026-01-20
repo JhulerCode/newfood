@@ -405,7 +405,7 @@ export default {
 
         this.sumarItems()
 
-        if (this.vista.pedido.venta_canal == 3) {
+        if (this.vista.pedido.venta_canal == 3 && this.vista.mode == 2) {
             await this.loadColaboradores()
             await this.loadPagoMetodos()
         }
@@ -465,7 +465,12 @@ export default {
                     'foto_url',
                     'categoria',
                 ],
-                incl: ['receta_insumos', 'combo_articulos', 'produccion_area1'],
+                incl: ['combo_articulos', 'produccion_area1'],
+                iccl: {
+                    combo_articulos: {
+                        incl: ['articulo1']
+                    }
+                }
             }
 
             this.vista.articulosLoaded = false

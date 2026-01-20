@@ -422,7 +422,7 @@ export const useAuth = defineStore('auth', {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
                 useVistas().vPedidos?.setIntervalTimeAgo()
                 useVistas().vPedidos?.calculatePendientes()
-                console.log(data.venta_canal)
+                // console.log(data.venta_canal)
                 if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 

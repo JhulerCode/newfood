@@ -102,7 +102,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'pagos_monto',
+                id: 'comprobante_pagos_monto',
                 title: 'Cobrado',
                 type: 'number',
                 format: 'currency',
@@ -133,11 +133,12 @@ export default {
                 fltr: {
                     transaccion: { op: 'Es', val: this.modal.transaccion.id },
                 },
-                sqls: ['pagos_monto'],
+                incl: ['socio1'],
+                sqls: ['comprobante_pagos_monto'],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)
-            this.modal.qry.cols.push('serie', 'numero')
+            this.modal.qry.cols.push('doc_tipo', 'serie', 'numero')
         },
         async loadComprobantes() {
             this.setQuery()

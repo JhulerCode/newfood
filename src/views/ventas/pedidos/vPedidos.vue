@@ -63,7 +63,7 @@
                         icon="fa-solid fa-rotate-right"
                         text="Recargar"
                         tipo="2"
-                        @click="loadPedidos()"
+                        @click="loadSalones()"
                         v-if="useAuth.verifyPermiso('vPedidos:listar')"
                     />
                 </div>
@@ -392,10 +392,6 @@ export default {
         clearInterval(this.vista.intervalAgo)
     },
     methods: {
-        initFiltros() {
-            this.columns[0].op = 'Es'
-            this.columns[0].val = dayjs().format('YYYY-MM-DD')
-        },
         setQuery() {
             this.vista.qry = {
                 fltr: {
@@ -423,6 +419,11 @@ export default {
             if (this.vista.venta_canal == 1) {
                 this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.incl.push('venta_mesa1')
+                this.vista.qry.iccl = {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                }
             }
         },
         async loadPedidos() {
@@ -448,6 +449,7 @@ export default {
                 },
                 cols: ['nombre'],
                 incl: ['mesas'],
+                ordr: [['nombre', 'ASC']],
             }
         },
         async loadSalones() {
@@ -588,12 +590,41 @@ export default {
         runMethod(method, item, item2) {
             this[method](item, item2)
         },
-        async ver(item) {
+        async loadPedido(item) {
+            const qry = {
+                incl: ['socio1', 'venta_mesa1', 'venta_pago_metodo1'],
+                iccl: {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+            if (res.code != 0) return false
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+                ordr: [['createdAt', 'ASC']],
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return false
+
+            res.data.transaccion_items = res1.data
+
+            return res
+        },
+        async ver(item) {
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -616,11 +647,8 @@ export default {
             )
         },
         async editar(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -636,20 +664,10 @@ export default {
             }
 
             this.useVistas.showVista('vComanda', `Editar pedido N° ${item.venta_codigo}`, send)
-            // this.useModals.setModal(
-            //     'mPedidoDetalles',
-            //     `Editar pedido N° ${item.venta_codigo}`,
-            //     2,
-            //     send,
-            //     true,
-            // )
         },
         async editarDetalles(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -709,14 +727,10 @@ export default {
             this.useAuth.socket.emit('vPedidos:anular', item)
         },
         async imprimirComanda(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             let atencion = ''
-
             if (res.data.venta_canal == 1) {
                 atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
@@ -734,30 +748,14 @@ export default {
                 productos: res.data.transaccion_items,
                 subdominio: this.useAuth.empresa.subdominio,
             }
-            // console.log(send)
+
             this.useAuth.socket.emit('vComanda:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async imprimirPrecuenta(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             let atencion = ''
-
             if (res.data.venta_canal == 1) {
                 atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
@@ -785,25 +783,10 @@ export default {
             }
 
             this.useAuth.socket.emit('vComanda:imprimirPrecuenta', send)
-
-            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async generarComprobante(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)

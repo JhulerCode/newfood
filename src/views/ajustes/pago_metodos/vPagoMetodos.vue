@@ -90,12 +90,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPagoMetodos:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO`}
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vPagoMetodos:eliminar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO`}
             },
         ],
     }),
