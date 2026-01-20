@@ -14,7 +14,7 @@
                 label="Tipo"
                 :nec="true"
                 v-model="modal.transaccion.tipo"
-                :lista="modal.kardex_tipos?.filter(a => ['3', '4'].includes(a.id)) || []"
+                :lista="modal.kardex_tipos?.filter((a) => ['3', '4'].includes(a.id)) || []"
                 style="grid-column: 1/3"
                 @elegir="modal.is_nuevo_lote = false"
             />
@@ -143,6 +143,7 @@ export default {
             if (res.code != 0) return
 
             this.initTransaccion()
+            this.useModals.show.mAjusteStock = false
         },
 
         async loadDatosSistema() {

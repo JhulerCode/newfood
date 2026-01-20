@@ -351,6 +351,18 @@ export const useAuth = defineStore('auth', {
             })
         },
         listenSocket() {
+            // --- empresa --- //
+            this.socket.on('empresa-updated', (data) => {
+                // console.log(data)
+                this.empresa = data
+            })
+
+            // --- colaboradores --- //
+            this.socket.on('colaborador-updated', (data) => {
+                console.log(data)
+                // this.empresa = data
+            })
+
             // --- Pedidos --- //
             this.socket.on('vComanda:crear', (data) => {
                 useVistas().addItem('vPedidos', 'pedidos', data, 'first')

@@ -28,6 +28,7 @@
                     :nec="true"
                     v-model="vista.empresa.ruc"
                     style="grid-column: 1/3"
+                    :disabled="true"
                 />
 
                 <JdInput
@@ -35,6 +36,7 @@
                     :nec="true"
                     v-model="vista.empresa.razon_social"
                     style="grid-column: 1/5"
+                    :disabled="true"
                 />
 
                 <JdInput
@@ -98,14 +100,14 @@
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
                 />
 
-                <div v-if="vista.empresa.archivo || vista.empresa.logo_url" class="empresa-logo">
+                <div v-if="vista.empresa.archivo || vista.empresa.foto" class="empresa-logo">
                     <img
                         :src="vista.blob"
                         :alt="'logo-' + vista.empresa.razon_social"
                         v-if="vista.empresa.archivo"
                     />
                     <img
-                        :src="vista.empresa.logo_url"
+                        :src="vista.empresa.foto.url"
                         :alt="'logo-' + vista.empresa.razon_social"
                         v-else
                     />
@@ -200,7 +202,7 @@ export default {
     methods: {
         async loadEmpresa() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(urls.empresa)
+            const res = await get(`${urls.empresa}/uno/${this.useAuth.empresa.id}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -211,21 +213,15 @@ export default {
 
         checkDatos() {
             const props = [
-                'ruc',
-                'razon_social',
                 'nombre_comercial',
+
                 'domicilio_fiscal',
                 'ubigeo',
+                'igv_porcentaje',
 
                 'telefono',
                 'correo',
                 'logo',
-
-                'igv_porcentaje',
-                // 'sol_usuario',
-                // 'sol_clave',
-
-                // 'pc_principal_ip',
             ]
 
             if (incompleteData(this.vista.empresa, props)) {
@@ -248,17 +244,17 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.empresa = res.data
+            // this.vista.empresa = res.data
         },
 
-        subirCdt() {
-            this.useModals.setModal(
-                'mEmpresaCdt',
-                'Subir certificado digital tributario',
-                null,
-                this.vista.empresa,
-            )
-        },
+        // subirCdt() {
+        //     this.useModals.setModal(
+        //         'mEmpresaCdt',
+        //         'Subir certificado digital tributario',
+        //         null,
+        //         this.vista.empresa,
+        //     )
+        // },
     },
 }
 </script>
