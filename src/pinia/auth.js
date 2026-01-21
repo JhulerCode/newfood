@@ -1,11 +1,11 @@
-import { defineStore } from "pinia"
+import { defineStore } from 'pinia'
 import { urls, get, post, patch } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
 import { useModals } from '@/pinia/modals.js'
-import { io } from "socket.io-client"
+import { io } from 'socket.io-client'
 import { host } from '@/utils/crud.js'
-import { jmsg } from "@/utils/swal"
+import { jmsg } from '@/utils/swal'
 
 export const useAuth = defineStore('auth', {
     state: () => ({
@@ -17,40 +17,54 @@ export const useAuth = defineStore('auth', {
 
         menu: [
             {
-                id: 'compras', label: 'Compras', icon: 'fa-solid fa-cart-shopping', children: [
+                id: 'compras',
+                label: 'Compras',
+                icon: 'fa-solid fa-cart-shopping',
+                children: [
                     {
-                        label: 'Proveedores', goto: 'vProveedores', permisos: [
+                        label: 'Proveedores',
+                        goto: 'vProveedores',
+                        permisos: [
                             { id: 'vProveedores:listar', label: 'Listar' },
                             { id: 'vProveedores:crear', label: 'Crear' },
                             { id: 'vProveedores:ver', label: 'Ver' },
                             { id: 'vProveedores:editar', label: 'Editar' },
                             { id: 'vProveedores:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Compras', goto: 'vCompras', permisos: [
+                        label: 'Compras',
+                        goto: 'vCompras',
+                        permisos: [
                             { id: 'vCompras:listar', label: 'Listar' },
                             { id: 'vCompras:crear', label: 'Crear' },
                             { id: 'vCompras:ver', label: 'Ver' },
                             { id: 'vCompras:editar', label: 'Editar' },
                             { id: 'vCompras:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
-                ]
+                ],
             },
             {
-                id: 'ventas', label: 'Ventas', icon: 'fa-solid fa-store', children: [
+                id: 'ventas',
+                label: 'Ventas',
+                icon: 'fa-solid fa-store',
+                children: [
                     {
-                        label: 'Clientes', goto: 'vClientes', permisos: [
+                        label: 'Clientes',
+                        goto: 'vClientes',
+                        permisos: [
                             { id: 'vClientes:listar', label: 'Listar' },
                             { id: 'vClientes:crear', label: 'Crear' },
                             { id: 'vClientes:ver', label: 'Ver' },
                             { id: 'vClientes:editar', label: 'Editar' },
                             { id: 'vClientes:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Pedidos', goto: 'vPedidos', permisos: [
+                        label: 'Pedidos',
+                        goto: 'vPedidos',
+                        permisos: [
                             { id: 'vPedidos:listar', label: 'Listar' },
                             { id: 'vPedidos:crear', label: 'Crear' },
                             { id: 'vPedidos:ver', label: 'Ver' },
@@ -69,46 +83,60 @@ export const useAuth = defineStore('auth', {
 
                             { id: 'vPedidos:unirMesas', label: 'Unir mesas' },
                             { id: 'vPedidos:cambiarMesa', label: 'Cambiar mesa' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Punto de venta', goto: 'vPos', permisos: [
-                            { id: 'vPos:crear', label: 'Crear' },
-                        ]
-                    }
-                ]
+                        label: 'Punto de venta',
+                        goto: 'vPos',
+                        permisos: [{ id: 'vPos:crear', label: 'Crear' }],
+                    },
+                ],
             },
             {
-                id: 'caja', label: 'Caja', icon: 'fa-solid fa-cash-register', children: [
+                id: 'caja',
+                label: 'Caja',
+                icon: 'fa-solid fa-cash-register',
+                children: [
                     {
-                        label: 'Apertura y cierre', goto: 'vCajaResumen', permisos: [
+                        label: 'Apertura y cierre',
+                        goto: 'vCajaResumen',
+                        permisos: [
                             { id: 'vCajaResumen:ver', label: 'Ver resumen' },
                             { id: 'vCajaResumen:aperturar', label: 'Aperturar caja' },
                             { id: 'vCajaResumen:cerrar', label: 'Cerrar caja' },
                         ],
                     },
                     {
-                        label: 'Ingresos y egresos', goto: 'vCajaMovimientos', permisos: [
+                        label: 'Ingresos y egresos',
+                        goto: 'vCajaMovimientos',
+                        permisos: [
                             { id: 'vCajaMovimientos:listar', label: 'Listar' },
                             { id: 'vCajaMovimientos:crear', label: 'Crear' },
                             { id: 'vCajaMovimientos:editar', label: 'Editar' },
                             { id: 'vCajaMovimientos:eliminar', label: 'Eliminar' },
-                        ]
-                    }
-                ]
+                        ],
+                    },
+                ],
             },
             {
-                id: 'articulos', label: 'Artículos', icon: 'fa-solid fa-boxes-stacked', children: [
+                id: 'articulos',
+                label: 'Artículos',
+                icon: 'fa-solid fa-boxes-stacked',
+                children: [
                     {
-                        label: 'Categorías', goto: 'vArticuloCategorias', permisos: [
+                        label: 'Categorías',
+                        goto: 'vArticuloCategorias',
+                        permisos: [
                             { id: 'vArticuloCategorias:listar', label: 'Listar' },
                             { id: 'vArticuloCategorias:crear', label: 'Crear' },
                             { id: 'vArticuloCategorias:editar', label: 'Editar' },
                             { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Insumos', goto: 'vInsumos', permisos: [
+                        label: 'Insumos',
+                        goto: 'vInsumos',
+                        permisos: [
                             { id: 'vInsumos:listar', label: 'Listar' },
                             { id: 'vInsumos:crear', label: 'Crear' },
                             { id: 'vInsumos:editar', label: 'Editar' },
@@ -121,10 +149,12 @@ export const useAuth = defineStore('auth', {
                             { id: 'vInsumos:crearBulk', label: 'Crear masivo' },
                             { id: 'vInsumos:editarBulk', label: 'Editar masivo' },
                             { id: 'vInsumos:eliminarBulk', label: 'Eliminar masivo' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Productos', goto: 'vProductos', permisos: [
+                        label: 'Productos',
+                        goto: 'vProductos',
+                        permisos: [
                             { id: 'vProductos:listar', label: 'Listar' },
                             { id: 'vProductos:crear', label: 'Crear' },
                             { id: 'vProductos:editar', label: 'Editar' },
@@ -142,10 +172,12 @@ export const useAuth = defineStore('auth', {
                             { id: 'vProductos:crearReceta', label: 'Crear receta' },
                             { id: 'vProductos:editarReceta', label: 'Editar receta' },
                             { id: 'vProductos:eliminarReceta', label: 'Eliminar receta' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Combos', goto: 'vCombos', permisos: [
+                        label: 'Combos',
+                        goto: 'vCombos',
+                        permisos: [
                             { id: 'vCombos:listar', label: 'Listar' },
                             { id: 'vCombos:crear', label: 'Crear' },
                             { id: 'vCombos:editar', label: 'Editar' },
@@ -154,23 +186,33 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCombos:crearBulk', label: 'Crear masivo' },
                             { id: 'vCombos:editarBulk', label: 'Editar masivo' },
                             { id: 'vCombos:eliminarBulk', label: 'Eliminar masivo' },
-                            { id: 'vCombos:crearComponentesBulk', label: 'Crear componentes masivo' },
-                        ]
+                            {
+                                id: 'vCombos:crearComponentesBulk',
+                                label: 'Crear componentes masivo',
+                            },
+                        ],
                     },
-                ]
+                ],
             },
             {
-                id: 'reportes', label: 'Reportes', icon: 'fa-solid fa-chart-line', children: [
+                id: 'reportes',
+                label: 'Reportes',
+                icon: 'fa-solid fa-chart-line',
+                children: [
                     {
-                        label: 'Pedidos', goto: 'vReportePedidos', permisos: [
+                        label: 'Pedidos',
+                        goto: 'vReportePedidos',
+                        permisos: [
                             { id: 'vReportePedidos:listar', label: 'Listar' },
                             { id: 'vReportePedidos:ver', label: 'Ver' },
                             { id: 'vReportePedidos:imprimirComanda', label: 'Imprimir' },
                             { id: 'vReportePedidos:verComprobantes', label: 'Ver comprobantes' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Comprobantes', goto: 'vReporteComprobantes', permisos: [
+                        label: 'Comprobantes',
+                        goto: 'vReporteComprobantes',
+                        permisos: [
                             { id: 'vReporteComprobantes:listar', label: 'Listar' },
                             { id: 'vReporteComprobantes:anular', label: 'Anular' },
                             { id: 'vReporteComprobantes:canjear', label: 'Canjear' },
@@ -182,74 +224,94 @@ export const useAuth = defineStore('auth', {
                             { id: 'vReporteComprobantes:descargarPdf', label: 'Descargar PDF' },
                             { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },
                             { id: 'vReporteComprobantes:descargarCdr', label: 'Descargar CDR' },
-                            { id: 'vReporteComprobantes:consultarEstado', label: 'Consultar estado' },
-                        ]
+                            {
+                                id: 'vReporteComprobantes:consultarEstado',
+                                label: 'Consultar estado',
+                            },
+                        ],
                     },
                     {
-                        label: 'Comprobantes detallado', goto: 'vComprobantesDetallado', permisos: [
-                            { id: 'vComprobantesDetallado:listar', label: 'Listar' },
-                        ]
+                        label: 'Comprobantes detallado',
+                        goto: 'vComprobantesDetallado',
+                        permisos: [{ id: 'vComprobantesDetallado:listar', label: 'Listar' }],
                     },
                     {
-                        label: 'Aperturas de caja', goto: 'vCajaAperturas', permisos: [
+                        label: 'Aperturas de caja',
+                        goto: 'vCajaAperturas',
+                        permisos: [
                             { id: 'vCajaAperturas:listar', label: 'Listar' },
                             { id: 'vCajaAperturas:verResumen', label: 'Ver resumen' },
                             { id: 'vCajaAperturas:imprimirResumen', label: 'Imprimir resumen' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Ingresos y egresos', goto: 'vDineroMovimientos', permisos: [
-                            { id: 'vDineroMovimientos:listar', label: 'Listar' },
-                        ]
+                        label: 'Ingresos y egresos',
+                        goto: 'vDineroMovimientos',
+                        permisos: [{ id: 'vDineroMovimientos:listar', label: 'Listar' }],
                     },
                     {
-                        label: 'Dashboard', goto: 'vDashboard', permisos: [
-                            { id: 'vDashboard:ver', label: 'Listar' },
-                        ]
-                    }
-                ]
+                        label: 'Dashboard',
+                        goto: 'vDashboard',
+                        permisos: [{ id: 'vDashboard:ver', label: 'Listar' }],
+                    },
+                ],
             },
             {
-                id: 'ajustes', label: 'Ajustes', icon: 'fa-solid fa-gear', children: [
+                id: 'ajustes',
+                label: 'Ajustes',
+                icon: 'fa-solid fa-gear',
+                children: [
                     {
-                        label: 'Empresa', goto: 'vEmpresa', permisos: [
+                        label: 'Empresa',
+                        goto: 'vEmpresa',
+                        permisos: [
                             { id: 'vEmpresa:ver', label: 'Ver' },
                             { id: 'vEmpresa:editar', label: 'Editar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Colaboradores', goto: 'vColaboradores', permisos: [
+                        label: 'Colaboradores',
+                        goto: 'vColaboradores',
+                        permisos: [
                             { id: 'vColaboradores:listar', label: 'Listar' },
                             { id: 'vColaboradores:crear', label: 'Crear' },
                             { id: 'vColaboradores:ver', label: 'Ver' },
                             { id: 'vColaboradores:editar', label: 'Editar' },
                             { id: 'vColaboradores:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Tipos de comprobante', goto: 'vComprobanteTipos', permisos: [
+                        label: 'Tipos de comprobante',
+                        goto: 'vComprobanteTipos',
+                        permisos: [
                             { id: 'vComprobanteTipos:listar', label: 'Listar' },
                             { id: 'vComprobanteTipos:editar', label: 'Editar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Métodos de pago', goto: 'vPagoMetodos', permisos: [
+                        label: 'Métodos de pago',
+                        goto: 'vPagoMetodos',
+                        permisos: [
                             { id: 'vPagoMetodos:listar', label: 'Listar' },
                             { id: 'vPagoMetodos:crear', label: 'Crear' },
                             { id: 'vPagoMetodos:editar', label: 'Editar' },
                             { id: 'vPagoMetodos:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Áreas de impresión', goto: 'vProduccionAreas', permisos: [
+                        label: 'Áreas de impresión',
+                        goto: 'vProduccionAreas',
+                        permisos: [
                             { id: 'vProduccionAreas:listar', label: 'Listar' },
                             { id: 'vProduccionAreas:crear', label: 'Crear' },
                             { id: 'vProduccionAreas:editar', label: 'Editar' },
                             { id: 'vProduccionAreas:eliminar', label: 'Eliminar' },
-                        ]
+                        ],
                     },
                     {
-                        label: 'Salones y mesas', goto: 'vSalones', permisos: [
+                        label: 'Salones y mesas',
+                        goto: 'vSalones',
+                        permisos: [
                             { id: 'vSalones:listar', label: 'Listar' },
                             { id: 'vSalones:crear', label: 'Crear' },
                             { id: 'vSalones:editar', label: 'Editar' },
@@ -258,9 +320,9 @@ export const useAuth = defineStore('auth', {
                             { id: 'vSalones:crearMesa', label: 'Crear mesa' },
                             { id: 'vSalones:editarMesa', label: 'Editar mesa' },
                             { id: 'vSalones:eliminarMesa', label: 'Eliminar mesa' },
-                        ]
+                        ],
                     },
-                ]
+                ],
             },
         ],
 
@@ -408,6 +470,13 @@ export const useAuth = defineStore('auth', {
                 useVistas().vPedidos?.calculatePendientes()
             })
 
+            this.socket.on('vPedidos:entregarBulk', (data) => {
+                useVistas().vPedidos.pedidos = useVistas().vPedidos.pedidos.filter(
+                    (a) => !data.includes(a.id),
+                )
+                useVistas().vPedidos?.calculatePendientes()
+            })
+
             this.socket.on('mCambiarMesa:cambiar', (data) => {
                 useVistas().updateItem('vPedidos', 'pedidos', data)
                 useVistas().vPedidos?.setIntervalTimeAgo()
@@ -450,7 +519,11 @@ export const useAuth = defineStore('auth', {
         },
         async logout(vueRouter) {
             this.setLoading(true, 'Cerrando sesion...')
-            const result = await post(`${urls.signin}/logout`, { id: this.usuario.colaborador }, false)
+            const result = await post(
+                `${urls.signin}/logout`,
+                { id: this.usuario.colaborador },
+                false,
+            )
             this.setLoading(false)
 
             if (result.code != 0) return
@@ -465,32 +538,34 @@ export const useAuth = defineStore('auth', {
         disconnectSocket() {
             if (this.socket) {
                 // Detén intentos de reconexión
-                this.socket.io.opts.reconnection = false;
+                this.socket.io.opts.reconnection = false
 
                 // Elimina todos los listeners
-                this.socket.removeAllListeners();
+                this.socket.removeAllListeners()
 
                 // Cierra la conexión
-                this.socket.disconnect();
+                this.socket.disconnect()
 
                 // Limpia la referencia
-                this.socket = null;
+                this.socket = null
 
-                console.log("🔌 Socket desconectado y limpiado completamente");
+                console.log('🔌 Socket desconectado y limpiado completamente')
             }
         },
         verifyPermiso(...permisos) {
             // console.log(permisos)
-            return permisos.some(p => this.usuario?.permisos?.includes(p))
+            return permisos.some((p) => this.usuario?.permisos?.includes(p))
         },
 
         // --- TABLES --- //
         updateQuery(columns, qry) {
-            columns.filter(a => a.op).forEach(b => {
-                qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
-            })
+            columns
+                .filter((a) => a.op)
+                .forEach((b) => {
+                    qry.fltr[b.id] = { op: b.op, val: b.val, val1: b.val1 }
+                })
 
-            qry.cols = columns.filter(a => a.show).map(b => b.id)
+            qry.cols = columns.filter((a) => a.show).map((b) => b.id)
         },
         saveTableColumns(tableName, columns) {
             if (!tableName) return
@@ -506,7 +581,7 @@ export const useAuth = defineStore('auth', {
                     val: col.val,
                     val1: col.val1,
                     orden: col.orden,
-                    sortDirection: col.sortDirection
+                    sortDirection: col.sortDirection,
                 }
             })
         },
@@ -514,7 +589,10 @@ export const useAuth = defineStore('auth', {
             // --- RECUPERA LAS COLUMNAS GUARDADAS --- //
             if (this.tables[tableName]) {
                 for (const a of columns) {
-                    Object.assign(a, this.tables[tableName].find(b => b.id === a.id))
+                    Object.assign(
+                        a,
+                        this.tables[tableName].find((b) => b.id === a.id),
+                    )
                 }
             }
         },
@@ -528,7 +606,7 @@ export const useAuth = defineStore('auth', {
 
             const send = {
                 id: this.usuario.colaborador,
-                avances: this.avances
+                avances: this.avances,
             }
 
             this.setLoading(true, 'Cargando...')
@@ -550,8 +628,7 @@ export const useAuth = defineStore('auth', {
 
             if (theme == '1') {
                 document.body.classList.remove('dark-mode')
-            }
-            else {
+            } else {
                 document.body.classList.add('dark-mode')
             }
         },
@@ -560,18 +637,21 @@ export const useAuth = defineStore('auth', {
 
             this.usuario.color = color
             document.documentElement.style.setProperty('--primary-color', color)
-            document.documentElement.style.setProperty('--primary-color-dark', this.obscurecerColor(color))
+            document.documentElement.style.setProperty(
+                '--primary-color-dark',
+                this.obscurecerColor(color),
+            )
         },
         obscurecerColor(color, porcentaje = 10) {
-            const r = parseInt(color.substring(1, 3), 16);
-            const g = parseInt(color.substring(3, 5), 16);
-            const b = parseInt(color.substring(5, 7), 16);
+            const r = parseInt(color.substring(1, 3), 16)
+            const g = parseInt(color.substring(3, 5), 16)
+            const b = parseInt(color.substring(5, 7), 16)
 
-            const rObscurecido = Math.max(0, Math.floor(r - (r * porcentaje / 100)));
-            const gObscurecido = Math.max(0, Math.floor(g - (g * porcentaje / 100)));
-            const bObscurecido = Math.max(0, Math.floor(b - (b * porcentaje / 100)));
+            const rObscurecido = Math.max(0, Math.floor(r - (r * porcentaje) / 100))
+            const gObscurecido = Math.max(0, Math.floor(g - (g * porcentaje) / 100))
+            const bObscurecido = Math.max(0, Math.floor(b - (b * porcentaje) / 100))
 
-            return `#${rObscurecido.toString(16).padStart(2, '0')}${gObscurecido.toString(16).padStart(2, '0')}${bObscurecido.toString(16).padStart(2, '0')}`;
+            return `#${rObscurecido.toString(16).padStart(2, '0')}${gObscurecido.toString(16).padStart(2, '0')}${bObscurecido.toString(16).padStart(2, '0')}`
         },
 
         setLoading(show, text) {
@@ -582,6 +662,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['token', 'isDarkMode', 'tables', 'avances']
-    }
+        paths: ['token', 'isDarkMode', 'tables', 'avances'],
+    },
 })

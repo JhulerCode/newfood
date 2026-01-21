@@ -122,9 +122,13 @@
                 :datos="pedidosFiltered || []"
                 :colNro="true"
                 :colAct="true"
+                :configRowSelect="true"
                 :reload="loadPedidos"
+                :actions="tableActions"
+                @actionClick="runMethod"
                 :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
+                ref="jdtable"
             >
             </JdTable>
         </template>
@@ -260,6 +264,14 @@ export default {
                 format: 'estado',
                 width: '10rem',
                 show: true,
+            },
+        ],
+        tableActions: [
+            {
+                icon: 'fa-solid fa-flag-checkered',
+                text: 'Confirmar entrega',
+                action: 'entregarBulk',
+                permiso: 'vPedidos:entregar',
             },
         ],
         tableRowOptions: [
@@ -861,6 +873,27 @@ export default {
             if (res.code != 0) return
 
             this.useAuth.socket.emit('vPedidos:entregar', res.data)
+        },
+        async entregarBulk() {
+            const ids = this.vista.pedidos.filter((a) => a.selected).map((b) => b.id)
+
+            const resQst = await jqst(`¿Está seguro de entregar ${ids.length} los pedidos?`)
+            if (resQst.isConfirmed == false) return
+
+            const send = { ids }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await post(
+                `${urls.transacciones}/entregar-bulk`,
+                send,
+                'Pedido entregado con éxito',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useAuth.socket.emit('vPedidos:entregarBulk', ids)
+            this.$refs['jdtable'].toogleSelectItems()
         },
 
         async abrirComandaMesa(mesa) {
