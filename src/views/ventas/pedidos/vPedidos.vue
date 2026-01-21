@@ -549,7 +549,7 @@ export default {
                     return acc
                 }, {})
 
-            console.log(conteoPorTipo)
+            // console.log(conteoPorTipo)
             this.vista.mesaPendientes = conteoPorTipo[1] || 0
             this.vista.llevarPendientes = conteoPorTipo[2] || 0
             this.vista.deliveryPendientes = conteoPorTipo[3] || 0

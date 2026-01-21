@@ -29,6 +29,7 @@
         </JdTable>
     </div>
 
+    <mComprobante v-if="useModals.show.mComprobante" />
     <mComprobantePagos
         v-if="useModals.show.mComprobantePagos"
         @pagosModificados="actualizarPagos"
@@ -52,6 +53,7 @@ import {
     mPdfViewer,
 } from '@jhuler/components'
 
+import mComprobante from '@/views/reportes/comprobantes/mComprobante.vue'
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
 import mComprobanteCorreo from '@/views/reportes/comprobantes/mComprobanteCorreo.vue'
@@ -74,6 +76,7 @@ export default {
         mConfigFiltros,
         mPdfViewer,
 
+        mComprobante,
         mComprobantePagos,
         mComprobanteCanjear,
         mComprobanteCorreo,
@@ -233,6 +236,12 @@ export default {
         ],
         tableRowOptions: [
             {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vReporteComprobantes:anular',
+            },
+            {
                 label: 'Anular',
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
@@ -329,6 +338,14 @@ export default {
                 fltr: {},
                 sqls: ['comprobante_pagos_monto'],
                 incl: ['socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
+                iccl: {
+                    caja_apertura1: {
+                        cols: ['createdAt'],
+                    },
+                    transaccion1: {
+                        cols: ['venta_codigo'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -419,6 +436,20 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                comprobante: { ...res.data },
+                comprobante_estados: [{ ...res.data.estado1 }],
+            }
+
+            this.useModals.setModal('mComprobante', 'Comprobante', null, send, true)
+        },
         anular(item) {
             const send = {
                 url: 'comprobantes',
@@ -497,7 +528,7 @@ export default {
         async enviarCorreo(item) {
             this.useModals.setModal(
                 'mComprobanteCorreo',
-                'Enviar comrpobante por email',
+                'Enviar comprobante por email',
                 null,
                 item,
             )
@@ -519,18 +550,6 @@ export default {
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')
