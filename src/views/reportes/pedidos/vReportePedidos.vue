@@ -225,14 +225,14 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadColaboradores()
-            await this.loadSocios()
 
+            for (const a of this.columns) {
+                if (a.id == 'createdBy') a.reload = this.loadColaboradores
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'venta_canal') a.lista = this.vista.venta_canales
+                if (a.id == 'estado') a.lista = this.vista.transaccion_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'createdBy').lista = this.vista.colaboradores
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'venta_canal').lista = this.vista.venta_canales
-            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
@@ -368,6 +368,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.colaboradores = res.data
+            return res.data
         },
         async loadSocios() {
             const qry = {
@@ -383,6 +384,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
     },
 }

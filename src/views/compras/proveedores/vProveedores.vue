@@ -187,9 +187,11 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
+            for (const a of this.columns) {
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+            }
             const cols = this.columns
-            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
 
             const send = {
                 table: this.tableName,

@@ -147,6 +147,7 @@ export default {
                 id: 'stock',
                 title: 'Stock',
                 toRight: true,
+                filtrable: false,
                 width: '8rem',
                 show: true,
                 seek: true,
@@ -434,14 +435,15 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
-            await this.loadProduccionAreas()
 
-            const cols = this.columns.filter((a) => a.id != 'stock')
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
-            cols.find((a) => a.id == 'produccion_area').lista = this.vista.produccion_areas
+            for (const a of this.columns) {
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'has_receta') a.lista = this.vista.estados
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
+            }
+            const cols = this.columns
 
             const send = {
                 table: this.tableName,
@@ -481,7 +483,7 @@ export default {
                 if (a.id == 'has_receta') a.lista = this.vista.estados
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
             }
-            const cols = this.columns.filter((a) => a.editable == true)
+            const cols = this.columns
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 

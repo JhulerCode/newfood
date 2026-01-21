@@ -170,13 +170,14 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadPagoMetodos()
 
+            for (const a of this.columns) {
+                if (a.id == 'tipo') a.lista = this.vista.caja_operacion_tipos
+                if (a.id == 'operacion') a.lista = this.vista.caja_operaciones
+                if (a.id == 'pago_metodo') a.reload = this.loadPagoMetodos
+                if (a.id == 'estado') a.lista = this.vista.dinero_movimiento_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'tipo').lista = this.vista.caja_operacion_tipos
-            cols.find((a) => a.id == 'operacion').lista = this.vista.caja_operaciones
-            cols.find((a) => a.id == 'pago_metodo').lista = this.vista.pago_metodos
-            cols.find((a) => a.id == 'estado').lista = this.vista.dinero_movimiento_estados
 
             const send = {
                 table: this.tableName,
@@ -211,6 +212,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.pago_metodos = res.data
+            return res.data
         },
 
         runMethod(method, item) {

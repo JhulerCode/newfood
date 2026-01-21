@@ -67,7 +67,7 @@ export default {
         tableName: 'vComprobantesDetallado',
         columns: [
             {
-                id: 'comprobante_fecha',
+                id: 'comprobante1.fecha_emision',
                 title: 'Fecha',
                 prop: 'comprobante1.fecha_emision',
                 format: 'date',
@@ -78,7 +78,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'comprobante_tipo',
+                id: 'comprobante1.doc_tipo',
                 title: 'Tipo compr.',
                 prop: 'comprobante1.doc_tipo1.nombre',
                 type: 'select',
@@ -88,7 +88,7 @@ export default {
                 seek: true,
             },
             {
-                id: 'comprobante_serie',
+                id: 'comprobante1.serie',
                 title: 'Serie',
                 prop: 'comprobante1.serie',
                 type: 'text',
@@ -98,7 +98,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'comprobante_correlativo',
+                id: 'comprobante1.correlativo',
                 title: 'Correlativo',
                 prop: 'comprobante1.numero',
                 type: 'text',
@@ -108,9 +108,10 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo1.nombre',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
+                type: 'text',
                 width: '20rem',
                 show: true,
                 seek: true,
@@ -158,7 +159,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'comprobante_estado',
+                id: 'comprobante1.estado',
                 title: 'Estado',
                 prop: 'comprobante_estado1.nombre',
                 type: 'select',
@@ -210,12 +211,12 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            // await this.loadPagoComprobantes()
-            await this.loadComprobanteTipos()
 
+            for (const a of this.columns) {
+                if (a.id == 'comprobante1.doc_tipo') a.reload = this.loadComprobanteTipos
+                if (a.id == 'comprobante1.estado') a.lista = this.vista.comprobante_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'comprobante_tipo').lista = this.vista.comprobante_tipos
-            cols.find((a) => a.id == 'comprobante_estado').lista = this.vista.comprobante_estados
 
             const send = {
                 table: this.tableName,
@@ -254,6 +255,7 @@ export default {
         // },
         async loadComprobanteTipos() {
             this.vista.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
+            return this.vista.comprobante_tipos
         },
     },
 }

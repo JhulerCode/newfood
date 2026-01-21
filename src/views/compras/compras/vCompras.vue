@@ -227,12 +227,13 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadSocios()
 
+            for (const a of this.columns) {
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+                if (a.id == 'estado') a.lista = this.vista.transaccion_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
@@ -337,6 +338,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['transaccion_estados', 'pago_condiciones']

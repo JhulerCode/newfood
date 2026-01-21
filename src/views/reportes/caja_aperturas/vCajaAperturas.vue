@@ -76,6 +76,7 @@ export default {
                 title: 'Aperturado por',
                 prop: 'createdBy1.nombres_apellidos',
                 type: 'select',
+                mostrar: 'nombres_apellidos',
                 width: '15rem',
                 show: true,
                 seek: true,
@@ -168,8 +169,11 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
+            for (const a of this.columns) {
+                if (a.id == 'estado') a.lista = this.vista.caja_apertura_estados
+                if (a.id == 'createdBy') a.reload = this.loadColaboradores
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'estado').lista = this.vista.caja_apertura_estados
 
             const send = {
                 table: this.tableName,
@@ -226,18 +230,6 @@ export default {
             }
 
             this.useAuth.socket.emit('vCajaAperturas:imprimirResumen', send)
-
-            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/caja_resumen.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
 
         async loadDatosSistema() {
@@ -247,6 +239,22 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.vista, res.data)
+        },
+        async loadColaboradores() {
+            const qry = {
+                fltr: {},
+                cols: ['nombres', 'apellidos', 'nombres_apellidos'],
+            }
+
+            this.vista.socios = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.colaboradores}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code !== 0) return
+
+            this.vista.colaboradores = res.data
+            return res.data
         },
     },
 }

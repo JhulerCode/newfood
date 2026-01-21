@@ -392,6 +392,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
         // async loadPagoComprobantes() {
         //     const qry = {
@@ -410,19 +411,19 @@ export default {
         // },
         async loadComprobanteTipos() {
             this.vista.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
+            return this.vista.comprobante_tipos
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadSocios()
-            // await this.loadPagoComprobantes()
-            await this.loadComprobanteTipos()
 
+            for (const a of this.columns) {
+                if(a.id == 'doc_tipo') a.reload = this.loadComprobanteTipos
+                if(a.id == 'socio') a.reload = this.loadSocios
+                if(a.id == 'estado') a.lista = this.vista.comprobante_estados
+                if(a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.comprobante_tipos
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
-            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
 
             const send = {
                 table: this.tableName,
