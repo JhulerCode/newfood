@@ -405,7 +405,7 @@ export default {
 
         this.sumarItems()
 
-        if (this.vista.pedido.venta_canal == 3 && this.vista.mode == 2) {
+        if (this.vista.pedido.venta_canal == 3 && this.vista.mode == 2 || this.vista.mode == 1) {
             await this.loadColaboradores()
             await this.loadPagoMetodos()
         }

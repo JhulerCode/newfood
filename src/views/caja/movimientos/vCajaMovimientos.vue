@@ -8,7 +8,7 @@
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaMovimientos:crear')"
+                    v-if="useAuth.verifyPermiso('vCajaMovimientos:crear') && vista.caja_apertura"
                 />
             </div>
         </div>

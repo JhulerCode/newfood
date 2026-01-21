@@ -286,6 +286,7 @@ export default {
                 icon: 'fa-regular fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPedidos:editar',
+                ocultar: { venta_facturado: true },
             },
             {
                 label: 'Editar detalles',
