@@ -1,17 +1,29 @@
 <template>
-    <JdModal modal="mCaja" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal modal="mSucursal" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdInput
-                label="Nombre"
+                label="Codigo"
                 :nec="true"
-                v-model="modal.item.nombre"
+                v-model="modal.item.codigo"
                 :disabled="modal.mode == 3"
             />
 
             <JdInput
-                label="Impresora"
+                label="Dirección"
                 :nec="true"
-                v-model="modal.item.impresora"
+                v-model="modal.item.direccion"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdInput
+                label="Teléfono"
+                v-model="modal.item.telefono"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdInput
+                label="Correo"
+                v-model="modal.item.correo"
                 :disabled="modal.mode == 3"
             />
 
@@ -49,17 +61,17 @@ export default {
             {
                 text: 'Grabar',
                 action: 'crear',
-                permiso: 'vCajas:crear',
+                permiso: 'vSucursales:crear',
             },
             {
                 text: 'Actualizar',
                 action: 'modificar',
-                permiso: 'vCajas:editar',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
     created() {
-        this.modal = this.useModals.mCaja
+        this.modal = this.useModals.mSucursal
         this.setButtons()
     },
     methods: {
@@ -73,7 +85,7 @@ export default {
             }
         },
         checkDatos() {
-            const props = ['nombre', 'impresora', 'activo']
+            const props = ['codigo', 'direccion', 'activo']
 
             if (incompleteData(this.modal.item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -86,25 +98,25 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.cajas, this.modal.item)
+            const res = await post(urls.sucursales, this.modal.item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vCajas', 'cajas', res.data)
-            this.useModals.show.mCaja = false
+            this.useVistas.addItem('vSucursales', 'sucursales', res.data)
+            this.useModals.show.mSucursal = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.cajas, this.modal.item)
+            const res = await patch(urls.sucursales, this.modal.item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vCajas', 'cajas', res.data)
-            this.useModals.show.mCaja = false
+            this.useVistas.updateItem('vSucursales', 'sucursales', res.data)
+            this.useModals.show.mSucursal = false
         },
     },
 }

@@ -28,6 +28,7 @@ const urls = {
     receta_insumos: `${host}/api/receta_insumos`,
     salones: `${host}/api/salones`,
     socios: `${host}/api/socios`,
+    sucursales: `${host}/api/sucursales`,
     transacciones: `${host}/api/transacciones`,
     transaccion_items: `${host}/api/transaccion_items`,
 

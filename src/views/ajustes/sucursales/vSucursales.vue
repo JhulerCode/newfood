@@ -1,14 +1,14 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Cajas</strong>
+            <strong>Sucursales</strong>
 
             <div class="buttons">
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajas:crear')"
+                    v-if="useAuth.verifyPermiso('vSucursales:crear')"
                 />
             </div>
         </div>
@@ -16,22 +16,22 @@
         <JdTable
             :name="tableName"
             :columns="columns"
-            :datos="vista.cajas || []"
+            :datos="vista.sucursales || []"
             :colAct="true"
-            :reload="loadCajas"
+            :reload="loadSucursales"
             :rowOptions="tableRowOptions"
             @rowOptionSelected="runMethod"
         >
         </JdTable>
     </div>
 
-    <mCaja v-if="useModals.show.mCaja" />
+    <mSucursal v-if="useModals.show.mSucursal" />
 </template>
 
 <script>
 import { JdButton, JdTable } from '@jhuler/components'
 
-import mCaja from './mCaja.vue'
+import mSucursal from './mSucursal.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -45,7 +45,7 @@ export default {
         JdButton,
         JdTable,
 
-        mCaja,
+        mSucursal,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -54,20 +54,36 @@ export default {
 
         vista: {},
 
-        tableName: 'vCajas',
+        tableName: 'vSucursales',
         columns: [
             {
-                id: 'nombre',
-                title: 'Nombre',
+                id: 'codigo',
+                title: 'Código',
                 width: '10rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'impresora',
-                title: 'Impresora',
+                id: 'direccion',
+                title: 'Dirección',
+                width: '15rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'telefono',
+                title: 'Teléfono',
                 width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'correo',
+                title: 'Correo',
+                width: '15rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -88,23 +104,23 @@ export default {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vCajas:editar',
+                permiso: 'vSucursales:editar',
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
-                permiso: 'vCajas:eliminar',
+                permiso: 'vSucursales:eliminar',
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vCajas
+        this.vista = this.useVistas.vSucursales
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vCajas:listar') == true) this.loadCajas()
+        if (this.useAuth.verifyPermiso('vSucursales:listar') == true) this.loadSucursales()
     },
     methods: {
         setQuery() {
@@ -114,24 +130,24 @@ export default {
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
-        async loadCajas() {
+        async loadSucursales() {
             this.setQuery()
 
-            this.vista.cajas = []
+            this.vista.sucursales = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.cajas}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.sucursales}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.cajas = res.data
+            this.vista.sucursales = res.data
         },
 
         nuevo() {
             const item = { activo: true }
 
-            this.useModals.setModal('mCaja', 'Nueva caja', 1, item)
+            this.useModals.setModal('mSucursal', 'Nueva sucursal', 1, item)
         },
 
         runMethod(method, item) {
@@ -139,24 +155,24 @@ export default {
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.cajas}/uno/${item.id}`)
+            const res = await get(`${urls.sucursales}/uno/${item.id}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mCaja', 'Editar cajas', 2, res.data)
+            this.useModals.setModal('mSucursal', 'Editar sucursal', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.cajas, item)
+            const res = await delet(urls.sucursales, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vCajas', 'cajas', item)
+            this.useVistas.removeItem('vSucursales', 'sucursales', item)
         },
     },
 }

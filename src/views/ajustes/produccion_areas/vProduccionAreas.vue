@@ -57,6 +57,15 @@ export default {
         tableName: 'vProduccionAreas',
         columns: [
             {
+                id: 'sucursal',
+                title: 'Sucursal',
+                prop: 'sucursal1.codigo',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 width: '10rem',
@@ -120,6 +129,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['sucursal1'],
                 ordr: [['nombre', 'ASC']],
             }
 

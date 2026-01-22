@@ -1,6 +1,17 @@
 <template>
     <JdModal modal="mProduccionArea" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
+            <JdSelect
+                label="Sucursal"
+                :nec="true"
+                :lista="modal.sucursales || []"
+                mostrar="codigo"
+                :loaded="modal.sucursalesLoaded"
+                @reload="loadSucursales"
+                v-model="modal.item.sucursal"
+                :disabled="modal.mode == 3 || modal.mode == 2"
+            />
+
             <JdInput
                 label="Nombre"
                 :nec="true"
@@ -75,6 +86,7 @@ export default {
         this.modal = this.useModals.mProduccionArea
         this.setButtons()
         this.loadDatosSistema()
+        this.loadSucursales()
     },
     methods: {
         setButtons() {
@@ -128,6 +140,26 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
+        },
+        async loadSucursales() {
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['codigo'],
+                ordr: [['codigo', 'ASC']],
+            }
+
+            this.modal.sucursales = []
+            this.modal.sucursalesLoaded = false
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sucursales}?qry=${JSON.stringify(qry)}`)
+            this.modal.sucursalesLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.sucursales = res.data
         },
     },
 }

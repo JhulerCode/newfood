@@ -25,10 +25,10 @@
         <vDashboard v-if="useVistas.show.vDashboard" />
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
+        <vSucursales v-if="useVistas.show.vSucursales" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
         <vComprobanteTipos v-if="useVistas.show.vComprobanteTipos" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
-        <!-- <vCajas v-if="useVistas.show.vCajas" /> -->
         <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
         <vSalones v-if="useVistas.show.vSalones" />
     </section>
@@ -68,6 +68,7 @@ import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 
 //----- AJUSTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
+import vSucursales from '@/views/ajustes/sucursales/vSucursales.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 import vComprobanteTipos from '@/views/ajustes/comprobante_tipos/vComprobanteTipos.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
@@ -101,10 +102,10 @@ export default {
         vDashboard,
 
         vEmpresa,
+        vSucursales,
         vColaboradores,
         vComprobanteTipos,
         vPagoMetodos,
-        // vCajas,
         vProduccionAreas,
         vSalones,
     },
