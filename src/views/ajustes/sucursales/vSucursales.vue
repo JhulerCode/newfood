@@ -26,12 +26,16 @@
     </div>
 
     <mSucursal v-if="useModals.show.mSucursal" />
+    <mSucursalComprobanteTipos v-if="useModals.show.mSucursalComprobanteTipos" />
+    <mSucursalPagoMetodos v-if="useModals.show.mSucursalPagoMetodos" />
 </template>
 
 <script>
 import { JdButton, JdTable } from '@jhuler/components'
 
 import mSucursal from './mSucursal.vue'
+import mSucursalComprobanteTipos from './mSucursalComprobanteTipos.vue'
+import mSucursalPagoMetodos from './mSucursalPagoMetodos.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,6 +50,8 @@ export default {
         JdTable,
 
         mSucursal,
+        mSucursalComprobanteTipos,
+        mSucursalPagoMetodos,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -104,6 +110,18 @@ export default {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
+                permiso: 'vSucursales:editar',
+            },
+            {
+                label: 'Tipos de comprobante',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editarComprobanteTipos',
+                permiso: 'vSucursales:editar',
+            },
+            {
+                label: 'Métodos de pago',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editarPagoMetodos',
                 permiso: 'vSucursales:editar',
             },
             {
@@ -173,6 +191,13 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vSucursales', 'sucursales', item)
+        },
+
+        editarComprobanteTipos(item) {
+            this.useModals.setModal('mSucursalComprobanteTipos', `${item.codigo} - Tipos de comprobante`, 2, item)
+        },
+        editarPagoMetodos(item) {
+            this.useModals.setModal('mSucursalPagoMetodos', `${item.codigo} - Métodos de pago`, 2, item)
         },
     },
 }

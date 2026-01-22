@@ -29,6 +29,8 @@ const urls = {
     salones: `${host}/api/salones`,
     socios: `${host}/api/socios`,
     sucursales: `${host}/api/sucursales`,
+    sucursal_comprobante_tipos: `${host}/api/sucursal-comprobante-tipos`,
+    sucursal_pago_metodos: `${host}/api/sucursal-pago-metodos`,
     transacciones: `${host}/api/transacciones`,
     transaccion_items: `${host}/api/transaccion_items`,
 
@@ -148,21 +150,22 @@ function setBody(item) {
     }
 
     // Agregar el resto de datos como JSON
-    formData.append("datos", JSON.stringify(resto))
+    formData.append('datos', JSON.stringify(resto))
 
     return formData
 }
 
 async function process(response, ms) {
-    const contentType = response.headers.get("Content-Type")
+    const contentType = response.headers.get('Content-Type')
 
-    if (contentType && contentType.includes("application/json")) {
+    if (contentType && contentType.includes('application/json')) {
         const res = await response.json()
 
         if ([401, 403, 404, 426].includes(response.status)) {
             jmsg('error', res.msg)
 
-            if (response.status == 401) useModals().setModal('mLogin', 'Sesión terminada', null, null)
+            if (response.status == 401)
+                useModals().setModal('mLogin', 'Sesión terminada', null, null)
 
             return { code: response.status }
         }
@@ -174,8 +177,7 @@ async function process(response, ms) {
         if (res.code == 0 && ms != false) jmsg('success', ms)
 
         return res
-    }
-    else {
+    } else {
         const blob = await response.blob()
         return blob
     }
@@ -184,18 +186,11 @@ async function process(response, ms) {
 function getSubdominio() {
     const hostname = window.location.hostname
 
-    const parts = hostname.split(".")
+    const parts = hostname.split('.')
 
     if (parts.length > 2) return parts[0]
 
     return subdominio_prueba
 }
 
-export {
-    host,
-    urls,
-    get,
-    post,
-    patch,
-    delet,
-}
+export { host, urls, get, post, patch, delet }

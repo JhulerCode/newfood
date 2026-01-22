@@ -26,12 +26,14 @@
     </div>
 
     <mPagoMetodo v-if="useModals.show.mPagoMetodo" />
+    <mPagoMetodoLocales v-if="useModals.show.mPagoMetodoLocales" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mPagoMetodo from './mPagoMetodo.vue'
+import mPagoMetodoLocales from './mPagoMetodoLocales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,6 +48,7 @@ export default {
         JdTable,
 
         mPagoMetodo,
+        mPagoMetodoLocales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -90,14 +93,21 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPagoMetodos:editar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO`}
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+            },
+            {
+                label: 'Locales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarLocales',
+                permiso: 'vPagoMetodos:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vPagoMetodos:eliminar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO`}
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
             },
         ],
     }),
@@ -107,8 +117,7 @@ export default {
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true)
-            this.loadPagoMetodos()
+        if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true) this.loadPagoMetodos()
     },
     methods: {
         setQuery() {
@@ -162,6 +171,10 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vPagoMetodos', 'pago_metodos', item)
+        },
+
+        editarLocales(item) {
+            this.useModals.setModal('mPagoMetodoLocales', `${item.nombre} - locales`, 2, item)
         },
     },
 }
