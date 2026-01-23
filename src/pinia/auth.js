@@ -578,7 +578,7 @@ export const useAuth = defineStore('auth', {
 
             qry.cols = columns.filter((a) => a.show).map((b) => b.id)
         },
-        saveTableColumns(tableName, columns) {
+        async saveTableColumns(tableName, columns) {
             if (!tableName) return
 
             this.tables[tableName] = columns.map((col) => {
@@ -595,6 +595,17 @@ export const useAuth = defineStore('auth', {
                     sortDirection: col.sortDirection,
                 }
             })
+
+            const send = {
+                id: this.usuario.colaborador,
+                tables: this.tables
+            }
+
+            this.setLoading(true, 'Cargando...')
+            const res = await patch(`${urls.colaboradores}/tables`, send, false)
+            this.setLoading(false)
+
+            if (res.code != 0) return
         },
         setColumns(tableName, columns) {
             // --- RECUPERA LAS COLUMNAS GUARDADAS --- //
