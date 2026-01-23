@@ -26,6 +26,7 @@
     </div>
 
     <mSucursal v-if="useModals.show.mSucursal" />
+    <mSucursalArticulos v-if="useModals.show.mSucursalArticulos" />
     <mSucursalComprobanteTipos v-if="useModals.show.mSucursalComprobanteTipos" />
     <mSucursalPagoMetodos v-if="useModals.show.mSucursalPagoMetodos" />
 </template>
@@ -34,6 +35,7 @@
 import { JdButton, JdTable } from '@jhuler/components'
 
 import mSucursal from './mSucursal.vue'
+import mSucursalArticulos from './mSucursalArticulos.vue'
 import mSucursalComprobanteTipos from './mSucursalComprobanteTipos.vue'
 import mSucursalPagoMetodos from './mSucursalPagoMetodos.vue'
 
@@ -50,6 +52,7 @@ export default {
         JdTable,
 
         mSucursal,
+        mSucursalArticulos,
         mSucursalComprobanteTipos,
         mSucursalPagoMetodos,
     },
@@ -125,6 +128,12 @@ export default {
                 permiso: 'vSucursales:editar',
             },
             {
+                label: 'Articulos',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editarArticulos',
+                permiso: 'vSucursales:editar',
+            },
+            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
@@ -194,10 +203,23 @@ export default {
         },
 
         editarComprobanteTipos(item) {
-            this.useModals.setModal('mSucursalComprobanteTipos', `${item.codigo} - Tipos de comprobante`, 2, item)
+            this.useModals.setModal(
+                'mSucursalComprobanteTipos',
+                `${item.codigo} - Tipos de comprobante`,
+                2,
+                item,
+            )
         },
         editarPagoMetodos(item) {
-            this.useModals.setModal('mSucursalPagoMetodos', `${item.codigo} - Métodos de pago`, 2, item)
+            this.useModals.setModal(
+                'mSucursalPagoMetodos',
+                `${item.codigo} - Métodos de pago`,
+                2,
+                item,
+            )
+        },
+        editarArticulos(item) {
+            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, item)
         },
     },
 }

@@ -29,6 +29,7 @@ const urls = {
     salones: `${host}/api/salones`,
     socios: `${host}/api/socios`,
     sucursales: `${host}/api/sucursales`,
+    sucursal_articulos: `${host}/api/sucursal-articulos`,
     sucursal_comprobante_tipos: `${host}/api/sucursal-comprobante-tipos`,
     sucursal_pago_metodos: `${host}/api/sucursal-pago-metodos`,
     transacciones: `${host}/api/transacciones`,
