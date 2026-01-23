@@ -122,15 +122,16 @@ export default {
     flex-direction: column;
     overflow-y: hidden;
 
-    .tablero {
-        padding: 2rem 2rem;
-        overflow-y: auto;
-    }
+    // .tablero {
+    //     padding: 2rem 2rem;
+    //     overflow-y: auto;
+    // }
 
     .vista {
         // background-color: var(--bg-color);
-        padding: 2rem 2rem;
-        border-radius: 0.5rem;
+        // border-radius: 0.5rem;
+        padding: 2rem 2rem 1rem 2rem;
+        overflow-y: auto;
 
         > .head {
             margin-bottom: 1rem;
@@ -138,8 +139,8 @@ export default {
             justify-content: space-between;
             gap: 1rem;
             flex-wrap: wrap;
-            border-bottom: var(--border);
-            padding-bottom: 1rem;
+            // border-bottom: var(--border);
+            // padding-bottom: 1rem;
 
             strong {
                 font-size: 1.4rem;
@@ -151,6 +152,21 @@ export default {
                 flex-wrap: wrap;
             }
         }
+
+        .card {
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 0.5rem;
+            // box-shadow: 0 0 0.5rem var(--shadow-color);
+            overflow: hidden;
+
+            .card-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.5rem;
+            }
+        }
     }
 
     .vista-fill {
@@ -159,6 +175,14 @@ export default {
         flex-direction: column;
         overflow: hidden;
         // padding: 2rem 2rem;
+    }
+}
+
+@media (max-width: 540px) {
+    .main-center {
+        .vista {
+            padding: 1rem 1rem;
+        }
     }
 }
 </style>

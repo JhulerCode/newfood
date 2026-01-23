@@ -12,18 +12,19 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.colaboradores || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :configCols="true"
-            :reload="loadColaboradores"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.colaboradores || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :configCols="true"
+                :reload="loadColaboradores"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mColaborador v-if="useModals.show.mColaborador" />
@@ -293,9 +294,6 @@ export default {
 
             this.useVistas.removeItem('vColaboradores', 'colaboradores', item)
         },
-        // actualizarTodos() {
-        //     this.useAuth.socket.emit('vColaboradores:actualizarTodos')
-        // },
 
         async loadDatosSistema() {
             const qry = [
@@ -314,5 +312,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

@@ -13,16 +13,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.produccion_areas || []"
-            :colAct="true"
-            :reload="loadCajas"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.produccion_areas || []"
+                :colAct="true"
+                :reload="loadCajas"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+            </JdTable>
+        </div>
     </div>
 
     <mProduccionArea v-if="useModals.show.mProduccionArea" />
@@ -182,5 +184,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

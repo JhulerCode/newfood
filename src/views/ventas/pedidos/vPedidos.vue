@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <template v-if="vista.venta_canal == 1">
+        <div class="card" v-if="vista.venta_canal == 1">
             <div class="salones-head">
                 <ul class="container-salones">
                     <li
@@ -113,9 +113,9 @@
                     </div>
                 </li>
             </ul>
-        </template>
+        </div>
 
-        <template v-if="vista.venta_canal != 1">
+        <div class="card" v-if="vista.venta_canal != 1">
             <JdTable
                 :name="tableName"
                 :columns="columns"
@@ -131,7 +131,7 @@
                 ref="jdtable"
             >
             </JdTable>
-        </template>
+        </div>
     </div>
 
     <mMesasUnir v-if="useModals.show.mMesasUnir" />
@@ -1071,7 +1071,7 @@ export default {
     }
 
     .tipo-activo {
-        background-color: var(--bg-color2);
+        background-color: var(--bg-color);
         // color: white;
     }
 }
@@ -1113,6 +1113,7 @@ export default {
 
 .container-mesas {
     max-height: 100%;
+    // height: 10rem;
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
@@ -1196,6 +1197,7 @@ export default {
 @media (max-width: 540px) {
     .container-mesas {
         gap: 1rem;
+        overflow-y: auto;
 
         .mesa {
             width: 11rem;

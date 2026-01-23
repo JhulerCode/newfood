@@ -6,21 +6,23 @@
             <div class="buttons"></div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.dinero_movimientos || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadMovimientos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cDetalle="{ item }">
-                {{ item.comprobante1?.serie_correlativo }}
-                {{ item.detalle }}
-            </template>
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.dinero_movimientos || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadMovimientos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cDetalle="{ item }">
+                    {{ item.comprobante1?.serie_correlativo }}
+                    {{ item.detalle }}
+                </template>
+            </JdTable>
+        </div>
     </div>
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />

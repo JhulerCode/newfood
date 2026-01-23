@@ -6,17 +6,18 @@
             <div class="buttons"></div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.caja_aperturas || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadCajaAperturas"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.caja_aperturas || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadCajaAperturas"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mConfigCols v-if="useModals.show.mConfigCols" />

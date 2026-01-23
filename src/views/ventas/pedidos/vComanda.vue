@@ -26,7 +26,9 @@
                     <JdButton text="Modificar e imprimir" @click="modificar(true)" />
                 </template>
 
-                <template v-if="vista.mode == 2.1 && useAuth.verifyPermiso('vPedidos:addProductos')">
+                <template
+                    v-if="vista.mode == 2.1 && useAuth.verifyPermiso('vPedidos:addProductos')"
+                >
                     <JdButton text="Grabar" tipo="2" @click="addProductos()" />
                     <JdButton text="Grabar e imprimir" @click="addProductos(true)" />
                 </template>
@@ -34,11 +36,22 @@
         </div>
 
         <div class="comanda">
-            <div class="left">
-                <div class="container-categorias">
-                    <div v-if="isSmallScreen" class="container-header">
-                        <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
+            <!-- <div class="left"> -->
+            <div class="card container-categorias">
+                <div v-if="isSmallScreen" class="container-header">
+                    <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
 
+                    <JdButton
+                        title="Recargar"
+                        icon="fa-solid fa-rotate-right"
+                        tipo="2"
+                        @click="loadCategorias"
+                    />
+                </div>
+
+                <template v-else>
+                    <div class="container-header">
+                        <strong>Categorias:</strong>
                         <JdButton
                             title="Recargar"
                             icon="fa-solid fa-rotate-right"
@@ -47,89 +60,75 @@
                         />
                     </div>
 
-                    <template v-else>
-                        <div class="container-header">
-                            <strong>Categorias:</strong>
-                            <JdButton
-                                title="Recargar"
-                                icon="fa-solid fa-rotate-right"
-                                tipo="2"
-                                @click="loadCategorias"
-                            />
-                        </div>
-
-                        <ul class="categorias">
-                            <li
-                                v-for="(a, i) in vista.categorias || []"
-                                :key="i"
-                                class="categoria-li"
-                                @click="vista.categoria = a.id"
-                            >
-                                <!-- <div v-if="a.id == vista.categoria">ASD</div> -->
-                                <i
-                                    class="fa-solid fa-caret-right"
-                                    v-if="a.id == vista.categoria"
-                                ></i>
-                                <div
-                                    class="categoria-box max-1line"
-                                    :style="{ backgroundColor: a.color }"
-                                    :class="{ 'categoria-selected': a.id == vista.categoria }"
-                                >
-                                    {{ a.nombre }}
-                                </div>
-                            </li>
-                        </ul>
-                    </template>
-                </div>
-
-                <div class="container-articulos">
-                    <div class="container-buscar">
-                        <JdInput
-                            icon="fa-solid fa-magnifying-glass"
-                            type="search"
-                            placeholder="Buscar por nombre..."
-                            v-model="vista.txtBuscarArticulo"
-                        />
-
-                        <JdButton
-                            title="Recargar"
-                            icon="fa-solid fa-rotate-right"
-                            tipo="2"
-                            @click="loadArticulos"
-                        />
-                    </div>
-
-                    <ul class="articulos">
+                    <ul class="categorias">
                         <li
-                            v-for="(a, i) in articulosFiltered || []"
+                            v-for="(a, i) in vista.categorias || []"
                             :key="i"
-                            class="articulo"
-                            @click="addArticulo(a)"
-                            :title="a.nombre"
+                            class="categoria-li"
+                            @click="vista.categoria = a.id"
                         >
-                            <div class="articulo-foto">
-                                <img :src="a.foto_url" v-if="a.foto_url" />
-                                <img
-                                    src="https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg"
-                                    alt="no-image"
-                                    v-else
-                                />
-                            </div>
-
-                            <div class="articulo-name max-2lines">
+                            <!-- <div v-if="a.id == vista.categoria">ASD</div> -->
+                            <i class="fa-solid fa-caret-right" v-if="a.id == vista.categoria"></i>
+                            <div
+                                class="categoria-box max-1line"
+                                :style="{ backgroundColor: a.color }"
+                                :class="{ 'categoria-selected': a.id == vista.categoria }"
+                            >
                                 {{ a.nombre }}
-                            </div>
-
-                            <div class="articulo-precio" v-if="a.precio_venta">
-                                {{ redondear(showPrecio(a)) }}
                             </div>
                         </li>
                     </ul>
-                </div>
+                </template>
             </div>
 
+            <div class="container-articulos">
+                <div class="container-buscar">
+                    <JdInput
+                        icon="fa-solid fa-magnifying-glass"
+                        type="search"
+                        placeholder="Buscar por nombre..."
+                        v-model="vista.txtBuscarArticulo"
+                    />
+
+                    <JdButton
+                        title="Recargar"
+                        icon="fa-solid fa-rotate-right"
+                        tipo="2"
+                        @click="loadArticulos"
+                    />
+                </div>
+
+                <ul class="articulos">
+                    <li
+                        v-for="(a, i) in articulosFiltered || []"
+                        :key="i"
+                        class="articulo"
+                        @click="addArticulo(a)"
+                        :title="a.nombre"
+                    >
+                        <div class="articulo-foto">
+                            <img :src="a.foto_url" v-if="a.foto_url" />
+                            <img
+                                src="https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg"
+                                alt="no-image"
+                                v-else
+                            />
+                        </div>
+
+                        <div class="articulo-name max-2lines">
+                            {{ a.nombre }}
+                        </div>
+
+                        <div class="articulo-precio" v-if="a.precio_venta">
+                            {{ redondear(showPrecio(a)) }}
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!-- </div> -->
+
             <div
-                class="right"
+                class="card container-resumen"
                 :style="{
                     'grid-template-rows': `${vista.mode != 2.1 ? 'auto 1fr auto' : '1fr auto'}`,
                 }"
@@ -405,7 +404,7 @@ export default {
 
         this.sumarItems()
 
-        if (this.vista.pedido.venta_canal == 3 && this.vista.mode == 2 || this.vista.mode == 1) {
+        if ((this.vista.pedido.venta_canal == 3 && this.vista.mode == 2) || this.vista.mode == 1) {
             await this.loadColaboradores()
             await this.loadPagoMetodos()
         }
@@ -430,7 +429,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'color'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.categoriasLoaded = false
@@ -468,9 +467,9 @@ export default {
                 incl: ['combo_articulos', 'produccion_area1'],
                 iccl: {
                     combo_articulos: {
-                        incl: ['articulo1']
-                    }
-                }
+                        incl: ['articulo1'],
+                    },
+                },
             }
 
             this.vista.articulosLoaded = false
@@ -602,9 +601,7 @@ export default {
                     pu: this.showPrecio(item),
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
-                        item.igv_afectacion == '10'
-                            ? this.useAuth.empresa.igv_porcentaje
-                            : 0,
+                        item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
 
                     observacion: '',
 
@@ -732,8 +729,7 @@ export default {
             this.vista.pedido.monto = this.vista.mtoImpVenta
 
             if (
-                this.vista.pedido.venta_pago_metodo !=
-                `${this.useAuth.empresa.subdominio}-EFECTIVO`
+                this.vista.pedido.venta_pago_metodo != `${this.useAuth.empresa.subdominio}-EFECTIVO`
             ) {
                 this.vista.pedido.venta_pago_con = null
             }
@@ -848,139 +844,135 @@ export default {
     height: 100%;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 1fr 30rem;
+    grid-template-columns: 12rem 1fr 30rem;
     gap: 1rem;
 
-    .left {
+    // .left {
+    //     display: grid;
+    //     grid-template-columns: 12rem 1fr;
+    //     gap: 1rem;
+    //     overflow: hidden;
+
+    .container-categorias {
+        height: 100%;
         display: grid;
-        grid-template-columns: 12rem 1fr;
-        gap: 1rem;
+        grid-template-rows: auto 1fr;
         overflow: hidden;
+        // gap: 0.5rem;
 
-        .container-categorias {
-            height: 100%;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            overflow: hidden;
+        .container-header {
+            display: flex;
+            justify-content: space-between;
             gap: 0.5rem;
-
-            .container-header {
-                display: flex;
-                justify-content: space-between;
-                gap: 0.5rem;
-            }
-
-            select {
-                border-radius: 0.2rem;
-                border: var(--border);
-            }
-
-            .categorias {
-                overflow-y: auto;
-
-                .categoria-li {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-
-                    .categoria-box {
-                        padding: 0.5rem;
-                        font-size: 0.9rem;
-                        height: fit-content;
-                        border-radius: 0.3rem;
-                        cursor: pointer;
-                        margin-bottom: 0.5rem;
-                        width: 100%;
-                    }
-                }
-
-                // .categoria-selected {
-                //     font-weight: bold;
-                //     // border: 1px solid var(--amarillo);
-                //     // box-shadow: 0 0 0.5rem var(--shadow-color);
-                // }
-            }
         }
 
-        .container-articulos {
-            height: 100%;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            overflow: hidden;
-            gap: 0.5rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-            background-color: var(--bg-color2);
+        .categorias {
+            overflow-y: auto;
+            margin-top: 0.5rem;
 
-            .container-buscar {
+            .categoria-li {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
+
+                .categoria-box {
+                    padding: 0.5rem;
+                    font-size: 0.9rem;
+                    height: fit-content;
+                    border-radius: 0.3rem;
+                    cursor: pointer;
+                    margin-bottom: 0.5rem;
+                    width: 100%;
+                }
             }
 
-            .articulos {
-                height: 100%;
-                overflow-y: auto;
+            // .categoria-selected {
+            //     font-weight: bold;
+            //     // border: 1px solid var(--amarillo);
+            //     // box-shadow: 0 0 0.5rem var(--shadow-color);
+            // }
+        }
+    }
+
+    .container-articulos {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+        gap: 0.5rem;
+        // border-radius: 0 0.5rem 0.5rem 0;
+        background-color: var(--bg-color2);
+
+        .container-buscar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .articulos {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 0.5rem;
+            // padding: 1rem;
+
+            .articulo {
+                height: 10rem;
+                width: 10rem;
+                background-color: var(--bg-color);
+                position: relative;
+                border-radius: 0.5rem;
+                cursor: pointer;
                 overflow-x: hidden;
-                display: flex;
-                flex-wrap: wrap;
-                align-content: flex-start;
-                gap: 0.5rem;
-                padding: 1rem;
 
-                .articulo {
-                    height: 10rem;
-                    width: 10rem;
-                    background-color: var(--bg-color);
-                    position: relative;
-                    border-radius: 0.5rem;
-                    cursor: pointer;
-                    overflow-x: hidden;
+                .articulo-foto {
+                    height: 7rem;
+                    overflow: hidden;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
 
-                    .articulo-foto {
-                        height: 7rem;
-                        overflow: hidden;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        img {
-                            max-width: calc(100% - 0.5rem);
-                            max-height: calc(100% - 0.5rem);
-                            object-fit: cover;
-                        }
+                    img {
+                        max-width: calc(100% - 0.5rem);
+                        max-height: calc(100% - 0.5rem);
+                        object-fit: cover;
                     }
+                }
 
-                    .articulo-name {
-                        font-size: 1.1rem;
-                        height: 3rem;
-                        padding: 0rem 0.3rem 0.3rem 0.3rem;
-                    }
+                .articulo-name {
+                    font-size: 1.1rem;
+                    height: 3rem;
+                    padding: 0rem 0.3rem 0.3rem 0.3rem;
+                }
 
-                    .articulo-precio {
-                        position: absolute;
-                        padding: 0.3rem 0.5rem;
-                        color: white;
-                        background-color: var(--verde);
-                        top: 0.2rem;
-                        right: 0.2rem;
-                        border-radius: 0.3rem;
-                        width: 5rem;
-                        text-align: center;
-                        font-size: 0.9rem;
-                        // box-shadow: 0 0 1rem var(--shadow-color);
-                    }
+                .articulo-precio {
+                    position: absolute;
+                    padding: 0.3rem 0.5rem;
+                    color: white;
+                    background-color: var(--verde);
+                    top: 0.2rem;
+                    right: 0.2rem;
+                    border-radius: 0.3rem;
+                    width: 5rem;
+                    text-align: center;
+                    font-size: 0.9rem;
+                    // box-shadow: 0 0 1rem var(--shadow-color);
+                }
 
-                    &:hover {
-                        // border: 2px solid var(--amarillo);
-                        // background-color: var(--amarillo);
-                        box-shadow: 0 0 0.8rem var(--amarillo);
-                    }
+                &:hover {
+                    // border: 2px solid var(--amarillo);
+                    // background-color: var(--amarillo);
+                    box-shadow: 0 0 0.8rem var(--amarillo);
                 }
             }
         }
     }
+    // }
 
-    .right {
+    .container-resumen {
         height: 100%;
         display: grid;
         // grid-template-rows: auto 1fr auto;
@@ -1093,25 +1085,17 @@ export default {
     }
 }
 
-@media (max-width: 1016px) {
-    .comanda {
-        .left {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-
-            .container-categorias {
-                height: fit-content;
-                margin-bottom: 1rem;
-            }
-        }
-    }
-}
-
 @media (max-width: 540px) {
+    .vista-fill {
+        height: initial;
+        display: initial;
+        flex-direction: initial;
+        overflow: auto;
+    }
+
     .comanda {
         grid-template-columns: 1fr !important;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr !important;
 
         .right {
             .pedido-detalles {

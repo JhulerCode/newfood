@@ -1,6 +1,13 @@
 <template>
     <header>
-        <div class="left"></div>
+        <div class="left">
+            <ul class="rutas">
+                <li v-for="(a, i) in vistaKey" :key="i">
+                    <span>{{ a.label }}</span>
+                    <small v-if="i < vistaKey.length - 1">/</small>
+                </li>
+            </ul>
+        </div>
 
         <div class="right">
             <div class="actions">
@@ -28,6 +35,7 @@
 <script>
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
+import { useVistas } from '@/pinia/vistas'
 
 import { urls, patch } from '@/utils/crud'
 
@@ -35,7 +43,29 @@ export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
+        useVistas: useVistas(),
     }),
+    computed: {
+        vistaKey() {
+            const keyTrue = Object.keys(this.useVistas.show).find(
+                (key) => this.useVistas.show[key] === true,
+            )
+
+            const send = []
+
+            for (const a of this.useAuth.menu) {
+                for (const b of a.children) {
+                    if (b.goto == keyTrue) {
+                        send.push(b)
+                        send.push(a)
+                        break
+                    }
+                }
+            }
+
+            return send.reverse()
+        },
+    },
     methods: {
         toogleNavbar() {
             this.useAuth.showNavbar = !this.useAuth.showNavbar
@@ -95,17 +125,34 @@ header {
     justify-content: space-between;
     gap: 1rem;
     border-bottom: var(--border);
+    padding: 0 1.5rem;
 
     .left {
         display: flex;
-        gap: 0.5rem;
+        align-items: center;
+        justify-content: center;
+
+        .rutas {
+            display: flex;
+            gap: 0.5rem;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                span {
+                    color: var(--text-color2);
+                }
+            }
+        }
     }
 
     .right {
         display: flex;
         align-items: center;
         gap: 1rem;
-        padding: 0 1.5rem 0 0;
+        // padding: 0 1.5rem 0 0;
 
         .actions {
             display: flex;

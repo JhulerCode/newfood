@@ -30,7 +30,10 @@
                     </span>
                 </div>
 
-                <div v-if="a.children && grupoExpandido === a.label" class="items-container">
+                <div
+                    v-if="a.children && grupoExpandido === a.label && useAuth.showNavbar"
+                    class="items-container"
+                >
                     <div
                         v-for="(b, j) in a.children"
                         :key="j"
@@ -239,8 +242,11 @@ export default {
     }
 
     .items-container {
-        margin: 0 0 0 1rem;
+        margin: 0.2rem 0 0.2rem 1rem;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
     }
 
     .option-active {

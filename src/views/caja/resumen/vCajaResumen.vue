@@ -1,6 +1,6 @@
 <template>
-    <div class="tablero">
-        <div class="tablero-head">
+    <div class="vista">
+        <div class="head">
             <strong>{{ vista.pasado == true ? 'Caja resumen' : 'Apertura y cierre' }}</strong>
 
             <div class="buttons">
@@ -37,7 +37,7 @@
             </div>
         </div>
 
-        <div class="tablero-body">
+        <div>
             <div class="first" v-if="vista.caja_apertura == null">
                 <div class="card caja">
                     <div class="card-head" :style="{ 'background-color': 'var(--rojo)' }">
@@ -56,7 +56,7 @@
                 <div class="first">
                     <div class="card caja">
                         <div
-                            class="card-head"
+                            class="caja-head"
                             :style="{
                                 'background-color':
                                     vista.caja_apertura.estado == 2
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="dato">
-                            <span>Usuario</span>
+                            <span>Aperturado por</span>
                             <p>{{ vista.caja_apertura.createdBy1?.nombres_apellidos }}</p>
                         </div>
 
@@ -894,36 +894,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tablero-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    // position: sticky;
-    top: 0;
-    background-color: var(--bg-color2);
-    padding: 1rem 0;
-    z-index: 3;
-
-    strong {
-        font-size: 1.4rem;
-    }
-
-    .buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-}
-
-.card {
-    padding: 1rem;
-    background-color: var(--bg-color);
-    border-radius: 1rem;
-    box-shadow: 0 0 0.5rem var(--shadow-color);
-    overflow: hidden;
-}
-
 .icon {
     display: grid;
     place-content: center;
@@ -934,6 +904,10 @@ export default {
     i {
         color: var(--text-color3);
     }
+}
+
+.card {
+    box-shadow: 0 0 0.5rem var(--shadow-color);
 }
 
 .card-head {
@@ -962,8 +936,9 @@ export default {
     margin-bottom: 2rem;
 
     .caja {
-        .card-head {
+        .caja-head {
             height: 5rem;
+            display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 0.5rem;

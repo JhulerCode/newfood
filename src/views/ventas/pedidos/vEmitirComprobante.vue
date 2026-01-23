@@ -32,7 +32,7 @@
 
         <div class="comanda">
             <div class="left">
-                <div class="datos">
+                <div class="card datos">
                     <JdInput
                         label="Fecha"
                         type="date"
@@ -85,7 +85,7 @@
                     />
                 </div>
 
-                <div class="totales" v-if="vista.totals">
+                <div class="card totales" v-if="vista.totals">
                     <span>Ope. gravadas:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_GRAVADO) }}</p>
 
@@ -160,58 +160,61 @@
             </div>
 
             <div class="right">
-                <JdTable
-                    :columns="columnsArticulos"
-                    :datos="vista.comprobante.comprobante_items || []"
-                    height="100%"
-                    class="pedido-items"
-                    :seeker="false"
-                    :download="false"
-                    :colAct="true"
-                    colActWidth="4.5rem"
-                    @onInput="runMethod"
-                >
-                    <template v-slot:cAction="{ item }">
-                        <JdButton
-                            icon="fa-regular fa-handshake"
-                            :small="true"
-                            tipo="2"
-                            :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'"
-                            @click="setCortesia(item)"
-                        />
-
-                        <JdButton
-                            icon="fa-solid fa-trash-can"
-                            :small="true"
-                            tipo="2"
-                            title="Quitar"
-                            @click="quitarArticulo(item)"
-                        />
-                    </template>
-
-                    <template v-slot:colDescuento="{ item }">
-                        <template v-if="codigosAfectacionGratuitas.includes(item.igv_afectacion)"
-                            >CORTESÍA</template
-                        >
-                        <div class="item_descuento" v-else>
-                            <JdSelect
-                                v-model="item.descuento_tipo"
-                                :lista="descuento_tipos"
-                                mostrar="codigo"
-                                @elegir="setDescuentoTipo(item)"
+                <div class="card">
+                    <JdTable
+                        :columns="columnsArticulos"
+                        :datos="vista.comprobante.comprobante_items || []"
+                        height="100%"
+                        class="pedido-items"
+                        :seeker="false"
+                        :download="false"
+                        :colAct="true"
+                        colActWidth="4.5rem"
+                        @onInput="runMethod"
+                    >
+                        <template v-slot:cAction="{ item }">
+                            <JdButton
+                                icon="fa-regular fa-handshake"
+                                :small="true"
+                                tipo="2"
+                                :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'"
+                                @click="setCortesia(item)"
                             />
 
-                            <JdInput
-                                type="number"
-                                :toRight="true"
-                                v-model="item.descuento_valor"
-                                @input="setDescuentoValor(item)"
+                            <JdButton
+                                icon="fa-solid fa-trash-can"
+                                :small="true"
+                                tipo="2"
+                                title="Quitar"
+                                @click="quitarArticulo(item)"
                             />
-                        </div>
-                    </template>
-                </JdTable>
+                        </template>
 
-                <div class="container-pagos">
+                        <template v-slot:colDescuento="{ item }">
+                            <template
+                                v-if="codigosAfectacionGratuitas.includes(item.igv_afectacion)"
+                                >CORTESÍA</template
+                            >
+                            <div class="item_descuento" v-else>
+                                <JdSelect
+                                    v-model="item.descuento_tipo"
+                                    :lista="descuento_tipos"
+                                    mostrar="codigo"
+                                    @elegir="setDescuentoTipo(item)"
+                                />
+
+                                <JdInput
+                                    type="number"
+                                    :toRight="true"
+                                    v-model="item.descuento_valor"
+                                    @input="setDescuentoValor(item)"
+                                />
+                            </div>
+                        </template>
+                    </JdTable>
+                </div>
+
+                <div class="card container-pagos">
                     <div class="head">
                         Métodos de pago
 
@@ -967,9 +970,7 @@ export default {
                 return true
             }
 
-            if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-01`
-            ) {
+            if (this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-01`) {
                 if (['0', '1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
@@ -981,9 +982,7 @@ export default {
                 }
             }
 
-            if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`
-            ) {
+            if (this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`) {
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true
@@ -1122,7 +1121,7 @@ export default {
     overflow: hidden;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 2rem;
+    gap: 1rem;
 
     .left {
         display: flex;
@@ -1142,7 +1141,7 @@ export default {
         }
 
         .totales {
-            background-color: var(--bg-color2);
+            // background-color: var(--bg-color2);
             padding: 1rem;
             border-radius: 0.5rem;
             display: grid;

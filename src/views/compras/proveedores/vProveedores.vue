@@ -12,18 +12,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.socios || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadSocios"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <!-- :configCols="true" -->
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.socios || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadSocios"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />
@@ -155,7 +155,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
-                order: [['nombres', 'ASC']],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

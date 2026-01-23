@@ -215,7 +215,7 @@ export default {
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
                 cols: ['nombre', 'unidad', 'igv_afectacion'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true
@@ -326,7 +326,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_categorias = []
@@ -346,7 +346,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.produccion_areas = []

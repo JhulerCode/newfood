@@ -20,7 +20,7 @@
         </div>
 
         <div class="container-datos">
-            <div class="datos-fiscales">
+            <div class="card datos-fiscales">
                 <strong style="grid-column: 1/3">Datos fiscales</strong>
 
                 <JdInput
@@ -80,9 +80,17 @@
                     v-model="vista.empresa.departamento"
                     style="grid-column: 1/4"
                 /> -->
+
+                <JdInput
+                    label="Impuesto (%)"
+                    :nec="true"
+                    type="number"
+                    v-model="vista.empresa.igv_porcentaje"
+                    style="grid-column: 1/4"
+                />
             </div>
 
-            <div class="datos-secundarios">
+            <div class="card datos-secundarios">
                 <strong>Datos generales</strong>
 
                 <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
@@ -99,63 +107,19 @@
                     "
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
                 />
-
-                <div v-if="vista.empresa.archivo || vista.empresa.foto" class="empresa-logo">
-                    <img
-                        :src="vista.blob"
-                        :alt="'logo-' + vista.empresa.razon_social"
-                        v-if="vista.empresa.archivo"
-                    />
-                    <img
-                        :src="vista.empresa.foto.url"
-                        :alt="'logo-' + vista.empresa.razon_social"
-                        v-else
-                    />
-                </div>
             </div>
 
-            <div>
-                <div class="datos-secundarios">
-                    <strong>Facturación electrónica</strong>
-
-                    <JdInput
-                        label="Impuesto (%)"
-                        :nec="true"
-                        type="number"
-                        v-model="vista.empresa.igv_porcentaje"
-                    />
-
-                    <!-- <JdInput label="Usuario SOL" :nec="true" v-model="vista.empresa.sol_usuario" />
-
-                    <JdInputPassword
-                        label="Clave SOL"
-                        :nec="true"
-                        v-model="vista.empresa.sol_clave"
-                    />
-
-                    <JdButton text="Subir certificado" tipo="2" @click="subirCdt" /> -->
-
-                    <!-- <JdInputFile
-                        label="Certificado (CDT)"
-                        :nec="true"
-                        accept="image/*"
-                        v-model="vista.empresa.cdt"
-                        @handleFile="
-                            (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
-                        "
-                        @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
-                    /> -->
-                </div>
-
-                <!-- <div class="datos-secundarios mrg-top2">
-                    <strong>Impresión</strong>
-
-                    <JdInput
-                        label="Pc principal"
-                        :nec="true"
-                        v-model="vista.empresa.pc_principal_ip"
-                    />
-                </div> -->
+            <div v-if="vista.empresa.archivo || vista.empresa.foto" class="empresa-logo">
+                <img
+                    :src="vista.blob"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-if="vista.empresa.archivo"
+                />
+                <img
+                    :src="vista.empresa.foto.url"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-else
+                />
             </div>
         </div>
     </div>
@@ -265,7 +229,7 @@ export default {
     grid-template-columns: 1fr 1fr 1fr;
     // display: flex;
     // flex-wrap: wrap;
-    gap: 4rem;
+    gap: 2rem;
     overflow-y: auto;
 
     .datos-fiscales {
@@ -284,6 +248,7 @@ export default {
     }
 
     .empresa-logo {
+        height: fit-content;
         // width: 100%;
         padding: 0.5rem;
         box-shadow: 0 0 0.5rem var(--shadow-color);

@@ -13,16 +13,17 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.pago_metodos || []"
-            :colAct="true"
-            :reload="loadPagoMetodos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.pago_metodos || []"
+                :colAct="true"
+                :reload="loadPagoMetodos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mPagoMetodo v-if="useModals.show.mPagoMetodo" />
@@ -179,5 +180,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

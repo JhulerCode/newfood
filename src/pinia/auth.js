@@ -309,7 +309,8 @@ export const useAuth = defineStore('auth', {
                         goto: 'vComprobanteTipos',
                         permisos: [
                             { id: 'vComprobanteTipos:listar', label: 'Listar' },
-                            { id: 'vComprobanteTipos:editar', label: 'Editar' },
+                            { id: 'vComprobanteTipos:crear', label: 'Crear' },
+                            { id: 'vComprobanteTipos:eliminar', label: 'Eliminar' },
                         ],
                     },
                     {
@@ -598,7 +599,7 @@ export const useAuth = defineStore('auth', {
 
             const send = {
                 id: this.usuario.colaborador,
-                tables: this.tables
+                tables: this.tables,
             }
 
             this.setLoading(true, 'Cargando...')

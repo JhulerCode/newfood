@@ -12,18 +12,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.socios || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadSocios"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
-        <!-- :configCols="true" -->
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.socios || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadSocios"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />
@@ -135,14 +135,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vClientes:editar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS`}
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS` },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vClientes:eliminar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS`}
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS` },
             },
         ],
     }),
@@ -157,7 +157,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
-                order: [['nombres', 'ASC']],
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

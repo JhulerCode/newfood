@@ -29,22 +29,22 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.articulos || []"
-            :colAct="true"
-            :configRowSelect="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadArticulos"
-            :actions="tableActions"
-            @actionClick="runMethod"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-            ref="jdtable"
-        >
-        </JdTable>
-        <!-- :configCols="true" -->
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.articulos || []"
+                :colAct="true"
+                :configRowSelect="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadArticulos"
+                :actions="tableActions"
+                @actionClick="runMethod"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+                ref="jdtable"
+            />
+        </div>
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
@@ -593,7 +593,7 @@ export default {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: '2' }, activo: { op: 'Es', val: true } },
                 cols: ['nombre'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []

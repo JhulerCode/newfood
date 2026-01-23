@@ -8,25 +8,27 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.comprobantes || []"
-            :configFiltros="openConfigFiltros"
-            :reload="loadComprobantes"
-            :colAct="true"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cVenta_canal="{ item }">
-                <template v-if="item.venta_canal == 1">
-                    {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.comprobantes || []"
+                :configFiltros="openConfigFiltros"
+                :reload="loadComprobantes"
+                :colAct="true"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cVenta_canal="{ item }">
+                    <template v-if="item.venta_canal == 1">
+                        {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+                    </template>
+                    <template v-else>
+                        {{ item.venta_canal1.nombre }}
+                    </template>
                 </template>
-                <template v-else>
-                    {{ item.venta_canal1.nombre }}
-                </template>
-            </template>
-        </JdTable>
+            </JdTable>
+        </div>
     </div>
 
     <mComprobante v-if="useModals.show.mComprobante" />

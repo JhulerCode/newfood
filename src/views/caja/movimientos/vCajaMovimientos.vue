@@ -13,20 +13,22 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.dinero_movimientos || []"
-            :colAct="true"
-            :reload="loadMovimientos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cDetalle="{ item }">
-                {{ item.comprobante1?.serie_correlativo }}
-                {{ item.detalle }}
-            </template>
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.dinero_movimientos || []"
+                :colAct="true"
+                :reload="loadMovimientos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cDetalle="{ item }">
+                    {{ item.comprobante1?.serie_correlativo }}
+                    {{ item.detalle }}
+                </template>
+            </JdTable>
+        </div>
     </div>
 
     <mCajaMovimiento v-if="useModals.show.mCajaMovimiento" />

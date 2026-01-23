@@ -13,16 +13,17 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.sucursales || []"
-            :colAct="true"
-            :reload="loadSucursales"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.sucursales || []"
+                :colAct="true"
+                :reload="loadSucursales"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mSucursal v-if="useModals.show.mSucursal" />
@@ -117,19 +118,19 @@ export default {
             },
             {
                 label: 'Tipos de comprobante',
-                icon: 'fa-solid fa-pen-to-square',
+                icon: 'fa-regular fa-file-lines',
                 action: 'editarComprobanteTipos',
                 permiso: 'vSucursales:editar',
             },
             {
                 label: 'Métodos de pago',
-                icon: 'fa-solid fa-pen-to-square',
+                icon: 'fa-regular fa-credit-card',
                 action: 'editarPagoMetodos',
                 permiso: 'vSucursales:editar',
             },
             {
                 label: 'Articulos',
-                icon: 'fa-solid fa-pen-to-square',
+                icon: 'fa-solid fa-boxes-stacked',
                 action: 'editarArticulos',
                 permiso: 'vSucursales:editar',
             },
@@ -224,5 +225,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

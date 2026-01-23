@@ -4,32 +4,33 @@
             <strong>Tipos de comprobante</strong>
 
             <div class="buttons">
-                <!-- <JdButton
+                <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vComprobanteTipos:crear')"
-                /> -->
+                />
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.comprobante_tipos || []"
-            :colAct="true"
-            :reload="loadPagoComprobantes"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.comprobante_tipos || []"
+                :colAct="true"
+                :reload="loadPagoComprobantes"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mComprobanteTipo v-if="useModals.show.mComprobanteTipo" />
 </template>
 
 <script>
-import { JdTable } from '@jhuler/components'
+import { JdTable, JdButton } from '@jhuler/components'
 
 import mComprobanteTipo from './mComprobanteTipo.vue'
 
@@ -41,7 +42,7 @@ import { urls, get } from '@/utils/crud'
 
 export default {
     components: {
-        // JdButton,
+        JdButton,
         JdTable,
 
         mComprobanteTipo,
@@ -116,10 +117,10 @@ export default {
         ],
         tableRowOptions: [
             {
-                label: 'Editar',
+                label: 'Eliminar',
                 icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vComprobanteTipos:editar',
+                action: 'eliminar',
+                permiso: 'vComprobanteTipos:eliminar',
             },
         ],
     }),
@@ -170,5 +171,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

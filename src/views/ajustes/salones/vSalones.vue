@@ -20,19 +20,23 @@
         </div>
 
         <div class="body">
-            <JdTable
-                :name="tableName"
-                :columns="columns"
-                :datos="vista.salones || []"
-                :colAct="true"
-                :seeker="false"
-                :reload="loadSalones"
-                :rowOptions="tableRowOptions"
-                @rowOptionSelected="runMethod"
-            >
-            </JdTable>
+            <div class="card">
+                <strong>Salones</strong>
 
-            <div v-if="vista.salon?.id">
+                <JdTable
+                    :name="tableName"
+                    :columns="columns"
+                    :datos="vista.salones || []"
+                    :colAct="true"
+                    :seeker="false"
+                    :reload="loadSalones"
+                    :rowOptions="tableRowOptions"
+                    @rowOptionSelected="runMethod"
+                >
+                </JdTable>
+            </div>
+
+            <div v-if="vista.salon?.id" class="card">
                 <strong>Mesas de {{ vista.salon?.nombre }}</strong>
 
                 <JdTable
@@ -302,7 +306,7 @@ export default {
 .body {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5rem;
+    gap: 3rem;
     align-items: flex-start;
 }
 

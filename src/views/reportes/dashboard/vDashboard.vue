@@ -1,6 +1,6 @@
 <template>
-    <div class="tablero">
-        <div class="tablero-head">
+    <div class="vista">
+        <div class="head">
             <strong>Dashboard ventas</strong>
 
             <div class="buttons">
@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <div class="tablero-body">
+        <div>
             <div class="first" v-if="vista.data">
                 <div class="card">
                     <div class="icon" style="background-color: var(--verde)">
@@ -102,9 +102,9 @@
                     />
                 </div>
 
-                <div class="card"></div>
+                <div></div>
 
-                <div class="card"></div>
+                <div></div>
 
                 <div class="card">
                     <v-chart
@@ -375,7 +375,7 @@ export default {
         pieOptCanalesCantidad() {
             return {
                 title: {
-                    text: 'Canales',
+                    text: 'Canales (cantidad)',
                     left: 'center',
                     top: 0,
                     padding: 0,
@@ -495,11 +495,7 @@ export default {
 }
 
 .card {
-    padding: 1rem;
-    background-color: var(--bg-color);
-    border-radius: 1rem;
     box-shadow: 0 0 0.5rem var(--shadow-color);
-    overflow: hidden;
 }
 
 .icon {

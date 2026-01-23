@@ -326,7 +326,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'color'],
-                order: [['nombre', 'ASC']],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.categoriasLoaded = false

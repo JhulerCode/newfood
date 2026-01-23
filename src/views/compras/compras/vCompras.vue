@@ -19,17 +19,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.transacciones || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadTransacciones"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.transacciones || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadTransacciones"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mTransaccion v-if="useModals.show.mTransaccion" />
