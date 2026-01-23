@@ -122,8 +122,13 @@ export default {
     flex-direction: column;
     overflow-y: hidden;
 
+    .tablero {
+        padding: 2rem 2rem;
+        overflow-y: auto;
+    }
+
     .vista {
-        background-color: var(--bg-color);
+        // background-color: var(--bg-color);
         padding: 2rem 2rem;
         border-radius: 0.5rem;
 
@@ -153,6 +158,7 @@ export default {
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        // padding: 2rem 2rem;
     }
 }
 </style>

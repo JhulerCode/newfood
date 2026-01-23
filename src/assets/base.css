@@ -8,7 +8,7 @@
     --verde: #34d16e;
     --amarillo: #ffb22b;
     --rojo: #e94343;
-    --morado: #A855F7;
+    --morado: #a855f7;
 
     --bg-color: #ffffff;
     --bg-color-hover: whitesmoke;
@@ -128,15 +128,7 @@ a {
     /* flex-wrap: wrap; */
 }
 
-.scroll-tiny {
-	&::-webkit-scrollbar {
-		width: 0.6rem;
-		height: 0.6rem;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		border: solid 0.1rem var(--bg-color);
-		background-color: var(--bg-color2);
-		border-radius: 0.3rem;
-	}
+* {
+    /* scrollbar-color: red orange; */
+    scrollbar-width: thin;
 }

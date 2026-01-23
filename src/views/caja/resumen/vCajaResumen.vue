@@ -894,12 +894,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tablero {
-    height: 100%;
-    overflow-y: auto;
-    // padding: 0 1rem;
-}
-
 .tablero-head {
     display: flex;
     justify-content: space-between;
