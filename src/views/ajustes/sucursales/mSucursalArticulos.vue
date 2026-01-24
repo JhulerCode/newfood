@@ -52,14 +52,14 @@ export default {
                 sort: true,
                 seek: true,
             },
-            // {
-            //     id: 'articulo1.unidad',
-            //     title: 'unidad',
-            //     prop: 'articulo1.unidad',
-            //     width: '6rem',
-            //     show: true,
-            //     sort: true,
-            // },
+            {
+                id: 'articulo1.unidad',
+                title: 'Unidad',
+                prop: 'articulo1.unidad',
+                width: '6rem',
+                show: true,
+                sort: true,
+            },
             {
                 id: 'estado',
                 title: 'Estado',
@@ -89,7 +89,7 @@ export default {
             const qry = {
                 fltr: {
                     sucursal: { op: 'Es', val: this.modal.item.id },
-                    'articulo1.tipo': { op: 'Es', val: '2' },
+                    'articulo1.tipo': { op: 'Es', val: this.modal.tipo },
                 },
                 incl: ['articulo1'],
                 cols: ['estado'],

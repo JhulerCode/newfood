@@ -8,13 +8,21 @@
                     text="Recargar"
                     tipo="2"
                     @click="loadEmpresa"
-                    v-if="useAuth.verifyPermiso('vEmpresa:ver')"
+                    v-if="useAuth.verifyPermiso('vEmpresa:ver') && !vista.is_editing"
                 />
+
+                <JdButton
+                    text="Editar"
+                    @click="edit"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar') && !vista.is_editing"
+                />
+
+                <JdButton text="Cancelar" tipo="2" @click="cancelEdit" v-if="vista.is_editing" />
 
                 <JdButton
                     text="Modificar"
                     @click="modificar"
-                    v-if="useAuth.verifyPermiso('vEmpresa:editar')"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar') && vista.is_editing"
                 />
             </div>
         </div>
@@ -44,6 +52,7 @@
                     :nec="true"
                     v-model="vista.empresa.nombre_comercial"
                     style="grid-column: 1/5"
+                    :disabled="!vista.is_editing"
                 />
 
                 <JdInput
@@ -51,6 +60,7 @@
                     :nec="true"
                     v-model="vista.empresa.domicilio_fiscal"
                     style="grid-column: 1/5"
+                    :disabled="!vista.is_editing"
                 />
 
                 <JdInput
@@ -58,6 +68,7 @@
                     :nec="true"
                     v-model="vista.empresa.ubigeo"
                     style="grid-column: 1/4"
+                    :disabled="!vista.is_editing"
                 />
 
                 <!-- <JdInput
@@ -87,15 +98,26 @@
                     type="number"
                     v-model="vista.empresa.igv_porcentaje"
                     style="grid-column: 1/4"
+                    :disabled="!vista.is_editing"
                 />
             </div>
 
             <div class="card datos-secundarios">
                 <strong>Datos generales</strong>
 
-                <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
+                <JdInput
+                    label="Teléfono"
+                    :nec="true"
+                    v-model="vista.empresa.telefono"
+                    :disabled="!vista.is_editing"
+                />
 
-                <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
+                <JdInput
+                    label="Correo"
+                    :nec="true"
+                    v-model="vista.empresa.correo"
+                    :disabled="!vista.is_editing"
+                />
 
                 <JdInputFile
                     label="Logo"
@@ -106,6 +128,7 @@
                         (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
                     "
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
+                    :disabled="!vista.is_editing"
                 />
             </div>
 
@@ -175,6 +198,12 @@ export default {
             this.vista.empresa = res.data
         },
 
+        edit() {
+            this.vista.is_editing = true
+        },
+        cancelEdit() {
+            this.vista.is_editing = false
+        },
         checkDatos() {
             const props = [
                 'nombre_comercial',

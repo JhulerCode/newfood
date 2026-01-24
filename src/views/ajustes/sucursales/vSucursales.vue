@@ -117,6 +117,12 @@ export default {
                 permiso: 'vSucursales:editar',
             },
             {
+                label: 'Eliminar',
+                icon: 'fa-solid fa-trash',
+                action: 'eliminar',
+                permiso: 'vSucursales:eliminar',
+            },
+            {
                 label: 'Tipos de comprobante',
                 icon: 'fa-regular fa-file-lines',
                 action: 'editarComprobanteTipos',
@@ -129,16 +135,16 @@ export default {
                 permiso: 'vSucursales:editar',
             },
             {
-                label: 'Articulos',
+                label: 'Insumos',
                 icon: 'fa-solid fa-boxes-stacked',
-                action: 'editarArticulos',
+                action: 'editarInsumos',
                 permiso: 'vSucursales:editar',
             },
             {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash',
-                action: 'eliminar',
-                permiso: 'vSucursales:eliminar',
+                label: 'Productos',
+                icon: 'fa-solid fa-boxes-stacked',
+                action: 'editarProductos',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -219,8 +225,19 @@ export default {
                 item,
             )
         },
-        editarArticulos(item) {
-            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, item)
+        editarInsumos(item) {
+            const send = {
+                item,
+                tipo: '1'
+            }
+            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, send, true)
+        },
+        editarProductos(item) {
+            const send = {
+                item,
+                tipo: '2'
+            }
+            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, send, true)
         },
     },
 }
