@@ -49,6 +49,7 @@
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -60,6 +61,7 @@ import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from '@jhuler
 
 import mImportarArticulos from '@/views/ajustes/insumos/mImportarArticulos.vue'
 import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -80,6 +82,7 @@ export default {
 
         mImportarArticulos,
         mArticulo,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -185,6 +188,12 @@ export default {
                 icon: 'fa-solid fa-copy',
                 action: 'clonar',
                 permiso: 'vInsumos:clonar',
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -397,6 +406,15 @@ export default {
 
             this.useModals.setModal('mArticulo', 'Nuevo insumo', 1, send)
         },
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_articulos',
+                column: 'articulo',
+            }
+
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
+        },
 
         async loadCategorias() {
             const qry = {
@@ -426,5 +444,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

@@ -97,18 +97,17 @@ export default {
                 ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
             },
             {
-                label: 'Sucursales',
-                icon: 'fa-solid fa-shop',
-                action: 'editarSucursales',
-                permiso: 'vPagoMetodos:editar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
-            },
-            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vPagoMetodos:eliminar',
                 ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -173,7 +172,6 @@ export default {
 
             this.useVistas.removeItem('vPagoMetodos', 'pago_metodos', item)
         },
-
         editarSucursales(item) {
             const send = {
                 item,

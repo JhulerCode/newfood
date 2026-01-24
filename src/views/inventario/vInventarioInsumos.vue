@@ -12,10 +12,8 @@
                 :columns="columns"
                 :datos="vista.articulos || []"
                 :colAct="true"
-                :configRowSelect="true"
                 :configFiltros="openConfigFiltros"
                 :reload="loadArticulos"
-                :actions="tableActions"
                 @actionClick="runMethod"
                 :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
@@ -154,8 +152,12 @@ export default {
     methods: {
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: '1' } },
-                incl: ['categoria1'],
+                fltr: {
+                    tipo: { op: 'Es', val: '1' },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
+                },
+                incl: ['categoria1', 'sucursal_articulos'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

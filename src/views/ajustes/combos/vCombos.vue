@@ -67,6 +67,7 @@
     <mImportarComboComponentes v-if="useModals.show.mImportarComboComponentes" />
     <mCombo v-if="useModals.show.mCombo" />
     <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -80,6 +81,7 @@ import mImportarArticulos from '@/views/ajustes/insumos/mImportarArticulos.vue'
 import mCombo from '@/views/ajustes/combos/mCombo.vue'
 import mArticuloPreciosSemana from '@/views/ajustes/productos/mArticuloPreciosSemana.vue'
 import mImportarComboComponentes from '@/views/ajustes/combos/mImportarComboComponentes.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -102,6 +104,7 @@ export default {
         mImportarComboComponentes,
         mCombo,
         mArticuloPreciosSemana,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -226,10 +229,22 @@ export default {
                 permiso: 'vCombos:eliminar',
             },
             {
+                label: 'Clonar',
+                icon: 'fa-solid fa-copy',
+                action: 'clonar',
+                permiso: 'vProductos:clonar',
+            },
+            {
                 label: 'Precios por día',
                 icon: 'fa-solid fa-tags',
                 action: 'openPreciosSemana',
                 permiso: 'vProductos:editar',
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -522,6 +537,28 @@ export default {
 
             this.useVistas.removeItem('vCombos', 'articulos', item)
         },
+        async clonar(item) {
+            const qry = {
+                incl: ['combo_articulos'],
+                iccl: {
+                    combo_articulos: {
+                        incl: ['articulo1'],
+                    },
+                },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+            if (res.code != 0) return
+
+            const send = {
+                ...res.data,
+                id: null,
+            }
+
+            this.useModals.setModal('mCombo', 'Nuevo combo', 1, send)
+        },
         async openPreciosSemana(item) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}/uno/${item.id}`)
@@ -530,6 +567,21 @@ export default {
             if (res.code != 0) return
 
             this.useModals.setModal('mArticuloPreciosSemana', 'Precios por día', null, res.data)
+        },
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_articulos',
+                column: 'articulo',
+            }
+
+            this.useModals.setModal(
+                'mRelacionadoSucursales',
+                `${item.nombre} - sucursales`,
+                2,
+                send,
+                true,
+            )
         },
 
         async loadCategorias() {

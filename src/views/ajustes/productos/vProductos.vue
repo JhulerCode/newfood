@@ -51,6 +51,7 @@
     <mArticulo v-if="useModals.show.mArticulo" />
     <mArticuloReceta v-if="useModals.show.mArticuloReceta" />
     <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -64,6 +65,7 @@ import mImportarArticulos from '@/views/ajustes/insumos/mImportarArticulos.vue'
 import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
 import mArticuloReceta from '@/views/ajustes/productos/mArticuloReceta.vue'
 import mArticuloPreciosSemana from '@/views/ajustes/productos/mArticuloPreciosSemana.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -72,7 +74,6 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
-import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -87,6 +88,7 @@ export default {
         mArticulo,
         mArticuloReceta,
         mArticuloPreciosSemana,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -260,6 +262,12 @@ export default {
                 icon: 'fa-solid fa-tags',
                 action: 'openPreciosSemana',
                 permiso: 'vProductos:editar',
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -519,35 +527,6 @@ export default {
 
             this.useModals.setModal('mArticuloReceta', `Receta - ${item.nombre}`, null, send)
         },
-        async verKardex(item) {
-            const send = {
-                articulo: {
-                    id: item.id,
-                    nombre: item.nombre,
-                    unidad: item.unidad,
-                },
-            }
-
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
-        },
-        async ajusteStock(item) {
-            const send = {
-                transaccion: {
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    articulo: item.id,
-                    estado: 1,
-                },
-                articulo1: {
-                    igv_afectacion: item.igv_afectacion,
-                    has_fv: item.has_fv,
-                },
-                articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 2,
-                // is_nuevo_lote: false,
-            }
-
-            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
-        },
         async openPreciosSemana(item) {
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulos}/uno/${item.id}`)
@@ -556,6 +535,15 @@ export default {
             if (res.code != 0) return
 
             this.useModals.setModal('mArticuloPreciosSemana', 'Precios por día', null, res.data)
+        },
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_articulos',
+                column: 'articulo',
+            }
+
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
         },
 
         async loadCategorias() {
