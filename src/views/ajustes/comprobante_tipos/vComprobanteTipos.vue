@@ -27,18 +27,21 @@
     </div>
 
     <mComprobanteTipo v-if="useModals.show.mComprobanteTipo" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mComprobanteTipo from './mComprobanteTipo.vue'
+import mRelacionadoSucursales from '@/views/ajustes/pago_metodos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get } from '@/utils/crud'
+import { urls, get, delet } from '@/utils/crud'
+import { jqst } from '@/utils/swal'
 
 export default {
     components: {
@@ -46,6 +49,7 @@ export default {
         JdTable,
 
         mComprobanteTipo,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -57,8 +61,9 @@ export default {
         tableName: 'vComprobanteTipos',
         columns: [
             {
-                id: 'nombre',
+                id: 'tipo',
                 title: 'Nombre',
+                prop: 'tipo1.nombre',
                 type: 'text',
                 width: '12rem',
                 show: true,
@@ -122,6 +127,13 @@ export default {
                 action: 'eliminar',
                 permiso: 'vComprobanteTipos:eliminar',
             },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vPagoMetodos:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+            },
         ],
     }),
     created() {
@@ -156,17 +168,41 @@ export default {
             this.vista.comprobante_tipos = res.data
         },
 
+        nuevo() {
+            const item = { activo: true, estandar: false }
+
+            this.useModals.setModal('mComprobanteTipo', 'Nuevo tipo de comprobante', 1, item)
+        },
+
         runMethod(method, item) {
             this[method](item)
         },
-        async editar(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.comprobante_tipos}/uno/${item.id}`)
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.comprobante_tipos, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mComprobanteTipo', 'Editar método de pago', 2, res.data)
+            this.useVistas.removeItem('vComprobanteTipos', 'comprobante_tipos', item)
+        },
+
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_comprobante_tipos',
+                column: 'comprobante_tipo',
+            }
+            this.useModals.setModal(
+                'mRelacionadoSucursales',
+                `${item.tipo1?.nombre} (${item.serie}) - sucursales`,
+                2,
+                send,
+                true,
+            )
         },
     },
 }

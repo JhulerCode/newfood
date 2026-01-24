@@ -27,14 +27,14 @@
     </div>
 
     <mPagoMetodo v-if="useModals.show.mPagoMetodo" />
-    <mPagoMetodoLocales v-if="useModals.show.mPagoMetodoLocales" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mPagoMetodo from './mPagoMetodo.vue'
-import mPagoMetodoLocales from './mPagoMetodoLocales.vue'
+import mRelacionadoSucursales from '../comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -49,7 +49,7 @@ export default {
         JdTable,
 
         mPagoMetodo,
-        mPagoMetodoLocales,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -175,7 +175,7 @@ export default {
         },
 
         editarLocales(item) {
-            this.useModals.setModal('mPagoMetodoLocales', `${item.nombre} - locales`, 2, item)
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - locales`, 2, item)
         },
     },
 }

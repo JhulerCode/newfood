@@ -1,5 +1,5 @@
 <template>
-    <JdModal modal="mPagoMetodoLocales">
+    <JdModal modal="mRelacionadoSucursales">
         <JdTable
             :columns="columns"
             :datos="modal.sucursales || []"
@@ -13,7 +13,7 @@
                     :lista="modal.activo_estados || []"
                     v-model="item.estado"
                     :disabled="modal.mode == 3"
-                    @elegir="modificar"
+                    @elegir="modificar(item)"
                 />
             </template>
         </JdTable>
@@ -41,7 +41,6 @@ export default {
         useVistas: useVistas(),
 
         modal: {},
-        colaborador: {},
 
         columns: [
             {
@@ -65,7 +64,7 @@ export default {
         ],
     }),
     async created() {
-        this.modal = this.useModals.mPagoMetodoLocales
+        this.modal = this.useModals.mRelacionadoSucursales
 
         await this.loadDatosSistema()
         this.loadSucursales()
@@ -74,7 +73,7 @@ export default {
         async loadSucursales() {
             const qry = {
                 fltr: {
-                    pago_metodo: { op: 'Es', val: this.modal.item.id },
+                    [this.modal.column]: { op: 'Es', val: this.modal.item.id },
                 },
                 incl: ['sucursal1'],
                 cols: ['estado'],
@@ -83,7 +82,7 @@ export default {
             this.modal.sucursales = []
             this.modal.sucursalesLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.sucursal_pago_metodos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls[this.modal.url]}?qry=${JSON.stringify(qry)}`)
             this.modal.sucursalesLoaded = true
             this.useAuth.setLoading(false)
 
@@ -106,13 +105,10 @@ export default {
             }
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.sucursal_pago_metodos, send)
+            const res = await patch(urls[this.modal.url], send)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
-
-            // this.useVistas.updateItem('vPagoMetodos', 'pago_metodos', res.data)
-            // this.useModals.show.mPagoMetodoLocales = false
         },
     },
 }
