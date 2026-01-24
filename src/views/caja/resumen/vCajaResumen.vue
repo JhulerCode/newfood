@@ -40,7 +40,7 @@
         <div>
             <div class="first" v-if="vista.caja_apertura == null">
                 <div class="card caja">
-                    <div class="card-head" :style="{ 'background-color': 'var(--rojo)' }">
+                    <div class="caja-head" :style="{ 'background-color': 'var(--rojo)' }">
                         CERRADO
                     </div>
                 </div>

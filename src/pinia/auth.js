@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { urls, get, post, patch } from '@/utils/crud.js'
 import { deepCopy } from '@/utils/mine'
 import { useVistas } from '@/pinia/vistas.js'
-import { useModals } from '@/pinia/modals.js'
+// import { useModals } from '@/pinia/modals.js'
 import { io } from 'socket.io-client'
 import { host } from '@/utils/crud.js'
 import { jmsg } from '@/utils/swal'
@@ -13,6 +13,7 @@ export const useAuth = defineStore('auth', {
         usuario: {},
         socket: null,
         empresa: {},
+        sucursal: {},
         app_version: '1.6.7',
 
         menu: [
@@ -278,6 +279,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vSucursales:ver', label: 'Ver' },
                             { id: 'vSucursales:editar', label: 'Editar' },
                             { id: 'vSucursales:eliminar', label: 'Eliminar' },
+                            { id: 'vSucursales:cambiarSucursal', label: 'Cambiar de sucursal' },
                         ],
                     },
                     {
@@ -390,6 +392,10 @@ export const useAuth = defineStore('auth', {
 
             if (result.empresa) {
                 this.empresa = deepCopy(result.empresa)
+            }
+
+            if (!this.sucursal.id || !this.empresa.sucursales.some((a) => a.id == this.sucursal.id)) {
+                this.sucursal = deepCopy(this.empresa.sucursales[0])
             }
         },
         connectSocket() {
@@ -542,10 +548,12 @@ export const useAuth = defineStore('auth', {
 
             if (vueRouter) vueRouter.replace({ name: 'SignIn' })
 
-            this.initVars()
-            useVistas().initVars()
-            useModals().initVars()
+            // this.initVars()
+            // useVistas().initVars()
+            // useModals().initVars()
             this.disconnectSocket()
+
+            window.location.reload()
         },
         disconnectSocket() {
             if (this.socket) {
@@ -685,6 +693,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['token', 'isDarkMode', 'tables', 'avances'],
+        paths: ['token', 'isDarkMode', 'tables', 'avances', 'sucursal'],
     },
 })

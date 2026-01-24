@@ -1,12 +1,17 @@
 <template>
     <header>
         <div class="left">
-            <ul class="rutas">
+            <div class="sucursal" @click="cambiarSucursal">
+                <small>Sucursal: </small>
+                <span>{{ useAuth.sucursal.codigo }}</span>
+            </div>
+
+            <!-- <ul class="rutas">
                 <li v-for="(a, i) in vistaKey" :key="i">
                     <span>{{ a.label }}</span>
                     <small v-if="i < vistaKey.length - 1">/</small>
                 </li>
-            </ul>
+            </ul> -->
         </div>
 
         <div class="right">
@@ -45,30 +50,32 @@ export default {
         useModals: useModals(),
         useVistas: useVistas(),
     }),
-    computed: {
-        vistaKey() {
-            const keyTrue = Object.keys(this.useVistas.show).find(
-                (key) => this.useVistas.show[key] === true,
-            )
+    // computed: {
+    //     vistaKey() {
+    //         const keyTrue = Object.keys(this.useVistas.show).find(
+    //             (key) => this.useVistas.show[key] === true,
+    //         )
 
-            const send = []
+    //         const send = []
 
-            for (const a of this.useAuth.menu) {
-                for (const b of a.children) {
-                    if (b.goto == keyTrue) {
-                        send.push(b)
-                        send.push(a)
-                        break
-                    }
-                }
-            }
+    //         for (const a of this.useAuth.menu) {
+    //             for (const b of a.children) {
+    //                 if (b.goto == keyTrue) {
+    //                     send.push(b)
+    //                     send.push(a)
+    //                     break
+    //                 }
+    //             }
+    //         }
 
-            return send.reverse()
-        },
-    },
+    //         return send.reverse()
+    //     },
+    // },
     methods: {
-        toogleNavbar() {
-            this.useAuth.showNavbar = !this.useAuth.showNavbar
+        cambiarSucursal() {
+            if (this.useAuth.verifyPermiso('vSucursales:cambiarSucursal')) {
+                this.useModals.setModal('mSucursalCambiar', 'Cambiar de sucursal')
+            }
         },
 
         reloadWindow() {
@@ -131,6 +138,27 @@ header {
         display: flex;
         align-items: center;
         justify-content: center;
+        gap: 1rem;
+
+        .sucursal {
+            display: flex;
+            align-items: center;
+            // justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--primary-color);
+            padding: 0.25rem 0.8rem;
+            border-radius: 1rem;
+            cursor: pointer;
+
+            span {
+                color: white;
+                font-size: 1.2rem;
+            }
+
+            small {
+                color: #f2f2f2;
+            }
+        }
 
         .rutas {
             display: flex;
@@ -182,4 +210,14 @@ header {
         }
     }
 }
+
+// @media (max-width: 540px) {
+//     header {
+//         .left {
+//             flex-direction: column;
+//             align-items: flex-start;
+//             gap: 0.25rem;
+//         }
+//     }
+// }
 </style>

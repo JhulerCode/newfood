@@ -11,6 +11,7 @@
 
     <mUserMenu v-if="useModals?.show?.mUserMenu" class="user-menu" />
     <mUserPreferences v-if="useModals?.show?.mUserPreferences" />
+    <mSucursalCambiar v-if="useModals?.show?.mSucursalCambiar" />
 
     <mLogin v-if="useModals?.show?.mLogin" />
 </template>
@@ -24,6 +25,7 @@ import ConsolaCenter from '@/views/_consola/ConsolaCenter.vue'
 
 import mUserMenu from './mUserMenu.vue'
 import mUserPreferences from './mUserPreferences.vue'
+import mSucursalCambiar from './mSucursalCambiar.vue'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'
@@ -37,6 +39,7 @@ export default {
 
         mUserMenu,
         mUserPreferences,
+        mSucursalCambiar,
 
         mLogin,
     },
