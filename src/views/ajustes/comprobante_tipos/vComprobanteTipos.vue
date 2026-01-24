@@ -34,7 +34,7 @@
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mComprobanteTipo from './mComprobanteTipo.vue'
-import mRelacionadoSucursales from '@/views/ajustes/pago_metodos/mRelacionadoSucursales.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'

@@ -34,7 +34,7 @@
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mPagoMetodo from './mPagoMetodo.vue'
-import mRelacionadoSucursales from '../comprobante_tipos/mRelacionadoSucursales.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -97,9 +97,9 @@ export default {
                 ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
             },
             {
-                label: 'Locales',
+                label: 'Sucursales',
                 icon: 'fa-solid fa-shop',
-                action: 'editarLocales',
+                action: 'editarSucursales',
                 permiso: 'vPagoMetodos:editar',
                 ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
             },
@@ -174,8 +174,14 @@ export default {
             this.useVistas.removeItem('vPagoMetodos', 'pago_metodos', item)
         },
 
-        editarLocales(item) {
-            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - locales`, 2, item)
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_pago_metodos',
+                column: 'pago_metodo',
+            }
+
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
         },
     },
 }
