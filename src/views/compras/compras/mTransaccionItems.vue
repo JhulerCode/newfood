@@ -142,12 +142,13 @@ export default {
 
             const qry = {
                 fltr: {
-                    // tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? '1' : '2' },
                     has_receta: { op: 'No es', val: true },
+                    is_combo: { op: 'No es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['nombre', 'unidad', 'precio_venta', 'igv_afectacion'],
+                cols: ['nombre', 'unidad', 'precio_venta', 'igv_afectacion', 'has_receta'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true
@@ -169,6 +170,7 @@ export default {
             if (i !== -1) return jmsg('warning', 'El artículo ya fue agregado')
 
             const send = {
+                id: crypto.randomUUID(),
                 articulo: item.id,
                 articulo1: {
                     nombre: item.nombre,

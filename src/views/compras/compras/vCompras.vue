@@ -186,7 +186,11 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
+                incl: ['socio1']
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

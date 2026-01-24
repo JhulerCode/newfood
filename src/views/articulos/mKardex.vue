@@ -144,6 +144,7 @@ export default {
             this.modal.qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['articulo1', 'transaccion1', 'comprobante1'],
                 iccl: {

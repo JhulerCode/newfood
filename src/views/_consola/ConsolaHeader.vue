@@ -1,7 +1,13 @@
 <template>
     <header>
         <div class="left">
-            <div class="sucursal" @click="cambiarSucursal">
+            <div
+                class="sucursal"
+                @click="cambiarSucursal"
+                :class="{
+                    pointer: this.useAuth.verifyPermiso('vSucursales:cambiarSucursal'),
+                }"
+            >
                 <small>Sucursal: </small>
                 <span>{{ useAuth.sucursal.codigo }}</span>
             </div>
@@ -148,7 +154,6 @@ header {
             background-color: var(--primary-color);
             padding: 0.25rem 0.8rem;
             border-radius: 1rem;
-            cursor: pointer;
 
             span {
                 color: white;
@@ -158,6 +163,9 @@ header {
             small {
                 color: #f2f2f2;
             }
+        }
+        .pointer {
+            cursor: pointer;
         }
 
         .rutas {

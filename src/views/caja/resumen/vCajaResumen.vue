@@ -828,7 +828,10 @@ export default {
     methods: {
         async loadCajaApertura() {
             const qry = {
-                fltr: { estado: { op: 'Es', val: '1' } },
+                fltr: {
+                    estado: { op: 'Es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 cols: [
                     'createdAt',
                     'updatedAt',
@@ -846,6 +849,12 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            if (res.data.length == 0) {
+                this.vista.caja_apertura = null
+                this.vista.resumen = null
+                return
+            }
 
             this.vista.caja_apertura = res.data[0]
             if (this.vista.caja_apertura) this.loadResumen()

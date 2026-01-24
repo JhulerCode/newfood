@@ -95,6 +95,7 @@ export default {
         // },
         async elegir(item) {
             this.useAuth.sucursal = deepCopy(item)
+            this.useModals.show.mSucursalCambiar = false
             window.location.reload()
         },
     },

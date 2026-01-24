@@ -306,8 +306,10 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: '2' },
                     is_combo: { op: 'Es', val: false },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'produccion_area1'],
+                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

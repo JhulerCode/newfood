@@ -404,7 +404,7 @@ export default {
 
         this.sumarItems()
 
-        if ((this.vista.pedido.venta_canal == 3 && this.vista.mode == 2) || this.vista.mode == 1) {
+        if (this.vista.pedido.venta_canal == 3 && (this.vista.mode == 2 || this.vista.mode == 1)) {
             await this.loadColaboradores()
             await this.loadPagoMetodos()
         }
@@ -451,7 +451,8 @@ export default {
             const qry = {
                 fltr: {
                     tipo: { op: 'Es', val: '2' },
-                    activo: { op: 'Es', val: true },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
                 cols: [
                     'nombre',
@@ -464,7 +465,7 @@ export default {
                     'foto_url',
                     'categoria',
                 ],
-                incl: ['combo_articulos', 'produccion_area1'],
+                incl: ['combo_articulos', 'produccion_area1', 'sucursal_articulos'],
                 iccl: {
                     combo_articulos: {
                         incl: ['articulo1'],

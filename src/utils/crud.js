@@ -127,6 +127,7 @@ function setHeaders(item) {
     headers['x-app-version'] = useAuth().app_version
 
     headers['x-empresa'] = getSubdominio()
+    headers['x-sucursal'] = getSucursal()
 
     return headers
 }
@@ -192,6 +193,10 @@ function getSubdominio() {
     if (parts.length > 2) return parts[0]
 
     return subdominio_prueba
+}
+
+function getSucursal() {
+    return useAuth().sucursal.id
 }
 
 export { host, urls, get, post, patch, delet }

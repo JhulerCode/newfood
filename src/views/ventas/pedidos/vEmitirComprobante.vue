@@ -444,6 +444,7 @@ export default {
             const qry = {
                 fltr: { activo: { op: 'Es', val: true } },
                 cols: ['nombre', 'color'],
+                ordr: [['nombre', 'asc']]
             }
 
             this.vista.pago_metodos = []

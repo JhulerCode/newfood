@@ -152,6 +152,7 @@ export default {
             const qry = {
                 fltr: {
                     estado: { op: 'Es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 cols: ['fecha_apertura', 'monto_apertura'],
             }
