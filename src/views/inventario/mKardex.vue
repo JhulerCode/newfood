@@ -129,7 +129,7 @@ export default {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                permiso: ['vInsumos:ajusteStock', 'vProductos:ajusteStock'],
+                permiso: ['vInventarioInsumos:ajusteStock', 'vInventarioProductos:ajusteStock'],
                 ocultar: { tipo: [1, 2] },
             },
         ],
@@ -149,13 +149,13 @@ export default {
                 incl: ['articulo1', 'transaccion1', 'comprobante1'],
                 iccl: {
                     comprobante1: {
-                        incl: ['socio1']
+                        incl: ['socio1'],
                     },
                     transaccion1: {
                         cols: ['compra_comprobante_serie', 'compra_comprobante_correlativo'],
-                        incl: ['socio1']
-                    }
-                }
+                        incl: ['socio1'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

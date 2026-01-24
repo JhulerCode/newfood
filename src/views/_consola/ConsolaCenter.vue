@@ -13,9 +13,8 @@
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
 
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
-        <vInsumos v-if="useVistas.show.vInsumos" />
-        <vProductos v-if="useVistas.show.vProductos" />
-        <vCombos v-if="useVistas.show.vCombos" />
+        <vInventarioInsumos v-if="useVistas.show.vInventarioInsumos" />
+        <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
         <vReportePedidos v-if="useVistas.show.vReportePedidos" />
         <vReporteComprobantes v-if="useVistas.show.vReporteComprobantes" />
@@ -26,11 +25,15 @@
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vSucursales v-if="useVistas.show.vSucursales" />
-        <vColaboradores v-if="useVistas.show.vColaboradores" />
+        <vSalones v-if="useVistas.show.vSalones" />
+        <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
         <vComprobanteTipos v-if="useVistas.show.vComprobanteTipos" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
-        <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
-        <vSalones v-if="useVistas.show.vSalones" />
+        <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
+        <vInsumos v-if="useVistas.show.vInsumos" />
+        <vProductos v-if="useVistas.show.vProductos" />
+        <vCombos v-if="useVistas.show.vCombos" />
+        <vColaboradores v-if="useVistas.show.vColaboradores" />
     </section>
 </template>
 
@@ -52,11 +55,9 @@ import vPos from '@/views/ventas/pedidos/vPos.vue'
 import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
 import vCajaMovimientos from '@/views/caja/movimientos/vCajaMovimientos.vue'
 
-//----- ARTÍCULOS --- //
-import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
-import vInsumos from '@/views/articulos/insumos/vInsumos.vue'
-import vProductos from '@/views/articulos/productos/vProductos.vue'
-import vCombos from '@/views/articulos/combos/vCombos.vue'
+//----- INVENTARIO --- //
+import vInventarioInsumos from '@/views/inventario/vInventarioInsumos.vue'
+import vInventarioProductos from '@/views/inventario/vInventarioProductos.vue'
 
 //----- REPORTES --- //
 import vReportePedidos from '@/views/reportes/pedidos/vReportePedidos.vue'
@@ -69,11 +70,15 @@ import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 //----- AJUSTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vSucursales from '@/views/ajustes/sucursales/vSucursales.vue'
-import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
+import vSalones from '@/views/ajustes/salones/vSalones.vue'
+import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
 import vComprobanteTipos from '@/views/ajustes/comprobante_tipos/vComprobanteTipos.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
-import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
-import vSalones from '@/views/ajustes/salones/vSalones.vue'
+import vArticuloCategorias from '@/views/ajustes/categorias/vArticuloCategorias.vue'
+import vInsumos from '@/views/ajustes/insumos/vInsumos.vue'
+import vProductos from '@/views/ajustes/productos/vProductos.vue'
+import vCombos from '@/views/ajustes/combos/vCombos.vue'
+import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 
 export default {
     components: {
@@ -88,6 +93,9 @@ export default {
 
         vCajaResumen,
         vCajaMovimientos,
+
+        vInventarioInsumos,
+        vInventarioProductos,
 
         vArticuloCategorias,
         vInsumos,

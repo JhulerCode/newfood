@@ -120,77 +120,26 @@ export const useAuth = defineStore('auth', {
                 ],
             },
             {
-                id: 'articulos',
-                label: 'Artículos',
+                id: 'inventario',
+                label: 'Inventario',
                 icon: 'fa-solid fa-boxes-stacked',
                 children: [
                     {
-                        label: 'Categorías',
-                        goto: 'vArticuloCategorias',
-                        permisos: [
-                            { id: 'vArticuloCategorias:listar', label: 'Listar' },
-                            { id: 'vArticuloCategorias:crear', label: 'Crear' },
-                            { id: 'vArticuloCategorias:editar', label: 'Editar' },
-                            { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
-                        ],
-                    },
-                    {
                         label: 'Insumos',
-                        goto: 'vInsumos',
+                        goto: 'vInventarioInsumos',
                         permisos: [
-                            { id: 'vInsumos:listar', label: 'Listar' },
-                            { id: 'vInsumos:crear', label: 'Crear' },
-                            { id: 'vInsumos:editar', label: 'Editar' },
-                            { id: 'vInsumos:eliminar', label: 'Eliminar' },
-
-                            { id: 'vInsumos:clonar', label: 'Clonar' },
-                            { id: 'vInsumos:kardex', label: 'Ver kardex' },
-                            { id: 'vInsumos:ajusteStock', label: 'Ajuste stock' },
-
-                            { id: 'vInsumos:crearBulk', label: 'Crear masivo' },
-                            { id: 'vInsumos:editarBulk', label: 'Editar masivo' },
-                            { id: 'vInsumos:eliminarBulk', label: 'Eliminar masivo' },
+                            { id: 'vInventarioInsumos:listar', label: 'Listar' },
+                            { id: 'vInventarioInsumos:kardex', label: 'Ver kardex' },
+                            { id: 'vInventarioInsumos:ajusteStock', label: 'Ajuste stock' },
                         ],
                     },
                     {
                         label: 'Productos',
-                        goto: 'vProductos',
+                        goto: 'vInventarioProductos',
                         permisos: [
-                            { id: 'vProductos:listar', label: 'Listar' },
-                            { id: 'vProductos:crear', label: 'Crear' },
-                            { id: 'vProductos:editar', label: 'Editar' },
-                            { id: 'vProductos:eliminar', label: 'Eliminar' },
-
-                            { id: 'vProductos:clonar', label: 'Clonar' },
-                            { id: 'vProductos:kardex', label: 'Ver kardex' },
-                            { id: 'vProductos:ajusteStock', label: 'Ajuste stock' },
-
-                            { id: 'vProductos:crearBulk', label: 'Crear masivo' },
-                            { id: 'vProductos:editarBulk', label: 'Editar masivo' },
-                            { id: 'vProductos:eliminarBulk', label: 'Eliminar masivo' },
-
-                            { id: 'vProductos:listarReceta', label: 'Listar receta' },
-                            { id: 'vProductos:crearReceta', label: 'Crear receta' },
-                            { id: 'vProductos:editarReceta', label: 'Editar receta' },
-                            { id: 'vProductos:eliminarReceta', label: 'Eliminar receta' },
-                        ],
-                    },
-                    {
-                        label: 'Combos',
-                        goto: 'vCombos',
-                        permisos: [
-                            { id: 'vCombos:listar', label: 'Listar' },
-                            { id: 'vCombos:crear', label: 'Crear' },
-                            { id: 'vCombos:editar', label: 'Editar' },
-                            { id: 'vCombos:eliminar', label: 'Eliminar' },
-
-                            { id: 'vCombos:crearBulk', label: 'Crear masivo' },
-                            { id: 'vCombos:editarBulk', label: 'Editar masivo' },
-                            { id: 'vCombos:eliminarBulk', label: 'Eliminar masivo' },
-                            {
-                                id: 'vCombos:crearComponentesBulk',
-                                label: 'Crear componentes masivo',
-                            },
+                            { id: 'vInventarioProductos:listar', label: 'Listar' },
+                            { id: 'vInventarioProductos:kardex', label: 'Ver kardex' },
+                            { id: 'vInventarioProductos:ajusteStock', label: 'Ajuste stock' },
                         ],
                     },
                 ],
@@ -326,6 +275,71 @@ export const useAuth = defineStore('auth', {
                         ],
                     },
                     {
+                        label: 'Categorías',
+                        goto: 'vArticuloCategorias',
+                        permisos: [
+                            { id: 'vArticuloCategorias:listar', label: 'Listar' },
+                            { id: 'vArticuloCategorias:crear', label: 'Crear' },
+                            { id: 'vArticuloCategorias:editar', label: 'Editar' },
+                            { id: 'vArticuloCategorias:eliminar', label: 'Eliminar' },
+                        ],
+                    },
+                    {
+                        label: 'Insumos',
+                        goto: 'vInsumos',
+                        permisos: [
+                            { id: 'vInsumos:listar', label: 'Listar' },
+                            { id: 'vInsumos:crear', label: 'Crear' },
+                            { id: 'vInsumos:editar', label: 'Editar' },
+                            { id: 'vInsumos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vInsumos:clonar', label: 'Clonar' },
+
+                            { id: 'vInsumos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vInsumos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vInsumos:eliminarBulk', label: 'Eliminar masivo' },
+                        ],
+                    },
+                    {
+                        label: 'Productos',
+                        goto: 'vProductos',
+                        permisos: [
+                            { id: 'vProductos:listar', label: 'Listar' },
+                            { id: 'vProductos:crear', label: 'Crear' },
+                            { id: 'vProductos:editar', label: 'Editar' },
+                            { id: 'vProductos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vProductos:clonar', label: 'Clonar' },
+
+                            { id: 'vProductos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vProductos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vProductos:eliminarBulk', label: 'Eliminar masivo' },
+
+                            { id: 'vProductos:listarReceta', label: 'Listar receta' },
+                            { id: 'vProductos:crearReceta', label: 'Crear receta' },
+                            { id: 'vProductos:editarReceta', label: 'Editar receta' },
+                            { id: 'vProductos:eliminarReceta', label: 'Eliminar receta' },
+                        ],
+                    },
+                    {
+                        label: 'Combos',
+                        goto: 'vCombos',
+                        permisos: [
+                            { id: 'vCombos:listar', label: 'Listar' },
+                            { id: 'vCombos:crear', label: 'Crear' },
+                            { id: 'vCombos:editar', label: 'Editar' },
+                            { id: 'vCombos:eliminar', label: 'Eliminar' },
+
+                            { id: 'vCombos:crearBulk', label: 'Crear masivo' },
+                            { id: 'vCombos:editarBulk', label: 'Editar masivo' },
+                            { id: 'vCombos:eliminarBulk', label: 'Eliminar masivo' },
+                            {
+                                id: 'vCombos:crearComponentesBulk',
+                                label: 'Crear componentes masivo',
+                            },
+                        ],
+                    },
+                    {
                         label: 'Colaboradores',
                         goto: 'vColaboradores',
                         permisos: [
@@ -394,7 +408,10 @@ export const useAuth = defineStore('auth', {
                 this.empresa = deepCopy(result.empresa)
             }
 
-            if (!this.sucursal.id || !this.empresa.sucursales.some((a) => a.id == this.sucursal.id)) {
+            if (
+                !this.sucursal.id ||
+                !this.empresa.sucursales.some((a) => a.id == this.sucursal.id)
+            ) {
                 this.sucursal = deepCopy(this.empresa.sucursales[0])
             }
         },

@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Insumos</strong>
+            <strong>Productos</strong>
 
             <div class="buttons">
                 <input
@@ -12,19 +12,19 @@
                     @change="importar"
                 />
 
-                <!-- <JdButton
+                <JdButton
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
                     @click="this.$refs.excel.click()"
-                    v-if="useAuth.verifyPermiso('vInsumos:crearBulk')"
-                /> -->
+                    v-if="useAuth.verifyPermiso('vProductos:crearBulk')"
+                />
 
                 <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vInsumos:crear')"
+                    v-if="useAuth.verifyPermiso('vProductos:crear')"
                 />
             </div>
         </div>
@@ -49,8 +49,8 @@
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
-    <mKardex v-if="useModals.show.mKardex" />
-    <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mArticuloReceta v-if="useModals.show.mArticuloReceta" />
+    <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -60,10 +60,10 @@
 <script>
 import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from '@jhuler/components'
 
-import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
-import mArticulo from '@/views/articulos/mArticulo.vue'
-import mKardex from '@/views/articulos/mKardex.vue'
-import mAjusteStock from '@/views/articulos/mAjusteStock.vue'
+import mImportarArticulos from '@/views/ajustes/insumos/mImportarArticulos.vue'
+import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
+import mArticuloReceta from '@/views/ajustes/productos/mArticuloReceta.vue'
+import mArticuloPreciosSemana from '@/views/ajustes/productos/mArticuloPreciosSemana.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -85,8 +85,8 @@ export default {
 
         mImportarArticulos,
         mArticulo,
-        mKardex,
-        mAjusteStock,
+        mArticuloReceta,
+        mArticuloPreciosSemana,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -95,7 +95,7 @@ export default {
 
         vista: {},
 
-        tableName: 'vInsumos',
+        tableName: 'vProductos',
         columns: [
             {
                 id: 'id',
@@ -106,6 +106,16 @@ export default {
                 seek: false,
                 sort: false,
             },
+            // {
+            //     id: 'foto_url',
+            //     title: 'Foto',
+            //     filtrable: false,
+            //     format: 'img',
+            //     width: '5rem',
+            //     show: true,
+            //     seek: true,
+            //     sort: true,
+            // },
             {
                 id: 'nombre',
                 title: 'Nombre',
@@ -116,37 +126,39 @@ export default {
                 sort: true,
             },
             {
-                id: 'unidad',
-                title: 'Unidad',
-                type: 'select',
+                id: 'precio_venta',
+                title: 'Precio de venta',
+                type: 'number',
                 editable: true,
+                format: 'decimal',
+                toRight: true,
                 width: '5rem',
                 show: true,
                 seek: false,
                 sort: true,
             },
-            {
-                id: 'stock',
-                title: 'Stock',
-                toRight: true,
-                filtrable: false,
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'activo',
-                title: 'Estado',
-                prop: 'activo1.nombre',
-                type: 'select',
-                editable: true,
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
+            // {
+            //     id: 'stock',
+            //     title: 'Stock',
+            //     toRight: true,
+            //     filtrable: false,
+            //     width: '8rem',
+            //     show: true,
+            //     seek: true,
+            //     sort: true,
+            // },
+            // {
+            //     id: 'activo',
+            //     title: 'Estado',
+            //     prop: 'activo1.nombre',
+            //     type: 'select',
+            //     editable: true,
+            //     format: 'yesno',
+            //     width: '8rem',
+            //     show: true,
+            //     seek: false,
+            //     sort: true,
+            // },
             {
                 id: 'categoria',
                 title: 'Categoría',
@@ -156,6 +168,39 @@ export default {
                 width: '10rem',
                 show: true,
                 seek: true,
+                sort: true,
+            },
+            {
+                id: 'produccion_area',
+                title: 'Área de impresión',
+                prop: 'produccion_area1.nombre',
+                type: 'select',
+                editable: true,
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            // {
+            //     id: 'valor',
+            //     title: 'Valor',
+            //     format: 'decimal',
+            //     toRight: true,
+            //     width: '10rem',
+            //     show: false,
+            //     seek: true,
+            //     sort: true,
+            // },
+            {
+                id: 'has_receta',
+                title: 'Es transformado?',
+                prop: 'has_receta1.nombre',
+                type: 'select',
+                editable: true,
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -175,13 +220,13 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 text: 'Editar',
                 action: 'editarBulk',
-                permiso: 'vInsumos:editarBulk',
+                permiso: 'vProductos:editarBulk',
             },
             {
                 icon: 'fa-solid fa-trash-can',
                 text: 'Eliminar',
                 action: 'eliminarBulk',
-                permiso: 'vInsumos:eliminarBulk',
+                permiso: 'vProductos:eliminarBulk',
             },
         ],
         tableRowOptions: [
@@ -189,51 +234,66 @@ export default {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
-                permiso: 'vInsumos:editar',
+                permiso: 'vProductos:editar',
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                permiso: 'vInsumos:eliminar',
+                permiso: 'vProductos:eliminar',
             },
             {
                 label: 'Clonar',
                 icon: 'fa-solid fa-copy',
                 action: 'clonar',
-                permiso: 'vInsumos:clonar',
+                permiso: 'vProductos:clonar',
             },
             {
-                label: 'Ver kardex',
-                icon: 'fa-solid fa-table-list',
-                action: 'verKardex',
-                permiso: 'vInsumos:kardex',
+                label: 'Receta',
+                icon: 'fa-solid fa-flask',
+                action: 'showReceta',
+                permiso: 'vProductos:listarReceta',
+                ocultar: { has_receta: false },
             },
             {
-                label: 'Ajuste stock',
-                icon: 'fa-solid fa-wrench',
-                action: 'ajusteStock',
-                permiso: 'vInsumos:ajusteStock',
+                label: 'Precios por día',
+                icon: 'fa-solid fa-tags',
+                action: 'openPreciosSemana',
+                permiso: 'vProductos:editar',
             },
         ],
     }),
     async created() {
-        this.vista = this.useVistas.vInsumos
+        this.vista = this.useVistas.vProductos
         this.useAuth.setColumns(this.tableName, this.columns)
+        this.columns[1].host = urls.uploads
+        this.hideColumns()
 
         this.verifyRowSelectIsActive()
 
         if (this.vista.loaded) return
-        if (this.useAuth.verifyPermiso('vInsumos:listar') == true) this.loadArticulos()
+        if (this.useAuth.verifyPermiso('vProductos:listar') == true) this.loadArticulos()
     },
     methods: {
+        hideColumns() {
+            if (this.useAuth.empresa.tipo == 2) {
+                this.columns[7].show = false
+                this.columns[8].show = false
+            }
+        },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: '1' } },
-                incl: ['categoria1'],
+                fltr: {
+                    tipo: { op: 'Es', val: '2' },
+                    is_combo: { op: 'Es', val: false },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
+                },
+                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            this.vista.qry.cols.push('unidad')
         },
         async loadArticulos() {
             this.setQuery()
@@ -258,8 +318,9 @@ export default {
 
         nuevo() {
             const item = {
-                tipo: '1',
+                tipo: '2',
                 igv_afectacion: 10,
+                unidad: 'NIU',
 
                 has_receta: false,
                 activo: true,
@@ -267,7 +328,7 @@ export default {
                 is_combo: false,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo insumo', 1, item)
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, item)
         },
         importar(event) {
             this.useAuth.setLoading(true, 'Cargando archivo...')
@@ -276,7 +337,14 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = ['Nombre', 'Categoria', 'Unidad', 'Tributo']
+                const headers = [
+                    'Nombre',
+                    'Categoria',
+                    'Tributo',
+                    'Es transformado?',
+                    'Precio de venta',
+                    'Área de impresión',
+                ]
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -296,29 +364,40 @@ export default {
                     {},
                 )
 
-                for (const a of res.data) {
-                    if (categoriasMap[a.Categoria]) {
-                        a.Categoria1 = categoriasMap[a.Categoria]
-                        a.Categoria = categoriasMap[a.Categoria].id
-                    } else {
-                        a.Categoria = null
-                    }
+                await this.loadProduccionAreas()
+                const produccion_areasMap = this.vista.produccion_areas.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
 
-                    if (igv_afectacionesMap[a.Tributo]) {
-                        a.Tributo = igv_afectacionesMap[a.Tributo].id
-                        a.Tributo1 = { ...igv_afectacionesMap[a.Tributo] }
-                    } else {
-                        a.Tributo = null
-                    }
+                for (const a of res.data) {
+                    a.nombre = a.Nombre
+                    a.has_receta = a['Es transformado?'] == 'SI' ? true : false
+                    a.precio_venta = a['Precio de venta']
+
+                    a.categoria1 = categoriasMap[a.Categoria]
+                    a.categoria = a.categoria1?.id
+
+                    a.tributo1 = igv_afectacionesMap[a.Tributo]
+                    a.tributo = a.tributo1?.id
+
+                    a.produccion_area1 = { ...produccion_areasMap[a['Área de impresión']] }
+                    a.produccion_area = a.produccion_area1?.id
                 }
 
                 this.useAuth.setLoading(false)
 
                 const send = {
-                    tipo: 1,
+                    tipo: 2,
                     articulos: res.data,
                 }
-                this.useModals.setModal('mImportarArticulos', 'Importar insumos', null, send, true)
+                this.useModals.setModal(
+                    'mImportarArticulos',
+                    'Importar productos',
+                    null,
+                    send,
+                    true,
+                )
             }
             reader.readAsArrayBuffer(file)
         },
@@ -327,10 +406,11 @@ export default {
             await this.loadDatosSistema()
 
             for (const a of this.columns) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (a.id == 'activo') a.lista = this.vista.activo_estados
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'has_receta') a.lista = this.vista.estados
                 if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
             }
             const cols = this.columns
 
@@ -366,10 +446,11 @@ export default {
             await this.loadDatosSistema()
 
             for (const a of this.columns) {
-                if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (a.id == 'activo') a.lista = this.vista.activo_estados
-                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
                 if (a.id == 'categoria') a.reload = this.loadCategorias
+                if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
+                if (a.id == 'has_receta') a.lista = this.vista.estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
             }
             const cols = this.columns
 
@@ -403,7 +484,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mArticulo', 'Editar insumo', 2, res.data)
+            this.useModals.setModal('mArticulo', 'Editar producto', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')
@@ -415,7 +496,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vInsumos', 'articulos', item)
+            this.useVistas.removeItem('vProductos', 'articulos', item)
         },
         async clonar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -429,7 +510,14 @@ export default {
                 id: null,
             }
 
-            this.useModals.setModal('mArticulo', 'Nuevo insumo', 1, send)
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, send)
+        },
+        async showReceta(item) {
+            const send = {
+                id: item.id,
+            }
+
+            this.useModals.setModal('mArticuloReceta', `Receta - ${item.nombre}`, null, send)
         },
         async verKardex(item) {
             const send = {
@@ -447,22 +535,32 @@ export default {
                 transaccion: {
                     fecha: dayjs().format('YYYY-MM-DD'),
                     articulo: item.id,
+                    estado: 1,
                 },
                 articulo1: {
                     igv_afectacion: item.igv_afectacion,
                     has_fv: item.has_fv,
                 },
                 articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 1,
+                articulo_tipo: 2,
                 // is_nuevo_lote: false,
             }
 
             this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
         },
+        async openPreciosSemana(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useModals.setModal('mArticuloPreciosSemana', 'Precios por día', null, res.data)
+        },
 
         async loadCategorias() {
             const qry = {
-                fltr: { tipo: { op: 'Es', val: '1' }, activo: { op: 'Es', val: true } },
+                fltr: { tipo: { op: 'Es', val: '2' }, activo: { op: 'Es', val: true } },
                 cols: ['nombre'],
                 ordr: [['nombre', 'ASC']],
             }
@@ -477,8 +575,24 @@ export default {
             this.vista.articulo_categorias = res.data
             return res.data
         },
+        async loadProduccionAreas() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+            }
+
+            this.vista.produccion_areas = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.produccion_areas}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.vista.produccion_areas = res.data
+            return res.data
+        },
         async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'activo_estados']
+            const qry = ['igv_afectaciones', 'unidades', 'activo_estados', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

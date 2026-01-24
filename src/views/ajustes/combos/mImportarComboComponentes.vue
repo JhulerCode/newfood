@@ -4,8 +4,7 @@
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
-        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false">
-        </JdTable>
+        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false" />
     </JdModal>
 </template>
 
@@ -17,6 +16,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, post } from '@/utils/crud'
+import { jmsg } from '@/utils/swal'
 
 export default {
     components: {
@@ -62,7 +62,19 @@ export default {
         eliminar(item) {
             this.modal.articulos = this.modal.articulos.filter((a) => a !== item)
         },
+        checkDatos() {
+            for (const a of this.modal.articulos) {
+                if (!a.articulo_principal || !a.articulo || !a.cantidad) {
+                    jmsg('error', 'Debe llenar todos los campos')
+                    return true
+                }
+            }
+
+            return false
+        },
         async grabar() {
+            if (this.checkDatos()) return
+
             const send = {
                 articulos: this.modal.articulos,
             }

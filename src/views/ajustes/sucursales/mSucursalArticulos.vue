@@ -4,7 +4,6 @@
             :columns="columns"
             :datos="modal.articulos || []"
             :reload="loadArticulos"
-            :seeker="false"
             :download="false"
         >
             <template v-slot:cEstado="{ item }">
@@ -51,6 +50,7 @@ export default {
                 width: '25rem',
                 show: true,
                 sort: true,
+                seek: true,
             },
             // {
             //     id: 'articulo1.unidad',

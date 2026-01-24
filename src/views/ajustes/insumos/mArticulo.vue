@@ -63,6 +63,7 @@
                 @handleFile="(file, blob) => ((articulo.archivo = file), (modal.blob = blob))"
                 @deleteFile="((articulo.archivo = null), (modal.blob = null))"
                 style="grid-column: 1/3"
+                v-if="articulo.tipo == 2"
             />
 
             <template v-if="useAuth.empresa.tipo == 1">
