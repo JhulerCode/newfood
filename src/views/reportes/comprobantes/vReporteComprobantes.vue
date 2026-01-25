@@ -5,6 +5,7 @@
 
             <div class="buttons">
                 <JdCheckBox label="Incluir detalle" v-model="vista.incluir_detalle" />
+                <JdCheckBox label="Todos los sucursales" v-model="vista.sucursal_todos" />
             </div>
         </div>
 
@@ -106,8 +107,9 @@ export default {
             {
                 id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'doc_tipo1.nombre',
+                prop: 'doc_tipo1.tipo_serie',
                 type: 'select',
+                mostrar: 'tipo_serie',
                 width: '10rem',
                 show: true,
                 sort: true,
@@ -117,6 +119,7 @@ export default {
                 id: 'serie',
                 title: 'Serie',
                 type: 'text',
+                filtrable: false,
                 width: '5rem',
                 show: true,
                 seek: true,
@@ -337,9 +340,7 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {
-                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
-                },
+                fltr: {},
                 sqls: ['comprobante_pagos_monto'],
                 incl: ['doc_tipo1', 'socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
                 iccl: {
@@ -356,6 +357,9 @@ export default {
             this.vista.qry.cols.push('caja_apertura', 'empresa_datos', 'cliente_datos')
             if (this.vista.incluir_detalle) {
                 this.vista.qry.incl.push('comprobante_items')
+            }
+            if (!this.vista.sucursal_todos) {
+                this.vista.qry.fltr.sucursal = { op: 'Es', val: this.useAuth.sucursal.id }
             }
         },
         async loadComprobantes() {

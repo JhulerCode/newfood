@@ -84,6 +84,7 @@ export default {
                 title: 'Tipo compr.',
                 prop: 'comprobante1.doc_tipo1.nombre',
                 type: 'select',
+                mostrar: 'tipo_serie',
                 width: '10rem',
                 show: true,
                 sort: true,
