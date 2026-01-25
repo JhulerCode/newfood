@@ -133,13 +133,13 @@ export default {
                 sort: true,
             },
             {
-                id: 'stock',
+                id: 'sucursal_stock',
                 title: 'Stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
                 show: true,
-                seek: true,
+                seek: false,
                 sort: true,
             },
             {
@@ -188,20 +188,6 @@ export default {
                 sort: true,
             },
         ],
-        tableActions: [
-            {
-                icon: 'fa-solid fa-pen-to-square',
-                text: 'Editar',
-                action: 'editarBulk',
-                permiso: 'vInventarioProductos:editarBulk',
-            },
-            {
-                icon: 'fa-solid fa-trash-can',
-                text: 'Eliminar',
-                action: 'eliminarBulk',
-                permiso: 'vInventarioProductos:eliminarBulk',
-            },
-        ],
         tableRowOptions: [
             {
                 label: 'Ver kardex',
@@ -245,7 +231,8 @@ export default {
                     'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
                     'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos'],
+                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos', 'kardexes'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
