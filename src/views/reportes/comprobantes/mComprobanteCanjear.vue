@@ -194,6 +194,11 @@ export default {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
+
+                if (this.modal.socio.doc_numero == this.useAuth.empresa.ruc) {
+                    jmsg('error', 'El cliente no puede ser el mismo que la empresa')
+                    return true
+                }
             }
 
             if (elegido.tipo == '03') {

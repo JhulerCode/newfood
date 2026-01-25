@@ -987,7 +987,11 @@ export default {
                 return true
             }
 
-            if (this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-01`) {
+            const elegido = this.vista.comprobante_tipos.find(
+                (a) => a.id == this.modal.comprobante.doc_tipo_nuevo,
+            )
+
+            if (elegido.tipo == '01') {
                 if (['0', '1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
@@ -999,7 +1003,7 @@ export default {
                 }
             }
 
-            if (this.vista.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`) {
+            if (elegido.tipo == '03') {
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true
