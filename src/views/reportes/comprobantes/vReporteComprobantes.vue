@@ -337,7 +337,9 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 sqls: ['comprobante_pagos_monto'],
                 incl: ['doc_tipo1', 'socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
                 iccl: {

@@ -410,8 +410,10 @@ export default {
 
         await this.loadComprobanteTipos()
         if (this.vista.comprobante_tipos && this.vista.comprobante_tipos.length > 0) {
-            const asd = this.vista.comprobante_tipos.find((a) => a.estandar == true)
-            this.vista.comprobante.doc_tipo = asd.id
+            const comprobante_tipo_estandar = this.vista.comprobante_tipos.find(
+                (a) => a.estandar == true,
+            )
+            this.vista.comprobante.doc_tipo = comprobante_tipo_estandar?.id
         }
     },
     methods: {
@@ -1073,13 +1075,13 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        // async grabar1() {
-        //     if (this.checkDatos()) return
-        //     this.shapeDatos()
+        async grabar() {
+            if (this.checkDatos()) return
+            this.shapeDatos()
 
-        //     console.log(this.vista.comprobante)
-        // },
-        async grabar(print) {
+            console.log(this.vista.comprobante)
+        },
+        async grabar1(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 

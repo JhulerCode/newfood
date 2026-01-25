@@ -11,10 +11,8 @@
                 :name="tableName"
                 :columns="columns"
                 :datos="vista.dinero_movimientos || []"
-                :colAct="true"
                 :configFiltros="openConfigFiltros"
                 :reload="loadMovimientos"
-                :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
             >
                 <template v-slot:cDetalle="{ item }">
@@ -126,7 +124,6 @@ export default {
                 sort: true,
             },
         ],
-        tableRowOptions: [],
     }),
     async created() {
         this.vista = this.useVistas.vDineroMovimientos
@@ -146,7 +143,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {
-                    // operacion: { op: 'No es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['pago_metodo1', 'comprobante1'],
             }

@@ -163,9 +163,9 @@ export default {
             {
                 id: 'comprobante1.estado',
                 title: 'Estado',
-                prop: 'comprobante_estado1.nombre',
+                prop: 'comprobante1.estado1.nombre',
                 type: 'select',
-                format: 'estado',
+                // format: 'estado',
                 width: '8rem',
                 show: true,
                 seek: false,
@@ -191,7 +191,9 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 incl: ['comprobante1', 'articulo1'],
             }
 

@@ -199,7 +199,10 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 2 } },
+                fltr: {
+                    tipo: { op: 'Es', val: 2 },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 incl: ['createdBy1', 'venta_mesa1', 'socio1'],
                 iccl: {
                     venta_mesa1: {

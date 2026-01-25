@@ -441,7 +441,9 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

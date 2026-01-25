@@ -146,7 +146,9 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 incl: ['createdBy1'],
             }
 
