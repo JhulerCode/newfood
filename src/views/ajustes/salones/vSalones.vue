@@ -28,10 +28,10 @@
                     :columns="columns"
                     :datos="vista.salones || []"
                     :colAct="true"
-                    :seeker="false"
                     :reload="loadSalones"
                     :rowOptions="tableRowOptions"
                     @rowOptionSelected="runMethod"
+                    class="mrg-top1"
                 >
                 </JdTable>
             </div>
@@ -123,7 +123,6 @@ export default {
                 format: 'yesno',
                 width: '6rem',
                 show: true,
-                seek: true,
                 sort: true,
             },
         ],

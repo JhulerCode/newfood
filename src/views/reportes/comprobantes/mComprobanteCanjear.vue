@@ -18,8 +18,11 @@
             <JdSelect
                 label="Tipo"
                 :nec="true"
-                v-model="modal.comprobante.doc_tipo1"
+                v-model="modal.comprobante.doc_tipo_nuevo"
                 :lista="pago_comprobantes_filtered"
+                mostrar="tipo_serie"
+                :loaded="modal.comprobanteTiposLoaded"
+                @reload="loadComprobanteTipos"
                 style="grid-column: 1/3"
             />
 
@@ -63,6 +66,7 @@ import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
 export default {
+    emits: ['canjeado'],
     components: {
         JdModal,
         JdInput,
@@ -85,29 +89,16 @@ export default {
         pago_comprobantes_filtered() {
             if (this.modal.comprobante_tipos == null) return []
 
-            if (
-                this.modal.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`
-            ) {
-                return this.modal.comprobante_tipos.filter(
-                    (a) =>
-                        a.id != `${this.useAuth.empresa.subdominio}-NV` &&
-                        a.id != `${this.useAuth.empresa.subdominio}-03`,
-                )
+            if (this.modal.comprobante.doc_tipo1?.tipo == `03`) {
+                return this.modal.comprobante_tipos.filter((a) => a.tipo != `NV` && a.tipo != `03`)
             } else {
-                return this.modal.comprobante_tipos.filter(
-                    (a) => a.id != `${this.useAuth.empresa.subdominio}-NV`,
-                )
+                return this.modal.comprobante_tipos.filter((a) => a.tipo != `NV`)
             }
         },
     },
     created() {
         this.modal = this.useModals.mComprobanteCanjear
-        // this.loadPagoComprobantes()
         this.loadComprobanteTipos()
-
-        if (this.modal.comprobante.doc_tipo == `${this.useAuth.empresa.subdominio}-03`) {
-            this.modal.comprobante.doc_tipo1 = `${this.useAuth.empresa.subdominio}-01`
-        }
     },
     methods: {
         async loadSocios(txtBuscar) {
@@ -145,23 +136,31 @@ export default {
 
             this.modal.socios = res.data
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.modal.comprobante_tipos = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.modal.comprobante_tipos = res.data
-        // },
         async loadComprobanteTipos() {
-            this.modal.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.modal.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            this.modal.comprobanteTiposLoaded = false
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
+            this.modal.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.modal.comprobante_tipos = res.data
         },
 
         setSocio(item) {
@@ -180,24 +179,24 @@ export default {
         },
 
         checkDatos() {
-            const props = ['fecha_emision', 'doc_tipo1', 'socio']
+            const props = ['fecha_emision', 'doc_tipo_nuevo', 'socio']
             if (incompleteData(this.modal.comprobante, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
                 return true
             }
 
-            if (
-                this.modal.comprobante.doc_tipo1 == `${this.useAuth.empresa.subdominio}-01`
-            ) {
+            const elegido = this.modal.comprobante_tipos.find(
+                (a) => a.id == this.modal.comprobante.doc_tipo_nuevo,
+            )
+
+            if (elegido.tipo == '01') {
                 if (['0', '1', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
             }
 
-            if (
-                this.modal.comprobante.doc_tipo1 == `${this.useAuth.empresa.subdominio}-03`
-            ) {
+            if (elegido.tipo == '03') {
                 if (['6', '4', '7'].includes(this.modal.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true

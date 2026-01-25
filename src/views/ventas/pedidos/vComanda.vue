@@ -538,8 +538,14 @@ export default {
         },
         async loadPagoMetodos() {
             const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_pago_metodos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_pago_metodos.estado': { op: 'Es', val: true },
+                },
                 cols: ['nombre'],
+                incl: ['sucursal_pago_metodos'],
+                ordr: [['nombre', 'asc']],
             }
 
             this.vista.pago_metodos = []

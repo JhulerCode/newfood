@@ -3,7 +3,7 @@
         <JdTable
             :columns="columns"
             :datos="modal.comprobante_tipos || []"
-            :reload="loadComprobanteTipos"
+            :reload="loadSucursalComprobanteTipos"
             :seeker="false"
             :download="false"
         >
@@ -66,7 +66,7 @@ export default {
         this.modal = this.useModals.mSucursalComprobanteTipos
 
         await this.loadDatosSistema()
-        this.loadComprobanteTipos()
+        this.loadSucursalComprobanteTipos()
     },
     methods: {
         async loadDatosSistema() {
@@ -77,7 +77,7 @@ export default {
 
             Object.assign(this.modal, res.data)
         },
-        async loadComprobanteTipos() {
+        async loadSucursalComprobanteTipos() {
             const qry = {
                 fltr: {
                     sucursal: { op: 'Es', val: this.modal.item.id },

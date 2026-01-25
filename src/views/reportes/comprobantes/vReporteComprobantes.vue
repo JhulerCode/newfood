@@ -339,7 +339,7 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 sqls: ['comprobante_pagos_monto'],
-                incl: ['socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
+                incl: ['doc_tipo1', 'socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
                 iccl: {
                     caja_apertura1: {
                         cols: ['createdAt'],
@@ -396,23 +396,31 @@ export default {
             this.vista.socios = res.data
             return res.data
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.vista.comprobante_tipos = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.vista.comprobante_tipos = res.data
-        // },
         async loadComprobanteTipos() {
-            this.vista.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.vista.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            this.vista.comprobanteTiposLoaded = false
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
+            this.vista.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.vista.comprobante_tipos = res.data
             return this.vista.comprobante_tipos
         },
 
@@ -420,10 +428,10 @@ export default {
             await this.loadDatosSistema()
 
             for (const a of this.columns) {
-                if(a.id == 'doc_tipo') a.reload = this.loadComprobanteTipos
-                if(a.id == 'socio') a.reload = this.loadSocios
-                if(a.id == 'estado') a.lista = this.vista.comprobante_estados
-                if(a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+                if (a.id == 'doc_tipo') a.reload = this.loadComprobanteTipos
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'estado') a.lista = this.vista.comprobante_estados
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
             }
             const cols = this.columns
 

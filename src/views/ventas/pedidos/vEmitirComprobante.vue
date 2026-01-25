@@ -47,9 +47,10 @@
                         :nec="true"
                         v-model="vista.comprobante.doc_tipo"
                         :lista="vista.comprobante_tipos || []"
+                        mostrar="tipo_serie"
                         :loaded="vista.comprobanteTiposLoaded"
                         @reload="loadComprobanteTipos"
-                        style="grid-column: 1/4"
+                        style="grid-column: 1/5"
                     />
 
                     <div style="grid-column: 1/5" class="dato-cliente">
@@ -422,29 +423,42 @@ export default {
 
             Object.assign(this.vista, res.data)
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.vista.comprobante_tipos = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.vista.comprobante_tipos = res.data
-        // },
         async loadComprobanteTipos() {
-            this.vista.comprobante_tipos = this.useAuth.empresa.comprobante_tipos
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.vista.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
+            this.vista.comprobanteTiposLoaded = false
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
+            this.vista.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
+
+            if (res.code != 0) return
+
+            this.vista.comprobante_tipos = res.data
         },
         async loadPagoMetodos() {
             const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_pago_metodos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_pago_metodos.estado': { op: 'Es', val: true },
+                },
                 cols: ['nombre', 'color'],
-                ordr: [['nombre', 'asc']]
+                incl: ['sucursal_pago_metodos'],
+                ordr: [['nombre', 'asc']],
             }
 
             this.vista.pago_metodos = []
