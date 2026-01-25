@@ -46,7 +46,7 @@ export default {
             {
                 id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'doc_tipo1.nombre',
+                prop: 'doc_tipo1.tipo1.nombre',
                 width: '10rem',
                 show: true,
                 sort: true,
@@ -133,7 +133,7 @@ export default {
                 fltr: {
                     transaccion: { op: 'Es', val: this.modal.transaccion.id },
                 },
-                incl: ['socio1'],
+                incl: ['doc_tipo1', 'socio1'],
                 sqls: ['comprobante_pagos_monto'],
             }
 

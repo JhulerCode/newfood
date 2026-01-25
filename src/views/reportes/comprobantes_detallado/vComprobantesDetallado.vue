@@ -82,7 +82,7 @@ export default {
             {
                 id: 'comprobante1.doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'comprobante1.doc_tipo1.nombre',
+                prop: 'comprobante1.doc_tipo1.tipo1.nombre',
                 type: 'select',
                 mostrar: 'tipo_serie',
                 width: '10rem',
@@ -95,13 +95,14 @@ export default {
                 title: 'Serie',
                 prop: 'comprobante1.serie',
                 type: 'text',
+                filtrable: false,
                 width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'comprobante1.correlativo',
+                id: 'comprobante1.numero',
                 title: 'Correlativo',
                 prop: 'comprobante1.numero',
                 type: 'text',
@@ -196,6 +197,11 @@ export default {
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['comprobante1', 'articulo1'],
+                iccl: {
+                    comprobante1: {
+                        incl: ['doc_tipo1']
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

@@ -107,7 +107,7 @@ export default {
             {
                 id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'doc_tipo1.tipo_serie',
+                prop: 'doc_tipo1.tipo1.nombre',
                 type: 'select',
                 mostrar: 'tipo_serie',
                 width: '10rem',

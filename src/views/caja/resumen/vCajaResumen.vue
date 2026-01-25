@@ -432,7 +432,7 @@
 
                         <JdTable
                             :datos="vista.resumen.comprobantes_canjeados || []"
-                            :columns="columnsComprobantesAnulados"
+                            :columns="columnsComprobantesCanjeados"
                             :seeker="false"
                             :download="false"
                             height="10rem"
@@ -624,7 +624,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'id',
+                id: 'serie_correlativo',
                 title: 'Número',
                 width: '10rem',
                 show: true,
@@ -649,7 +649,7 @@ export default {
             // },
         ],
 
-        columnsComprobantesAnulados: [
+        columnsComprobantesCanjeados: [
             {
                 id: 'tipo',
                 title: 'Documento',
@@ -658,7 +658,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'id',
+                id: 'serie_correlativo',
                 title: 'Número',
                 width: '8rem',
                 show: true,
