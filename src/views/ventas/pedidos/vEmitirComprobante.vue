@@ -1110,10 +1110,6 @@ export default {
         async imprimir(data) {
             const send = {
                 ...data,
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
                 sucursal: this.useAuth.sucursal.id,
             }
 

@@ -26,7 +26,6 @@
         <vEmpresa v-if="useVistas.show.vEmpresa" />
         <vSucursales v-if="useVistas.show.vSucursales" />
         <vSalones v-if="useVistas.show.vSalones" />
-        <vImpresionAreas v-if="useVistas.show.vImpresionAreas" />
         <vComprobanteTipos v-if="useVistas.show.vComprobanteTipos" />
         <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
@@ -71,7 +70,6 @@ import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
 import vSucursales from '@/views/ajustes/sucursales/vSucursales.vue'
 import vSalones from '@/views/ajustes/salones/vSalones.vue'
-import vImpresionAreas from '@/views/ajustes/produccion_areas/vImpresionAreas.vue'
 import vComprobanteTipos from '@/views/ajustes/comprobante_tipos/vComprobanteTipos.vue'
 import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
 import vArticuloCategorias from '@/views/ajustes/categorias/vArticuloCategorias.vue'
@@ -97,10 +95,6 @@ export default {
         vInventarioInsumos,
         vInventarioProductos,
 
-        vArticuloCategorias,
-        vInsumos,
-        vProductos,
-        vCombos,
 
         vReportePedidos,
         vReporteComprobantes,
@@ -111,11 +105,14 @@ export default {
 
         vEmpresa,
         vSucursales,
-        vColaboradores,
+        vSalones,
         vComprobanteTipos,
         vPagoMetodos,
-        vImpresionAreas,
-        vSalones,
+        vArticuloCategorias,
+        vInsumos,
+        vProductos,
+        vCombos,
+        vColaboradores,
     },
     data: () => ({
         useVistas: useVistas(),

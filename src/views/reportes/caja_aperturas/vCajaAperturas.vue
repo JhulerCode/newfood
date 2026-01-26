@@ -216,10 +216,6 @@ export default {
             } = res.data
 
             const send = {
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
                 caja_apertura: item,
                 efectivo_ingresos_total,
                 efectivo_egresos_total,
