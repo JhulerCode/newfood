@@ -626,6 +626,11 @@ export default {
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
                 ordr: [['createdAt', 'ASC']],
+                iccl: {
+                    articulo1: {
+                        incl: ['produccion_area1'],
+                    },
+                },
             }
             this.useAuth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)

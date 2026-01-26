@@ -988,7 +988,7 @@ export default {
             }
 
             const elegido = this.vista.comprobante_tipos.find(
-                (a) => a.id == this.modal.comprobante.doc_tipo_nuevo,
+                (a) => a.id == this.vista.comprobante.doc_tipo,
             )
 
             if (elegido.tipo == '01') {
@@ -1079,13 +1079,13 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        async grabar() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
+        // async grabar() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
 
-            console.log(this.vista.comprobante)
-        },
-        async grabar1(print) {
+        //     console.log(this.vista.comprobante)
+        // },
+        async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
 
