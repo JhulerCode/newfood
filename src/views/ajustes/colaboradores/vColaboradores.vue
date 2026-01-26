@@ -117,7 +117,7 @@ export default {
                 prop: 'activo1.nombre',
                 type: 'select',
                 format: 'yesno',
-                width: '5rem',
+                width: '7rem',
                 show: true,
                 seek: true,
                 sort: true,

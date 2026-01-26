@@ -280,6 +280,7 @@ export default {
 
         .user-texts {
             overflow: hidden;
+            width: 10rem;
 
             .user-name {
                 font-size: 0.85rem;

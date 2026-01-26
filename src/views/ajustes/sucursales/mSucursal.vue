@@ -126,6 +126,6 @@ export default {
 .container-datos {
     display: grid;
     grid-template-columns: 20rem;
-    gap: 1rem 2rem;
+    gap: 0.5rem;
 }
 </style>

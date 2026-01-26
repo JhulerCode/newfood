@@ -197,7 +197,10 @@ export default {
             this.vista.qry = {
                 fltr: {},
                 incl: ['sucursal1'],
-                ordr: [['nombre', 'ASC']],
+                ordr: [
+                    ['sucursal1', 'codigo', 'ASC'],
+                    ['nombre', 'ASC'],
+                ],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

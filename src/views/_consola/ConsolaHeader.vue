@@ -5,7 +5,8 @@
                 class="sucursal"
                 @click="cambiarSucursal"
                 :class="{
-                    pointer: this.useAuth.verifyPermiso('vSucursales:cambiarSucursal'),
+                    // pointer: this.useAuth.verifyPermiso('vSucursales:cambiarSucursal'),
+                    pointer: true,
                 }"
             >
                 <small>Sucursal: </small>
@@ -79,9 +80,9 @@ export default {
     // },
     methods: {
         cambiarSucursal() {
-            if (this.useAuth.verifyPermiso('vSucursales:cambiarSucursal')) {
-                this.useModals.setModal('mSucursalCambiar', 'Cambiar de sucursal')
-            }
+            // if (this.useAuth.verifyPermiso('vSucursales:cambiarSucursal')) {
+            this.useModals.setModal('mSucursalCambiar', 'Cambiar de sucursal')
+            // }
         },
 
         reloadWindow() {

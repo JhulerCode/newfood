@@ -233,7 +233,10 @@ export const useAuth = defineStore('auth', {
                             { id: 'vImpresionAreas:listar', label: 'Áreas de impresión - Listar' },
                             { id: 'vImpresionAreas:crear', label: 'Áreas de impresión - Crear' },
                             { id: 'vImpresionAreas:editar', label: 'Áreas de impresión - Editar' },
-                            { id: 'vImpresionAreas:eliminar', label: 'Áreas de impresión - Eliminar' },
+                            {
+                                id: 'vImpresionAreas:eliminar',
+                                label: 'Áreas de impresión - Eliminar',
+                            },
                         ],
                     },
                     {
@@ -407,7 +410,9 @@ export const useAuth = defineStore('auth', {
                 !this.sucursal.id ||
                 !this.empresa.sucursales.some((a) => a.id == this.sucursal.id)
             ) {
-                this.sucursal = deepCopy(this.empresa.sucursales[0])
+                if (this.empresa.sucursales[0]) {
+                    this.sucursal = deepCopy(this.empresa.sucursales[0])
+                }
             }
         },
         connectSocket() {
