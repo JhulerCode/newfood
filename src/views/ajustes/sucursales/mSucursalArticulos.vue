@@ -128,9 +128,9 @@ export default {
                 ordr: [['articulo1', 'nombre', 'ASC']],
                 iccl: {
                     articulo1: {
-                        incl: ['categoria1']
-                    }
-                }
+                        incl: ['categoria1'],
+                    },
+                },
             }
 
             this.modal.articulos = []
@@ -164,6 +164,7 @@ export default {
             const send = {
                 id: item.id,
                 estado: item.estado,
+                impresion_area: item.impresion_area,
             }
 
             this.useAuth.setLoading(true, 'Actualizando...')
