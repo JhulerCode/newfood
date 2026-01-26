@@ -26,7 +26,7 @@
                 style="grid-column: 1/4"
             />
 
-            <template v-if="useAuth.empresa.tipo == 1">
+            <!-- <template v-if="useAuth.empresa.tipo == 1">
                 <JdSelect
                     label="Área de impresión"
                     :nec="true"
@@ -34,7 +34,7 @@
                     :lista="modal.produccion_areas || []"
                     style="grid-column: 1/4"
                 />
-            </template>
+            </template> -->
 
             <JdInput
                 label="Precio de venta"

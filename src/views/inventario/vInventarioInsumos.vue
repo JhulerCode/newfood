@@ -95,8 +95,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'sucursal_stock',
+                id: 'sucursal1.stock',
                 title: 'Stock',
+                prop: 'sucursal1.stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
@@ -159,6 +160,11 @@ export default {
                 },
                 incl: ['categoria1', 'sucursal_articulos', 'kardexes'],
                 ordr: [['nombre', 'ASC']],
+                iccl: {
+                    sucursal_articulos: {
+                        incl: ['impresion_area1']
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

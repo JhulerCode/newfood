@@ -63,13 +63,13 @@ export default {
                 width: '8rem',
                 show: true,
             },
-            {
-                id: 'produccion_area',
-                title: 'Área de impresión',
-                prop: 'produccion_area1.nombre',
-                width: '8rem',
-                show: true,
-            },
+            // {
+            //     id: 'produccion_area',
+            //     title: 'Área de impresión',
+            //     prop: 'produccion_area1.nombre',
+            //     width: '8rem',
+            //     show: true,
+            // },
         ],
 
         buttons: [{ text: 'Grabar', action: 'grabar', spin: false, show: true }],

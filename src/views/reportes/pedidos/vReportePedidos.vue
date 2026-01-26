@@ -168,12 +168,12 @@ export default {
                 action: 'ver',
                 permiso: 'vReportePedidos:ver',
             },
-            {
-                label: 'Imprimir',
-                icon: 'fa-solid fa-print',
-                action: 'imprimir',
-                permiso: 'vReportePedidos:imprimirComanda',
-            },
+            // {
+            //     label: 'Imprimir',
+            //     icon: 'fa-solid fa-print',
+            //     action: 'imprimir',
+            //     permiso: 'vReportePedidos:imprimirComanda',
+            // },
             {
                 label: 'Ver comprobantes',
                 icon: 'fa-solid fa-up-right-from-square',
@@ -307,32 +307,32 @@ export default {
                 true,
             )
         },
-        async imprimir(item) {
-            const res = await this.loadPedido(item)
-            if (res == false) return
+        // async imprimir(item) {
+        //     const res = await this.loadPedido(item)
+        //     if (res == false) return
 
-            let atencion = ''
+        //     let atencion = ''
 
-            if (res.data.venta_canal == 1) {
-                atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
-            } else if (res.data.venta_canal == 2) {
-                atencion = 'PARA LLEVAR'
-            } else if (res.data.venta_canal == 3) {
-                atencion = 'DELIVERY'
-            }
+        //     if (res.data.venta_canal == 1) {
+        //         atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
+        //     } else if (res.data.venta_canal == 2) {
+        //         atencion = 'PARA LLEVAR'
+        //     } else if (res.data.venta_canal == 3) {
+        //         atencion = 'DELIVERY'
+        //     }
 
-            const send = {
-                createdAt: res.data.createdAt,
-                atencion,
-                venta_codigo: res.data.venta_codigo,
-                cliente_datos: res.data.venta_socio_datos,
-                is_reprint: true,
-                productos: res.data.transaccion_items,
-                sucursal: this.useAuth.sucursal.id,
-            }
+        //     const send = {
+        //         createdAt: res.data.createdAt,
+        //         atencion,
+        //         venta_codigo: res.data.venta_codigo,
+        //         cliente_datos: res.data.venta_socio_datos,
+        //         is_reprint: true,
+        //         productos: res.data.transaccion_items,
+        //         sucursal: this.useAuth.sucursal.id,
+        //     }
 
-            this.useAuth.socket.emit('vComanda:imprimir', send)
-        },
+        //     this.useAuth.socket.emit('vComanda:imprimir', send)
+        // },
         async verComprobantes(item) {
             const send = {
                 transaccion: item,

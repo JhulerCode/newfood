@@ -564,7 +564,6 @@ export default {
                     return acc
                 }, {})
 
-            // console.log(conteoPorTipo)
             this.vista.mesaPendientes = conteoPorTipo[1] || 0
             this.vista.llevarPendientes = conteoPorTipo[2] || 0
             this.vista.deliveryPendientes = conteoPorTipo[3] || 0
@@ -626,11 +625,16 @@ export default {
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
                 ordr: [['createdAt', 'ASC']],
-                iccl: {
-                    articulo1: {
-                        incl: ['produccion_area1'],
-                    },
-                },
+                // iccl: {
+                //     // articulo1: {
+                //     //     incl: ['produccion_area1'],
+                //     // },
+                //     // iccl: {
+                //     //     articulo1: {
+                //     //         incl: ['sucural_articulos']
+                //     //     }
+                //     // }
+                // },
             }
             this.useAuth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
@@ -757,6 +761,24 @@ export default {
                 atencion = 'PARA LLEVAR'
             } else if (res.data.venta_canal == 3) {
                 atencion = 'DELIVERY'
+            }
+
+            const articulos_ids = res.data.transaccion_items.map((a) => a.articulo)
+            const qry = {
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                    articulo: { op: 'Es', val: articulos_ids },
+                },
+                cols: ['articulo'],
+                incl: ['impresion_area1'],
+            }
+            const sucursal_articulos = await get(
+                `${urls.sucursal_articulos}?qry=${JSON.stringify(qry)}`,
+            )
+
+            for (const a of res.data.transaccion_items) {
+                const i = sucursal_articulos.data.find((b) => b.articulo == a.articulo)
+                if (i) a.articulo1.impresion_area1 = i.impresion_area1
             }
 
             const send = {

@@ -133,8 +133,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'sucursal_stock',
+                id: 'sucursal1.stock',
                 title: 'Stock',
+                prop: 'sucursal1.stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
@@ -154,9 +155,9 @@ export default {
                 sort: true,
             },
             {
-                id: 'produccion_area',
+                id: 'sucursal1.impresion_area',
                 title: 'Área de impresión',
-                prop: 'produccion_area1.nombre',
+                prop: 'sucursal1.impresion_area1.nombre',
                 type: 'select',
                 editable: true,
                 width: '10rem',
@@ -231,8 +232,13 @@ export default {
                     'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
                     'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos', 'kardexes'],
+                incl: ['categoria1', 'sucursal_articulos', 'kardexes'],
                 ordr: [['nombre', 'ASC']],
+                iccl: {
+                    sucursal_articulos: {
+                        incl: ['impresion_area1']
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

@@ -465,10 +465,13 @@ export default {
                     'foto_url',
                     'categoria',
                 ],
-                incl: ['combo_articulos', 'produccion_area1', 'sucursal_articulos'],
+                incl: ['combo_articulos', 'sucursal_articulos'],
                 iccl: {
                     combo_articulos: {
                         incl: ['articulo1'],
+                    },
+                    sucursal_articulos: {
+                        incl: ['impresion_area1'],
                     },
                 },
             }
@@ -600,7 +603,7 @@ export default {
                     articulo1: {
                         nombre: item.nombre,
                         unidad: item.unidad,
-                        produccion_area1: item.produccion_area1,
+                        impresion_area1: item.sucursal1.impresion_area1,
                     },
 
                     cantidad: 1,
