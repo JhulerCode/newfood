@@ -351,6 +351,7 @@ export default {
                         cols: ['venta_codigo'],
                     },
                 },
+                ordr: [['numero', 'ASC']]
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
