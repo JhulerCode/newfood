@@ -46,7 +46,7 @@ export default {
             {
                 id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'doc_tipo1.nombre',
+                prop: 'doc_tipo1.tipo1.nombre',
                 width: '10rem',
                 show: true,
                 sort: true,
@@ -102,7 +102,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'pagos_monto',
+                id: 'comprobante_pagos_monto',
                 title: 'Cobrado',
                 type: 'number',
                 format: 'currency',
@@ -133,11 +133,12 @@ export default {
                 fltr: {
                     transaccion: { op: 'Es', val: this.modal.transaccion.id },
                 },
-                sqls: ['pagos_monto'],
+                incl: ['doc_tipo1', 'socio1'],
+                sqls: ['comprobante_pagos_monto'],
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)
-            this.modal.qry.cols.push('serie', 'numero')
+            this.modal.qry.cols.push('doc_tipo', 'serie', 'numero')
         },
         async loadComprobantes() {
             this.setQuery()
@@ -164,26 +165,10 @@ export default {
 
             const send = {
                 ...res.data,
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
     },
 }

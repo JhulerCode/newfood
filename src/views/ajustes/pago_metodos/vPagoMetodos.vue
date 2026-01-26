@@ -13,25 +13,28 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.pago_metodos || []"
-            :colAct="true"
-            :reload="loadPagoMetodos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.pago_metodos || []"
+                :colAct="true"
+                :reload="loadPagoMetodos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mPagoMetodo v-if="useModals.show.mPagoMetodo" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mPagoMetodo from './mPagoMetodo.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -46,6 +49,7 @@ export default {
         JdTable,
 
         mPagoMetodo,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -85,17 +89,25 @@ export default {
             },
         ],
         tableRowOptions: [
-            // {
-            //     label: 'Editar',
-            //     icon: 'fa-solid fa-pen-to-square',
-            //     action: 'editar',
-            //     permiso: 'vPagoMetodos:editar',
-            // },
+            {
+                label: 'Editar',
+                icon: 'fa-solid fa-pen-to-square',
+                action: 'editar',
+                permiso: 'vPagoMetodos:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+            },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vPagoMetodos:eliminar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -105,13 +117,13 @@ export default {
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true)
-            this.loadPagoMetodos()
+        if (this.useAuth.verifyPermiso('vPagoMetodos:listar') == true) this.loadPagoMetodos()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -160,8 +172,15 @@ export default {
 
             this.useVistas.removeItem('vPagoMetodos', 'pago_metodos', item)
         },
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_pago_metodos',
+                column: 'pago_metodo',
+            }
+
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
+        },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

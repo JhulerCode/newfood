@@ -181,7 +181,7 @@
                         v-if="
                             vista.pedido.venta_canal == 3 &&
                             vista.pedido.venta_pago_metodo ==
-                                `${useAuth.usuario.empresa.subdominio}-EFECTIVO`
+                                `${useAuth.empresa.subdominio}-EFECTIVO`
                         "
                     >
                         <div class="pedido-paga">
@@ -326,6 +326,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre', 'color'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.categoriasLoaded = false
@@ -413,7 +414,7 @@ export default {
             this.vista.pedido = {
                 tipo: 2,
                 venta_canal: 4,
-                socio: `${this.useAuth.usuario.empresa.subdominio}-CLIENTES-VARIOS`,
+                socio: `${this.useAuth.empresa.subdominio}-CLIENTES-VARIOS`,
                 venta_socio_datos: {
                     doc_tipo: '0',
                     doc_numero: '00000000',
@@ -453,7 +454,7 @@ export default {
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
                         item.igv_afectacion == '10'
-                            ? this.useAuth.usuario.empresa.igv_porcentaje
+                            ? this.useAuth.empresa.igv_porcentaje
                             : 0,
 
                     observacion: '',

@@ -19,17 +19,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.transacciones || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadTransacciones"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.transacciones || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadTransacciones"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mTransaccion v-if="useModals.show.mTransaccion" />
@@ -185,7 +186,11 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 1 } },
+                fltr: {
+                    tipo: { op: 'Es', val: 1 },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
+                incl: ['socio1']
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -227,12 +232,13 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadSocios()
 
+            for (const a of this.columns) {
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+                if (a.id == 'estado') a.lista = this.vista.transaccion_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
-            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
@@ -247,11 +253,28 @@ export default {
             this[method](item)
         },
         async ver(item) {
+            const qry = {
+                incl: ['socio1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            res.data.transaccion_items = res1.data
 
             const send = {
                 transaccion: res.data,
@@ -262,11 +285,28 @@ export default {
             this.useModals.setModal('mTransaccion', 'Ver compra', 3, send, true)
         },
         async editar(item) {
+            const qry = {
+                incl: ['socio1'],
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return
+
+            res.data.transaccion_items = res1.data
 
             const send = {
                 transaccion: res.data,
@@ -303,6 +343,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['transaccion_estados', 'pago_condiciones']

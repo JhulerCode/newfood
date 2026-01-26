@@ -13,9 +13,8 @@
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
 
         <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
-        <vInsumos v-if="useVistas.show.vInsumos" />
-        <vProductos v-if="useVistas.show.vProductos" />
-        <vCombos v-if="useVistas.show.vCombos" />
+        <vInventarioInsumos v-if="useVistas.show.vInventarioInsumos" />
+        <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 
         <vReportePedidos v-if="useVistas.show.vReportePedidos" />
         <vReporteComprobantes v-if="useVistas.show.vReporteComprobantes" />
@@ -25,12 +24,15 @@
         <vDashboard v-if="useVistas.show.vDashboard" />
 
         <vEmpresa v-if="useVistas.show.vEmpresa" />
-        <vColaboradores v-if="useVistas.show.vColaboradores" />
-        <VPagoComprobantes v-if="useVistas.show.vPagoComprobantes" />
-        <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
-        <!-- <vCajas v-if="useVistas.show.vCajas" /> -->
-        <vProduccionAreas v-if="useVistas.show.vProduccionAreas" />
+        <vSucursales v-if="useVistas.show.vSucursales" />
         <vSalones v-if="useVistas.show.vSalones" />
+        <vComprobanteTipos v-if="useVistas.show.vComprobanteTipos" />
+        <vPagoMetodos v-if="useVistas.show.vPagoMetodos" />
+        <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
+        <vInsumos v-if="useVistas.show.vInsumos" />
+        <vProductos v-if="useVistas.show.vProductos" />
+        <vCombos v-if="useVistas.show.vCombos" />
+        <vColaboradores v-if="useVistas.show.vColaboradores" />
     </section>
 </template>
 
@@ -52,11 +54,9 @@ import vPos from '@/views/ventas/pedidos/vPos.vue'
 import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
 import vCajaMovimientos from '@/views/caja/movimientos/vCajaMovimientos.vue'
 
-//----- ARTÍCULOS --- //
-import vArticuloCategorias from '@/views/articulos/categorias/vArticuloCategorias.vue'
-import vInsumos from '@/views/articulos/insumos/vInsumos.vue'
-import vProductos from '@/views/articulos/productos/vProductos.vue'
-import vCombos from '@/views/articulos/combos/vCombos.vue'
+//----- INVENTARIO --- //
+import vInventarioInsumos from '@/views/inventario/vInventarioInsumos.vue'
+import vInventarioProductos from '@/views/inventario/vInventarioProductos.vue'
 
 //----- REPORTES --- //
 import vReportePedidos from '@/views/reportes/pedidos/vReportePedidos.vue'
@@ -68,12 +68,15 @@ import vDashboard from '@/views/reportes/dashboard/vDashboard.vue'
 
 //----- AJUSTES --- //
 import vEmpresa from '@/views/ajustes/empresa/vEmpresa.vue'
-import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
-import VPagoComprobantes from '@/views/ajustes/pago_comprobantes/vPagoComprobantes.vue'
-import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
-// import vCajas from '@/views/ajustes/cajas/vCajas.vue'
-import vProduccionAreas from '@/views/ajustes/produccion_areas/vProduccionAreas.vue'
+import vSucursales from '@/views/ajustes/sucursales/vSucursales.vue'
 import vSalones from '@/views/ajustes/salones/vSalones.vue'
+import vComprobanteTipos from '@/views/ajustes/comprobante_tipos/vComprobanteTipos.vue'
+import vPagoMetodos from '@/views/ajustes/pago_metodos/vPagoMetodos.vue'
+import vArticuloCategorias from '@/views/ajustes/categorias/vArticuloCategorias.vue'
+import vInsumos from '@/views/ajustes/insumos/vInsumos.vue'
+import vProductos from '@/views/ajustes/productos/vProductos.vue'
+import vCombos from '@/views/ajustes/combos/vCombos.vue'
+import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 
 export default {
     components: {
@@ -89,10 +92,9 @@ export default {
         vCajaResumen,
         vCajaMovimientos,
 
-        vArticuloCategorias,
-        vInsumos,
-        vProductos,
-        vCombos,
+        vInventarioInsumos,
+        vInventarioProductos,
+
 
         vReportePedidos,
         vReporteComprobantes,
@@ -102,12 +104,15 @@ export default {
         vDashboard,
 
         vEmpresa,
-        vColaboradores,
-        VPagoComprobantes,
-        vPagoMetodos,
-        // vCajas,
-        vProduccionAreas,
+        vSucursales,
         vSalones,
+        vComprobanteTipos,
+        vPagoMetodos,
+        vArticuloCategorias,
+        vInsumos,
+        vProductos,
+        vCombos,
+        vColaboradores,
     },
     data: () => ({
         useVistas: useVistas(),
@@ -122,10 +127,16 @@ export default {
     flex-direction: column;
     overflow-y: hidden;
 
+    // .tablero {
+    //     padding: 2rem 2rem;
+    //     overflow-y: auto;
+    // }
+
     .vista {
-        background-color: var(--bg-color);
-        padding: 2rem 2rem;
-        border-radius: 0.5rem;
+        // background-color: var(--bg-color);
+        // border-radius: 0.5rem;
+        padding: 2rem 2rem 1rem 2rem;
+        overflow-y: auto;
 
         > .head {
             margin-bottom: 1rem;
@@ -133,8 +144,8 @@ export default {
             justify-content: space-between;
             gap: 1rem;
             flex-wrap: wrap;
-            border-bottom: var(--border);
-            padding-bottom: 1rem;
+            // border-bottom: var(--border);
+            // padding-bottom: 1rem;
 
             strong {
                 font-size: 1.4rem;
@@ -146,6 +157,21 @@ export default {
                 flex-wrap: wrap;
             }
         }
+
+        .card {
+            padding: 1rem;
+            background-color: var(--bg-color);
+            border-radius: 0.5rem;
+            // box-shadow: 0 0 0.5rem var(--shadow-color);
+            overflow: hidden;
+
+            .card-head {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.5rem;
+            }
+        }
     }
 
     .vista-fill {
@@ -153,6 +179,15 @@ export default {
         display: flex;
         flex-direction: column;
         overflow: hidden;
+        // padding: 2rem 2rem;
+    }
+}
+
+@media (max-width: 540px) {
+    .main-center {
+        .vista {
+            padding: 1rem 1rem;
+        }
     }
 }
 </style>

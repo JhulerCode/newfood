@@ -8,25 +8,27 @@
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vCajaMovimientos:crear')"
+                    v-if="useAuth.verifyPermiso('vCajaMovimientos:crear') && vista.caja_apertura"
                 />
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.dinero_movimientos || []"
-            :colAct="true"
-            :reload="loadMovimientos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cDetalle="{ item }">
-                {{ item.comprobante1?.serie_correlativo }}
-                {{ item.detalle }}
-            </template>
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.dinero_movimientos || []"
+                :colAct="true"
+                :reload="loadMovimientos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cDetalle="{ item }">
+                    {{ item.comprobante1?.serie_correlativo }}
+                    {{ item.detalle }}
+                </template>
+            </JdTable>
+        </div>
     </div>
 
     <mCajaMovimiento v-if="useModals.show.mCajaMovimiento" />
@@ -150,6 +152,7 @@ export default {
             const qry = {
                 fltr: {
                     estado: { op: 'Es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 cols: ['fecha_apertura', 'monto_apertura'],
             }
@@ -168,7 +171,7 @@ export default {
                     caja_apertura: { op: 'Es', val: this.vista.caja_apertura.id },
                     operacion: { op: 'No es', val: '1' },
                 },
-                incl: ['pago_metodo1', 'comprobante1'],
+                incl: ['pago_metodo1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -193,7 +196,6 @@ export default {
             const item = {
                 fecha: dayjs().format('YYYY-MM-DD'),
                 caja_apertura: this.vista.caja_apertura.id,
-                pago_metodo: 1,
             }
 
             this.useModals.setModal('mCajaMovimiento', 'Nueva categoría', 1, item)

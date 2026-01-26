@@ -4,8 +4,7 @@
         :buttons="buttons"
         @button-click="(action) => this[action]()"
     >
-        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false">
-        </JdTable>
+        <JdTable :columns="columns" :datos="modal.articulos" :seeker="false" :download="false" />
     </JdModal>
 </template>
 
@@ -34,15 +33,21 @@ export default {
             { id: 'nombre', title: 'Nombre', width: '25rem', show: true, seek: true },
             {
                 id: 'categoria',
-                show: true,
-                width: '10rem',
                 title: 'Categoría',
                 prop: 'categoria1.nombre',
+                width: '10rem',
+                show: true,
+            },
+            {
+                id: 'unidad',
+                title: 'Unidad',
+                width: '6rem',
+                show: true,
             },
             {
                 id: 'tributo',
-                prop: 'tributo1.nombre',
                 title: 'Tributo',
+                prop: 'tributo1.nombre',
                 width: '18rem',
                 show: true,
             },
@@ -72,9 +77,17 @@ export default {
     created() {
         this.modal = this.useModals.mImportarArticulos
 
+        if (this.modal.tipo == 1) {
+            this.columns[4].show = false
+            this.columns[5].show = false
+            this.columns[6].show = false
+        }
+
         if (this.modal.tipo == 2) {
+            this.columns[2].show = false
+
             if (this.modal.is_combo == true) {
-                this.columns[3].show = false
+                this.columns[4].show = false
             }
         }
     },

@@ -1,11 +1,24 @@
 <template>
     <header>
         <div class="left">
-            <div class="btn" @click="toogleNavbar">
-                <i class="fa-solid fa-bars"></i>
+            <div
+                class="sucursal"
+                @click="cambiarSucursal"
+                :class="{
+                    // pointer: this.useAuth.verifyPermiso('vSucursales:cambiarSucursal'),
+                    pointer: true,
+                }"
+            >
+                <small>Sucursal: </small>
+                <span>{{ useAuth.sucursal.codigo }}</span>
             </div>
 
-            <img src="@/assets/img/logo-h.webp" />
+            <!-- <ul class="rutas">
+                <li v-for="(a, i) in vistaKey" :key="i">
+                    <span>{{ a.label }}</span>
+                    <small v-if="i < vistaKey.length - 1">/</small>
+                </li>
+            </ul> -->
         </div>
 
         <div class="right">
@@ -27,28 +40,6 @@
                     <i class="fa-solid fa-expand"></i>
                 </div>
             </div>
-
-            <div class="user-info" v-if="useAuth.usuario" @click="openUserMenu">
-                <div class="user-texts">
-                    <p
-                        class="user-name max-1line"
-                        :title="`${useAuth.usuario.nombres} ${useAuth.usuario.apellidos}`"
-                    >
-                        {{ useAuth.usuario.nombres }} {{ useAuth.usuario.apellidos }}
-                    </p>
-                    <p class="max-1line" :title="useAuth.usuario.cargo">
-                        <small>{{ useAuth.usuario.cargo }}</small>
-                    </p>
-                </div>
-
-                <div class="user-foto">
-                    {{
-                        useAuth.usuario.apellidos
-                            ? useAuth.usuario.nombres[0] + useAuth.usuario.apellidos[0]
-                            : useAuth.usuario.nombres?.slice(0, 2)
-                    }}
-                </div>
-            </div>
         </div>
     </header>
 </template>
@@ -56,6 +47,7 @@
 <script>
 import { useAuth } from '@/pinia/auth.js'
 import { useModals } from '@/pinia/modals'
+import { useVistas } from '@/pinia/vistas'
 
 import { urls, patch } from '@/utils/crud'
 
@@ -63,10 +55,34 @@ export default {
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
+        useVistas: useVistas(),
     }),
+    // computed: {
+    //     vistaKey() {
+    //         const keyTrue = Object.keys(this.useVistas.show).find(
+    //             (key) => this.useVistas.show[key] === true,
+    //         )
+
+    //         const send = []
+
+    //         for (const a of this.useAuth.menu) {
+    //             for (const b of a.children) {
+    //                 if (b.goto == keyTrue) {
+    //                     send.push(b)
+    //                     send.push(a)
+    //                     break
+    //                 }
+    //             }
+    //         }
+
+    //         return send.reverse()
+    //     },
+    // },
     methods: {
-        toogleNavbar() {
-            this.useAuth.showNavbar = !this.useAuth.showNavbar
+        cambiarSucursal() {
+            // if (this.useAuth.verifyPermiso('vSucursales:cambiarSucursal')) {
+            this.useModals.setModal('mSucursalCambiar', 'Cambiar de sucursal')
+            // }
         },
 
         reloadWindow() {
@@ -113,10 +129,6 @@ export default {
                 cancelFullScreen.call(doc)
             }
         },
-
-        openUserMenu() {
-            this.useModals.setModal('mUserMenu', 'Menu de usuario', null, null, true)
-        },
     },
 }
 </script>
@@ -126,17 +138,50 @@ header {
     display: flex;
     justify-content: space-between;
     gap: 1rem;
-    // padding: 0.5rem 1.5rem;
-    height: 4.5rem;
+    border-bottom: var(--border);
+    padding: 0 1.5rem;
 
     .left {
         display: flex;
         align-items: center;
-        padding: 0 0 0 1rem;
-        gap: 0.5rem;
+        justify-content: center;
+        gap: 1rem;
 
-        img {
-            height: 2.5rem;
+        .sucursal {
+            display: flex;
+            align-items: center;
+            // justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--primary-color);
+            padding: 0.25rem 0.8rem;
+            border-radius: 1rem;
+
+            span {
+                color: white;
+                font-size: 1.2rem;
+            }
+
+            small {
+                color: #f2f2f2;
+            }
+        }
+        .pointer {
+            cursor: pointer;
+        }
+
+        .rutas {
+            display: flex;
+            gap: 0.5rem;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                span {
+                    color: var(--text-color2);
+                }
+            }
         }
     }
 
@@ -144,40 +189,10 @@ header {
         display: flex;
         align-items: center;
         gap: 1rem;
-        padding: 0 1.5rem 0 0;
+        // padding: 0 1.5rem 0 0;
 
         .actions {
             display: flex;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-
-            .user-foto {
-                width: 3rem;
-                height: 3rem;
-                border-radius: 50%;
-                background-color: var(--bg-color-hover);
-                border: 1px solid var(--text-color2);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                font-size: 1.2rem;
-            }
-
-            .user-texts {
-                width: 10rem;
-                overflow: hidden;
-                text-align: right;
-
-                .user-name {
-                    font-size: 0.85rem;
-                    font-weight: bold;
-                }
-            }
         }
     }
 
@@ -205,25 +220,13 @@ header {
     }
 }
 
-@media (max-width: 540px) {
-    header {
-        .left {
-            img {
-                height: 2rem !important;
-            }
-        }
-
-        .right {
-            // .actions {
-            //     display: none;
-            // }
-
-            .user-info {
-                .user-texts {
-                    display: none !important;
-                }
-            }
-        }
-    }
-}
+// @media (max-width: 540px) {
+//     header {
+//         .left {
+//             flex-direction: column;
+//             align-items: flex-start;
+//             gap: 0.25rem;
+//         }
+//     }
+// }
 </style>

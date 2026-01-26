@@ -1,6 +1,17 @@
 <template>
     <JdModal modal="mSalon" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
+            <JdSelect
+                label="Sucursal"
+                :nec="true"
+                :lista="modal.sucursales || []"
+                mostrar="codigo"
+                :loaded="modal.sucursalesLoaded"
+                @reload="loadSucursales"
+                v-model="modal.item.sucursal"
+                :disabled="modal.mode == 3 || modal.mode == 2"
+            />
+
             <JdInput
                 label="Nombre"
                 :nec="true"
@@ -14,13 +25,13 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch } from '@jhuler/components'
+import { JdModal, JdInput, JdSelect, JdSwitch } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, post, patch } from '@/utils/crud'
+import { urls, get, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
@@ -28,6 +39,7 @@ export default {
     components: {
         JdModal,
         JdInput,
+        JdSelect,
         JdSwitch,
     },
     data: () => ({
@@ -54,6 +66,7 @@ export default {
     created() {
         this.modal = this.useModals.mSalon
         this.setButtons()
+        this.loadSucursales()
     },
     methods: {
         setButtons() {
@@ -66,7 +79,7 @@ export default {
             }
         },
         checkDatos() {
-            const props = ['nombre', 'activo']
+            const props = ['sucursal', 'nombre', 'activo']
 
             if (incompleteData(this.modal.item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -98,6 +111,27 @@ export default {
 
             this.useVistas.updateItem('vSalones', 'salones', res.data)
             this.useModals.show.mSalon = false
+        },
+
+        async loadSucursales() {
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                },
+                cols: ['codigo'],
+                ordr: [['codigo', 'ASC']],
+            }
+
+            this.modal.sucursales = []
+            this.modal.sucursalesLoaded = false
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sucursales}?qry=${JSON.stringify(qry)}`)
+            this.modal.sucursalesLoaded = true
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.sucursales = res.data
         },
     },
 }

@@ -12,13 +12,13 @@
                     @change="importar"
                 />
 
-                <!-- <JdButton
+                <JdButton
                     icon="fa-solid fa-file-excel"
                     text="Importar"
                     tipo="2"
                     @click="this.$refs.excel.click()"
                     v-if="useAuth.verifyPermiso('vInsumos:crearBulk')"
-                /> -->
+                />
 
                 <JdButton
                     text="Nuevo"
@@ -29,28 +29,27 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.articulos || []"
-            :colAct="true"
-            :configRowSelect="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadArticulos"
-            :actions="tableActions"
-            @actionClick="runMethod"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-            ref="jdtable"
-        >
-        </JdTable>
-        <!-- :configCols="true" -->
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.articulos || []"
+                :colAct="true"
+                :configRowSelect="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadArticulos"
+                :actions="tableActions"
+                @actionClick="runMethod"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+                ref="jdtable"
+            />
+        </div>
     </div>
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
-    <mKardex v-if="useModals.show.mKardex" />
-    <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -60,10 +59,9 @@
 <script>
 import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from '@jhuler/components'
 
-import mImportarArticulos from '@/views/articulos/mImportarArticulos.vue'
-import mArticulo from '@/views/articulos/mArticulo.vue'
-import mKardex from '@/views/articulos/mKardex.vue'
-import mAjusteStock from '@/views/articulos/mAjusteStock.vue'
+import mImportarArticulos from '@/views/ajustes/insumos/mImportarArticulos.vue'
+import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -72,7 +70,6 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
-import dayjs from 'dayjs'
 
 export default {
     components: {
@@ -85,8 +82,7 @@ export default {
 
         mImportarArticulos,
         mArticulo,
-        mKardex,
-        mAjusteStock,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -125,27 +121,18 @@ export default {
                 seek: false,
                 sort: true,
             },
-            {
-                id: 'stock',
-                title: 'Stock',
-                toRight: true,
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
-            {
-                id: 'activo',
-                title: 'Estado',
-                prop: 'activo1.nombre',
-                type: 'select',
-                editable: true,
-                format: 'yesno',
-                width: '8rem',
-                show: true,
-                seek: false,
-                sort: true,
-            },
+            // {
+            //     id: 'activo',
+            //     title: 'Estado',
+            //     prop: 'activo1.nombre',
+            //     type: 'select',
+            //     editable: true,
+            //     format: 'yesno',
+            //     width: '8rem',
+            //     show: true,
+            //     seek: false,
+            //     sort: true,
+            // },
             {
                 id: 'categoria',
                 title: 'Categoría',
@@ -163,7 +150,7 @@ export default {
                 prop: 'igv_afectacion1.nombre',
                 type: 'select',
                 editable: true,
-                width: '10rem',
+                width: '15rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -203,16 +190,10 @@ export default {
                 permiso: 'vInsumos:clonar',
             },
             {
-                label: 'Ver kardex',
-                icon: 'fa-solid fa-table-list',
-                action: 'verKardex',
-                permiso: 'vInsumos:kardex',
-            },
-            {
-                label: 'Ajuste stock',
-                icon: 'fa-solid fa-wrench',
-                action: 'ajusteStock',
-                permiso: 'vInsumos:ajusteStock',
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -229,6 +210,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: '1' } },
+                incl: ['categoria1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -295,19 +277,14 @@ export default {
                 )
 
                 for (const a of res.data) {
-                    if (categoriasMap[a.Categoria]) {
-                        a.Categoria1 = categoriasMap[a.Categoria]
-                        a.Categoria = categoriasMap[a.Categoria].id
-                    } else {
-                        a.Categoria = null
-                    }
+                    a.nombre = a.Nombre
+                    a.unidad = a.Unidad
 
-                    if (igv_afectacionesMap[a.Tributo]) {
-                        a.Tributo = igv_afectacionesMap[a.Tributo].id
-                        a.Tributo1 = { ...igv_afectacionesMap[a.Tributo] }
-                    } else {
-                        a.Tributo = null
-                    }
+                    a.categoria1 = categoriasMap[a.Categoria]
+                    a.categoria = a.categoria1?.id
+
+                    a.tributo1 = igv_afectacionesMap[a.Tributo]
+                    a.tributo = a.tributo1?.id
                 }
 
                 this.useAuth.setLoading(false)
@@ -323,13 +300,14 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
 
-            const cols = this.columns.filter((a) => a.id != 'stock')
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
+            for (const a of this.columns) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
+            const cols = this.columns
 
             const send = {
                 table: this.tableName,
@@ -361,14 +339,14 @@ export default {
         },
         async editarBulk() {
             await this.loadDatosSistema()
-            await this.loadCategorias()
 
-            const cols = this.columns.filter((a) => a.editable == true)
-            cols.find((a) => a.id == 'unidad').lista = this.vista.unidades
-            // cols.find((a) => a.id == 'has_fv').lista = this.vista.estados
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
-            cols.find((a) => a.id == 'igv_afectacion').lista = this.vista.igv_afectaciones
-            cols.find((a) => a.id == 'categoria').lista = this.vista.articulo_categorias
+            for (const a of this.columns) {
+                if (a.id == 'unidad') a.lista = this.vista.unidades
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+                if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'categoria') a.reload = this.loadCategorias
+            }
+            const cols = this.columns
 
             const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
 
@@ -428,38 +406,21 @@ export default {
 
             this.useModals.setModal('mArticulo', 'Nuevo insumo', 1, send)
         },
-        async verKardex(item) {
+        editarSucursales(item) {
             const send = {
-                articulo: {
-                    id: item.id,
-                    nombre: item.nombre,
-                    unidad: item.unidad,
-                },
+                item,
+                url: 'sucursal_articulos',
+                column: 'articulo',
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
-        },
-        async ajusteStock(item) {
-            const send = {
-                transaccion: {
-                    fecha: dayjs().format('YYYY-MM-DD'),
-                    articulo: item.id,
-                },
-                articulo1: {
-                    igv_afectacion: item.igv_afectacion,
-                    has_fv: item.has_fv,
-                },
-                articulos: [{ id: item.id, nombre: item.nombre }],
-                articulo_tipo: 1,
-                // is_nuevo_lote: false,
-            }
-
-            this.useModals.setModal('mAjusteStock', 'Ajuste de stock', null, send, true)
+            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
         },
 
         async loadCategorias() {
             const qry = {
                 fltr: { tipo: { op: 'Es', val: '1' }, activo: { op: 'Es', val: true } },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.vista.articulo_categorias = []
@@ -470,6 +431,7 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulo_categorias = res.data
+            return res.data
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'activo_estados']
@@ -482,5 +444,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

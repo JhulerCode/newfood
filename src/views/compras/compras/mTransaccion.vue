@@ -29,7 +29,7 @@
                     label="Comprobante"
                     :nec="true"
                     v-model="modal.transaccion.compra_comprobante"
-                    :lista="modal.pago_comprobantes || []"
+                    :lista="modal.comprobante_tipos || []"
                     :disabled="modal.mode == 3"
                     style="grid-column: 1/4"
                 />
@@ -161,8 +161,6 @@ export default {
         this.showButtons()
 
         this.loadDatosSistema()
-        // this.loadPagoComprobantes()
-        this.loadComprobanteTipos()
 
         if (this.modal.mode == 1) {
             this.setTotalesCero()
@@ -199,7 +197,6 @@ export default {
             }
 
             this.modal.mode = 1
-            // this.modal.socio = {}
             this.setTotalesCero()
         },
         async nuevo() {
@@ -212,19 +209,6 @@ export default {
                 if (resQst.isConfirmed) this.initPedido()
             }
         },
-
-        // changeDate() {
-        //     for (const a of this.modal.transaccion.transaccion_items) {
-        //         a.lote = this.setLote()
-        //     }
-        // },
-        // setLote() {
-        //     return `${obtenerNumeroJuliano(this.modal.transaccion.fecha)}-${Math.floor(Math.random() * 90 + 10)}`
-        // },
-
-        // setSocio(item) {
-        //     this.modal.socio = { ...item }
-        // },
 
         checkDatos() {
             const props = [
@@ -277,7 +261,7 @@ export default {
             if (res.code != 0) return
 
             const vista = this.modal.transaccion.tipo == 1 ? 'vCompras' : 'vVentas'
-            this.useVistas.addItem(vista, 'transacciones', res.data)
+            this.useVistas.addItem(vista, 'transacciones', res.data, 'first')
             this.useModals.show.mTransaccion = false
         },
         async guardarAvance() {
@@ -322,40 +306,9 @@ export default {
             if (res.code !== 0) return
 
             this.modal.socios = res.data
-
-            // if (this.modal.transaccion.socio) {
-            //     this.modal.socio = this.modal.socios.find(
-            //         (a) => a.id == this.modal.transaccion.socio,
-            //     )
-            // }
-        },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: {},
-        //         cols: ['nombre', 'serie', 'correlativo'],
-        //     }
-
-        //     this.useAuth.setLoading(true, 'Cargando...')
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.setLoading(false)
-
-        //     if (res.code != 0) return
-
-        //     this.modal.pago_comprobantes = res.data
-        // },
-        async loadComprobanteTipos() {
-            this.useAuth.setLoading(true, 'Cargando...')
-            this.modal.comprobanteTiposLoaded = false
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
-            this.modal.comprobanteTiposLoaded = true
-
-            if (res.code != 0) return
-            console.log(res.data)
-            this.modal.pago_comprobantes = res.data.comprobante_tipos
         },
         async loadDatosSistema() {
-            const qry = ['transaccion_estados', 'pago_condiciones']
+            const qry = ['transaccion_estados', 'pago_condiciones', 'comprobante_tipos']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

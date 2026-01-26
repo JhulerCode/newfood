@@ -12,18 +12,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.socios || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadSocios"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
-        <!-- :configCols="true" -->
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.socios || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadSocios"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />
@@ -135,12 +135,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vClientes:editar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS` },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vClientes:eliminar',
+                ocultar: { id: `${useAuth().empresa.subdominio}-CLIENTES-VARIOS` },
             },
         ],
     }),
@@ -155,6 +157,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 2 } },
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -186,9 +189,11 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
+            for (const a of this.columns) {
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+            }
             const cols = this.columns
-            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
 
             const send = {
                 table: this.tableName,

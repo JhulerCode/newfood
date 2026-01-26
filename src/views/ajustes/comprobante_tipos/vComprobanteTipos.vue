@@ -1,50 +1,55 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Comprobantes de pago</strong>
+            <strong>Tipos de comprobante</strong>
 
             <div class="buttons">
-                <!-- <JdButton
+                <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
-                    v-if="useAuth.verifyPermiso('vPagoComprobantes:crear')"
-                /> -->
+                    v-if="useAuth.verifyPermiso('vComprobanteTipos:crear')"
+                />
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.pago_comprobantes || []"
-            :colAct="true"
-            :reload="loadPagoComprobantes"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.comprobante_tipos || []"
+                :colAct="true"
+                :reload="loadPagoComprobantes"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
-    <mPagoComprobante v-if="useModals.show.mPagoComprobante" />
+    <mComprobanteTipo v-if="useModals.show.mComprobanteTipo" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 </template>
 
 <script>
-import { JdTable } from '@jhuler/components'
+import { JdTable, JdButton } from '@jhuler/components'
 
-import mPagoComprobante from './mPagoComprobante.vue'
+import mComprobanteTipo from './mComprobanteTipo.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get } from '@/utils/crud'
+import { urls, get, delet } from '@/utils/crud'
+import { jqst } from '@/utils/swal'
 
 export default {
     components: {
-        // JdButton,
+        JdButton,
         JdTable,
 
-        mPagoComprobante,
+        mComprobanteTipo,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -53,11 +58,12 @@ export default {
 
         vista: {},
 
-        tableName: 'vPagoComprobantes',
+        tableName: 'vComprobanteTipos',
         columns: [
             {
-                id: 'nombre',
+                id: 'tipo',
                 title: 'Nombre',
+                prop: 'tipo1.nombre',
                 type: 'text',
                 width: '12rem',
                 show: true,
@@ -116,26 +122,33 @@ export default {
         ],
         tableRowOptions: [
             {
-                label: 'Editar',
+                label: 'Eliminar',
                 icon: 'fa-solid fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vPagoComprobantes:editar',
+                action: 'eliminar',
+                permiso: 'vComprobanteTipos:eliminar',
+            },
+            {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-shop',
+                action: 'editarSucursales',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
     created() {
-        this.vista = this.useVistas.vPagoComprobantes
+        this.vista = this.useVistas.vComprobanteTipos
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
 
-        if (this.useAuth.verifyPermiso('vPagoComprobantes:listar') == true)
+        if (this.useAuth.verifyPermiso('vComprobanteTipos:listar') == true)
             this.loadPagoComprobantes()
     },
     methods: {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['serie', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -143,31 +156,53 @@ export default {
         async loadPagoComprobantes() {
             this.setQuery()
 
-            this.vista.pago_comprobantes = []
+            this.vista.comprobante_tipos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(this.vista.qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data
+            this.vista.comprobante_tipos = res.data
+        },
+
+        nuevo() {
+            const item = { activo: true, estandar: false }
+
+            this.useModals.setModal('mComprobanteTipo', 'Nuevo tipo de comprobante', 1, item)
         },
 
         runMethod(method, item) {
             this[method](item)
         },
-        async editar(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.pago_comprobantes}/uno/${item.id}`)
+        async eliminar(item) {
+            const resQst = await jqst('¿Está seguro de eliminar?')
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(urls.comprobante_tipos, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mPagoComprobante', 'Editar método de pago', 2, res.data)
+            this.useVistas.removeItem('vComprobanteTipos', 'comprobante_tipos', item)
+        },
+
+        editarSucursales(item) {
+            const send = {
+                item,
+                url: 'sucursal_comprobante_tipos',
+                column: 'comprobante_tipo',
+            }
+            this.useModals.setModal(
+                'mRelacionadoSucursales',
+                `${item.tipo1?.nombre} (${item.serie}) - sucursales`,
+                2,
+                send,
+                true,
+            )
         },
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

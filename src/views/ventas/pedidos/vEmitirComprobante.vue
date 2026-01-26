@@ -32,7 +32,7 @@
 
         <div class="comanda">
             <div class="left">
-                <div class="datos">
+                <div class="card datos">
                     <JdInput
                         label="Fecha"
                         type="date"
@@ -46,10 +46,11 @@
                         label="Tipo comprobante"
                         :nec="true"
                         v-model="vista.comprobante.doc_tipo"
-                        :lista="vista.pago_comprobantes || []"
+                        :lista="vista.comprobante_tipos || []"
+                        mostrar="tipo_serie"
                         :loaded="vista.comprobanteTiposLoaded"
                         @reload="loadComprobanteTipos"
-                        style="grid-column: 1/4"
+                        style="grid-column: 1/5"
                     />
 
                     <div style="grid-column: 1/5" class="dato-cliente">
@@ -85,7 +86,7 @@
                     />
                 </div>
 
-                <div class="totales" v-if="vista.totals">
+                <div class="card totales" v-if="vista.totals">
                     <span>Ope. gravadas:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_GRAVADO) }}</p>
 
@@ -160,58 +161,61 @@
             </div>
 
             <div class="right">
-                <JdTable
-                    :columns="columnsArticulos"
-                    :datos="vista.comprobante.comprobante_items || []"
-                    height="100%"
-                    class="pedido-items"
-                    :seeker="false"
-                    :download="false"
-                    :colAct="true"
-                    colActWidth="4.5rem"
-                    @onInput="runMethod"
-                >
-                    <template v-slot:cAction="{ item }">
-                        <JdButton
-                            icon="fa-regular fa-handshake"
-                            :small="true"
-                            tipo="2"
-                            :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'"
-                            @click="setCortesia(item)"
-                        />
-
-                        <JdButton
-                            icon="fa-solid fa-trash-can"
-                            :small="true"
-                            tipo="2"
-                            title="Quitar"
-                            @click="quitarArticulo(item)"
-                        />
-                    </template>
-
-                    <template v-slot:colDescuento="{ item }">
-                        <template v-if="codigosAfectacionGratuitas.includes(item.igv_afectacion)"
-                            >CORTESÍA</template
-                        >
-                        <div class="item_descuento" v-else>
-                            <JdSelect
-                                v-model="item.descuento_tipo"
-                                :lista="descuento_tipos"
-                                mostrar="codigo"
-                                @elegir="setDescuentoTipo(item)"
+                <div class="card">
+                    <JdTable
+                        :columns="columnsArticulos"
+                        :datos="vista.comprobante.comprobante_items || []"
+                        height="100%"
+                        class="pedido-items"
+                        :seeker="false"
+                        :download="false"
+                        :colAct="true"
+                        colActWidth="4.5rem"
+                        @onInput="runMethod"
+                    >
+                        <template v-slot:cAction="{ item }">
+                            <JdButton
+                                icon="fa-regular fa-handshake"
+                                :small="true"
+                                tipo="2"
+                                :title="item.cortesia ? 'Quitar cortesia' : 'Cortesia'"
+                                @click="setCortesia(item)"
                             />
 
-                            <JdInput
-                                type="number"
-                                :toRight="true"
-                                v-model="item.descuento_valor"
-                                @input="setDescuentoValor(item)"
+                            <JdButton
+                                icon="fa-solid fa-trash-can"
+                                :small="true"
+                                tipo="2"
+                                title="Quitar"
+                                @click="quitarArticulo(item)"
                             />
-                        </div>
-                    </template>
-                </JdTable>
+                        </template>
 
-                <div class="container-pagos">
+                        <template v-slot:colDescuento="{ item }">
+                            <template
+                                v-if="codigosAfectacionGratuitas.includes(item.igv_afectacion)"
+                                >CORTESÍA</template
+                            >
+                            <div class="item_descuento" v-else>
+                                <JdSelect
+                                    v-model="item.descuento_tipo"
+                                    :lista="descuento_tipos"
+                                    mostrar="codigo"
+                                    @elegir="setDescuentoTipo(item)"
+                                />
+
+                                <JdInput
+                                    type="number"
+                                    :toRight="true"
+                                    v-model="item.descuento_valor"
+                                    @input="setDescuentoValor(item)"
+                                />
+                            </div>
+                        </template>
+                    </JdTable>
+                </div>
+
+                <div class="card container-pagos">
                     <div class="head">
                         Métodos de pago
 
@@ -404,52 +408,59 @@ export default {
         await this.loadPagoMetodos()
         this.calculateInvoiceTotals()
 
-        // await this.loadPagoComprobantes()
         await this.loadComprobanteTipos()
-        if (this.vista.pago_comprobantes && this.vista.pago_comprobantes.length > 0) {
-            const asd = this.vista.pago_comprobantes.find((a) => a.estandar == true)
-            this.vista.comprobante.doc_tipo = asd.id
+        if (this.vista.comprobante_tipos && this.vista.comprobante_tipos.length > 0) {
+            const comprobante_tipo_estandar = this.vista.comprobante_tipos.find(
+                (a) => a.estandar == true,
+            )
+            this.vista.comprobante.doc_tipo = comprobante_tipo_estandar?.id
         }
     },
     methods: {
         async loadDatosSistema() {
-            const qry = ['pago_condiciones', 'CATALOGO_TRIBUTOS_SUNAT']
+            const qry = ['pago_condiciones']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return
 
             Object.assign(this.vista, res.data)
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.vista.pago_comprobantes = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.vista.pago_comprobantes = res.data
-        // },
         async loadComprobanteTipos() {
-            this.useAuth.setLoading(true, 'Cargando...')
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.vista.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
             this.vista.comprobanteTiposLoaded = false
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
             this.vista.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data
         },
         async loadPagoMetodos() {
             const qry = {
-                fltr: { activo: { op: 'Es', val: true } },
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_pago_metodos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_pago_metodos.estado': { op: 'Es', val: true },
+                },
                 cols: ['nombre', 'color'],
+                incl: ['sucursal_pago_metodos'],
+                ordr: [['nombre', 'asc']],
             }
 
             this.vista.pago_metodos = []
@@ -497,318 +508,6 @@ export default {
 
             this.vista.socios = res.data
         },
-
-        // calculateInvoiceLineValues1(product) {
-        //     const tributosCatalog = this.vista.CATALOGO_TRIBUTOS_SUNAT
-        //     const bolsa_tax_unit_amount = 0.5
-        //     // asegurar números
-        //     const pu = product.pu
-        //     const igvPct = product.igv_porcentaje
-        //     const igvRate = igvPct / 100
-        //     const cantidad = product.cantidad
-
-        //     // 1) calcular VU (valor unitario sin IGV) según afectación
-        //     // si la afectación es gravada (10) y el PU viene con IGV -> quitar IGV
-        //     const igvAfect = product.igv_afectacion
-        //     const vu = igvAfect === '10' ? pu / (1 + igvRate) : Number(product.vu ?? pu)
-        //     // Nota: si product.vu ya está definido y correcto (sin IGV), preferirlo; si no, usar pu.
-
-        //     // defaults
-        //     const has_bolsa_tax = !!product.has_bolsa_tax
-        //     const isc_porcentaje = product.isc_porcentaje
-        //     const isc_precio_sugerido = product.isc_precio_sugerido
-        //     const isc_monto_fijo_uni = product.isc_monto_fijo_uni
-        //     const ivap_porcentaje = product.ivap_porcentaje
-
-        //     // tax_info fallback
-        //     let tax_info = tributosCatalog[igvAfect]
-        //     if (!tax_info) {
-        //         const defaultInafecto = tributosCatalog['30'] || {
-        //             codigo_tributo: '9998',
-        //             codigo_internacional: 'FRE',
-        //             codigo: 'INA',
-        //             nombre: 'Inafecto',
-        //             categoria_impuesto_id: 'O',
-        //         }
-        //         tax_info = {
-        //             ...defaultInafecto,
-        //             codigo_tributo: '9998',
-        //             nombre: `Desconocido - ${igvAfect}`,
-        //         }
-        //     }
-
-        //     // -------------------
-        //     // 2) Descuento: calcular antes de impuestos
-        //     // product.descuento_tipo:
-        //     //   1 => descuento monetario TOTAL de la línea (se asume con IGV incluido)
-        //     //   2 => descuento porcentaje (ej. 10 => 10%)
-        //     // -------------------
-        //     let descuento_vu = 0 // descuento por unidad (neto)
-        //     let descuento_total = 0 // descuento total neto (línea)
-        //     let descuento_base = 0 // base sobre la que aplica % descuento (vu * qty)
-        //     let descuento_factor = 0 // porcentaje en decimal
-
-        //     if (
-        //         product.descuento_tipo != null &&
-        //         product.descuento_valor != null &&
-        //         product.descuento_valor !== 0
-        //     ) {
-        //         if (product.descuento_tipo == 1) {
-        //             // descuento_valor = monto total del descuento en PRECIO CON IGV (para toda la línea)
-        //             const descuentoConIGV = product.descuento_valor
-        //             const descuentoTotalNeto = descuentoConIGV / (1 + igvRate) // pasar a monto neto
-        //             descuento_vu = descuentoTotalNeto / cantidad
-        //             descuento_total = descuentoTotalNeto
-        //             descuento_base = vu * cantidad
-        //             descuento_factor = descuento_base > 0 ? descuento_vu / vu : 0
-        //         } else if (product.descuento_tipo === 2) {
-        //             // descuento_valor es porcentaje
-        //             descuento_base = vu * cantidad
-        //             descuento_factor = product.descuento_valor / 100
-        //             descuento_total = descuento_base * descuento_factor
-        //             descuento_vu = vu * descuento_factor
-        //         }
-        //     } else {
-        //         descuento_vu = 0
-        //         descuento_total = 0
-        //         descuento_base = 0
-        //         descuento_factor = 0
-        //     }
-
-        //     // cortar errores numéricos
-        //     descuento_vu = Number(descuento_vu || 0)
-        //     descuento_total = Number(descuento_total || 0)
-        //     descuento_base = Number(descuento_base || 0)
-        //     descuento_factor = Number(descuento_factor || 0)
-
-        //     // 3) Valor unitario neto después de descuento (base para impuestos)
-        //     const vu_neto = vu - descuento_vu // POR UNIDAD
-        //     const valor_total_sin_impuestos_raw =
-        //         tax_info.codigo_tributo === '9996' ? 0 : vu_neto * cantidad
-
-        //     // 4) ICBPER (independiente del descuento, es por unidad)
-        //     const icbper_unitario = has_bolsa_tax ? bolsa_tax_unit_amount : 0
-        //     const icbper_total = icbper_unitario * cantidad
-
-        //     // 5) ISC (calcular sobre base neta cuando aplica sistema '01'; si '02' o '03' sigue su lógica)
-        //     let isc_unitario = 0,
-        //         isc_base_unit = 0,
-        //         isc_percent = 0,
-        //         isc_tier = ''
-        //     if (product.isc_sistema_codigo) {
-        //         switch (product.isc_sistema_codigo) {
-        //             case '01':
-        //                 isc_unitario = vu_neto * (isc_porcentaje / 100) // base = vu_neto
-        //                 isc_base_unit = vu_neto
-        //                 isc_percent = isc_porcentaje
-        //                 isc_tier = '01'
-        //                 break
-        //             case '02':
-        //                 isc_unitario = isc_monto_fijo_uni
-        //                 isc_base_unit = isc_monto_fijo_uni
-        //                 isc_percent = 0
-        //                 isc_tier = '02'
-        //                 break
-        //             case '03':
-        //                 isc_unitario = isc_precio_sugerido * (isc_porcentaje / 100)
-        //                 isc_base_unit = isc_precio_sugerido
-        //                 isc_percent = isc_porcentaje
-        //                 isc_tier = '03'
-        //                 break
-        //         }
-        //     }
-        //     const isc_total = isc_unitario * cantidad
-        //     const isc_base_total = isc_base_unit * cantidad
-
-        //     // 6) IVAP (si aplica)
-        //     const ivap_unitario = igvAfect === '17' ? vu_neto * (ivap_porcentaje / 100) : 0
-        //     const ivap_total = ivap_unitario * cantidad
-
-        //     // 7) IGV base y cálculo (IGV efectivo solo si afectacion == '10')
-        //     const igv_base_unit = vu_neto + isc_unitario // base unitaria para IGV
-        //     const igv_unitario = igvAfect === '10' ? igv_base_unit * igvRate : 0
-        //     const igv_total = igv_unitario * cantidad
-        //     const igv_base_total = igv_base_unit * cantidad
-
-        //     // 8) Totales y precio referencia
-        //     const total_impuestos = igv_total + isc_total + ivap_total + icbper_total
-        //     const precio_unitario_final = Number(
-        //         (vu_neto + isc_unitario + ivap_unitario + igv_unitario + icbper_unitario).toFixed(
-        //             10,
-        //         ),
-        //     ) // 10 decs para XML si quieres
-        //     const valor_total_sin_impuestos = valor_total_sin_impuestos_raw
-        //     const descuento_total_round = descuento_total
-        //     const igv_total_round = igv_total
-        //     const isc_total_round = isc_total
-        //     const icbper_total_round = icbper_total
-        //     const ivap_total_round = ivap_total
-        //     const total_impuestos_round = total_impuestos
-        //     const valor_venta_round = vu_neto * cantidad
-        //     const total_linea_round = valor_venta_round + total_impuestos_round
-
-        //     // también asignar campos en product si los necesitas (opcional)
-        //     product.vu = vu
-        //     product.descuento_vu = descuento_vu
-        //     product.descuento_total = descuento_total_round
-        //     product.descuento_base = descuento_base
-        //     product.descuento_factor = descuento_factor
-
-        //     const noOnerosas = ['11', '12', '13', '14', '15', '16', '17']
-        //     product.valor_venta = noOnerosas.includes(igvAfect) ? 0 : valor_venta_round
-        //     product.igv = noOnerosas.includes(igvAfect) ? 0 : igv_total_round
-        //     product.total = noOnerosas.includes(igvAfect) ? 0 : total_linea_round
-
-        //     // product.valor_venta = valor_venta_round
-        //     // product.igv = igv_total_round
-        //     // product.total = total_linea_round
-
-        //     // ====================== RETORNO ======================
-        //     return {
-        //         descripcion: product.descripcion,
-        //         producto_codigo: product.codigo,
-        //         unidad: product.unidad,
-        //         cantidad: cantidad,
-
-        //         valor_unitario_neto: Number(vu_neto.toFixed(10)), // por unidad sin IGV (después de descuento)
-        //         valor_total_sin_impuestos: valor_total_sin_impuestos, // base de la línea (2 dec)
-        //         precio_unitario_final: precio_unitario_final, // para PricingReference (10 decs)
-        //         // total_linea: total_linea_round, // total final por línea
-        //         total_linea: noOnerosas.includes(igvAfect) ? 0 : total_linea_round,
-
-        //         descuentos: {
-        //             total: descuento_total_round,
-        //             base: descuento_base,
-        //             factor: Number(descuento_factor.toFixed(6)),
-        //         },
-
-        //         impuestos: {
-        //             total: total_impuestos_round,
-        //             igv: {
-        //                 base_unit: Number(igv_base_unit.toFixed(10)),
-        //                 base_total: igv_base_total,
-        //                 porcentaje: igvPct,
-        //                 monto_unitario: Number(igv_unitario.toFixed(10)),
-        //                 monto_total: igv_total_round,
-        //                 codigo_afectacion: igvAfect,
-        //             },
-        //             icbper: {
-        //                 monto_unitario: Number(icbper_unitario.toFixed(2)),
-        //                 monto_total: icbper_total_round,
-        //                 cantidad_bolsas: has_bolsa_tax ? cantidad : 0,
-        //             },
-        //             isc: {
-        //                 base_unit: Number(isc_base_unit.toFixed(10)),
-        //                 base_total: isc_base_total,
-        //                 porcentaje: isc_percent,
-        //                 monto_unitario: Number(isc_unitario.toFixed(10)),
-        //                 monto_total: isc_total_round,
-        //                 sistema: product.isc_sistema_codigo,
-        //                 tier_range: isc_tier,
-        //             },
-        //             ivap: {
-        //                 porcentaje: ivap_porcentaje,
-        //                 monto_unitario: Number(ivap_unitario.toFixed(10)),
-        //                 monto_total: ivap_total_round,
-        //             },
-        //         },
-        //     }
-        // },
-        // calculateInvoiceTotals1(
-        //     globalAllowanceAmount = 0,
-        //     globalChargeAmount = 0,
-        //     prepaidAmount = 0,
-        // ) {
-        //     const tributosCatalog = this.vista.CATALOGO_TRIBUTOS_SUNAT
-
-        //     let GrossLineExtensionAmount = 0 // Sub total ventas antes de descuentos
-        //     // let LineExtensionAmount = 0 // Base después de descuentos
-        //     let totalTaxAmountInvoice = 0
-        //     let AllowanceTotalAmount = globalAllowanceAmount
-        //     let ChargeTotalAmount = globalChargeAmount
-
-        //     const aggregatedTaxes = {}
-
-        //     for (const item of this.vista.comprobante.comprobante_items) {
-        //         const lineData = this.calculateInvoiceLineValues(item, tributosCatalog)
-
-        //         // Base neta después de descuentos (valor de venta de la línea)
-        //         const postDiscountBase = Number(lineData.valor_total_sin_impuestos || 0)
-
-        //         // Descuento de línea
-        //         const lineDiscount = Number((lineData.descuentos && lineData.descuentos.total) || 0)
-
-        //         // Base antes de descuentos = base después + descuento de línea
-        //         const preDiscountBase = postDiscountBase + lineDiscount
-
-        //         // Acumular
-        //         GrossLineExtensionAmount += preDiscountBase // Sub total ventas (antes de descuentos)
-        //         // LineExtensionAmount += postDiscountBase // auxiliar (neto)
-        //         totalTaxAmountInvoice += Number(
-        //             lineData.impuestos && lineData.impuestos.total ? lineData.impuestos.total : 0,
-        //         )
-
-        //         // Descuentos (global + líneas)
-        //         AllowanceTotalAmount += lineDiscount
-
-        //         // Agregar impuestos agrupados
-        //         if (lineData.impuestos) {
-        //             aggregatedTaxes.igv =
-        //                 (aggregatedTaxes.igv || 0) +
-        //                 Number((lineData.impuestos.igv && lineData.impuestos.igv.monto_total) || 0)
-        //             aggregatedTaxes.isc =
-        //                 (aggregatedTaxes.isc || 0) +
-        //                 Number((lineData.impuestos.isc && lineData.impuestos.isc.monto_total) || 0)
-        //             aggregatedTaxes.icbper =
-        //                 (aggregatedTaxes.icbper || 0) +
-        //                 Number(
-        //                     (lineData.impuestos.icbper && lineData.impuestos.icbper.monto_total) ||
-        //                         0,
-        //                 )
-        //             aggregatedTaxes.ivap =
-        //                 (aggregatedTaxes.ivap || 0) +
-        //                 Number(
-        //                     (lineData.impuestos.ivap && lineData.impuestos.ivap.monto_total) || 0,
-        //                 )
-
-        //             for (const [k, v] of Object.entries(lineData.impuestos)) {
-        //                 if (['total', 'igv', 'isc', 'icbper', 'ivap'].includes(k)) continue
-        //                 if (v && typeof v.monto_total === 'number') {
-        //                     aggregatedTaxes.otros = (aggregatedTaxes.otros || 0) + v.monto_total
-        //                 }
-        //             }
-        //         }
-        //     }
-
-        //     // Sub total ventas = suma bases antes de descuentos
-        //     const SubTotalVentas = GrossLineExtensionAmount
-
-        //     // Descuentos = global + líneas
-        //     const Descuentos = AllowanceTotalAmount
-
-        //     // Valor venta = sub total - descuentos
-        //     const ValorVenta = SubTotalVentas - Descuentos
-
-        //     // Importe total = valor venta + impuestos + cargos - anticipos
-        //     const ImporteTotal =
-        //         ValorVenta + totalTaxAmountInvoice + ChargeTotalAmount - prepaidAmount
-
-        //     // Guardar resultados
-        //     this.vista.totals = {
-        //         sub_total_ventas: SubTotalVentas,
-        //         anticipos: prepaidAmount,
-        //         descuentos: Descuentos,
-        //         valor_venta: ValorVenta,
-        //         isc: aggregatedTaxes.isc || 0,
-        //         igv: aggregatedTaxes.igv || 0,
-        //         icbper: aggregatedTaxes.icbper || 0,
-        //         otros_cargos: ChargeTotalAmount,
-        //         otros_ributos: (aggregatedTaxes.ivap || 0) + (aggregatedTaxes.otros || 0),
-        //         importe_total: ImporteTotal,
-        //     }
-
-        //     this.calcularPorPagar()
-        // },
         sumarUno(item) {
             if (item.cantidad > item.cantidadMax) {
                 item.cantidad = item.cantidadMax
@@ -1288,23 +987,23 @@ export default {
                 return true
             }
 
-            if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-01`
-            ) {
+            const elegido = this.vista.comprobante_tipos.find(
+                (a) => a.id == this.vista.comprobante.doc_tipo,
+            )
+
+            if (elegido.tipo == '01') {
                 if (['0', '1', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener RUC')
                     return true
                 }
 
-                if (this.vista.socio.doc_numero == this.useAuth.usuario.empresa.ruc) {
+                if (this.vista.socio.doc_numero == this.useAuth.empresa.ruc) {
                     jmsg('error', 'El cliente no puede ser el mismo que la empresa')
                     return true
                 }
             }
 
-            if (
-                this.vista.comprobante.doc_tipo == `${this.useAuth.usuario.empresa.subdominio}-03`
-            ) {
+            if (elegido.tipo == '03') {
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
                     return true
@@ -1380,12 +1079,12 @@ export default {
             this.vista.comprobante.icbper = this.vista.totals.MNT_IMPUESTO_BOLSAS
             this.vista.comprobante.monto = this.vista.totals.MNT_TOT
         },
-        async grabar1() {
-            if (this.checkDatos()) return
-            this.shapeDatos()
+        // async grabar() {
+        //     if (this.checkDatos()) return
+        //     this.shapeDatos()
 
-            console.log(this.vista.comprobante)
-        },
+        //     console.log(this.vista.comprobante)
+        // },
         async grabar(print) {
             if (this.checkDatos()) return
             this.shapeDatos()
@@ -1411,26 +1110,10 @@ export default {
         async imprimir(data) {
             const send = {
                 ...data,
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
 
         runMethod(method, item) {
@@ -1455,7 +1138,7 @@ export default {
     overflow: hidden;
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: 2rem;
+    gap: 1rem;
 
     .left {
         display: flex;
@@ -1475,7 +1158,7 @@ export default {
         }
 
         .totales {
-            background-color: var(--bg-color2);
+            // background-color: var(--bg-color2);
             padding: 1rem;
             border-radius: 0.5rem;
             display: grid;

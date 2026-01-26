@@ -1,6 +1,6 @@
 <template>
-    <div class="tablero">
-        <div class="tablero-head">
+    <div class="vista">
+        <div class="head">
             <strong>{{ vista.pasado == true ? 'Caja resumen' : 'Apertura y cierre' }}</strong>
 
             <div class="buttons">
@@ -37,10 +37,10 @@
             </div>
         </div>
 
-        <div class="tablero-body">
+        <div>
             <div class="first" v-if="vista.caja_apertura == null">
                 <div class="card caja">
-                    <div class="card-head" :style="{ 'background-color': 'var(--rojo)' }">
+                    <div class="caja-head" :style="{ 'background-color': 'var(--rojo)' }">
                         CERRADO
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                 <div class="first">
                     <div class="card caja">
                         <div
-                            class="card-head"
+                            class="caja-head"
                             :style="{
                                 'background-color':
                                     vista.caja_apertura.estado == 2
@@ -75,7 +75,7 @@
                         </div>
 
                         <div class="dato">
-                            <span>Usuario</span>
+                            <span>Aperturado por</span>
                             <p>{{ vista.caja_apertura.createdBy1?.nombres_apellidos }}</p>
                         </div>
 
@@ -432,7 +432,7 @@
 
                         <JdTable
                             :datos="vista.resumen.comprobantes_canjeados || []"
-                            :columns="columnsComprobantesAnulados"
+                            :columns="columnsComprobantesCanjeados"
                             :seeker="false"
                             :download="false"
                             height="10rem"
@@ -624,7 +624,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'id',
+                id: 'serie_correlativo',
                 title: 'Número',
                 width: '10rem',
                 show: true,
@@ -649,7 +649,7 @@ export default {
             // },
         ],
 
-        columnsComprobantesAnulados: [
+        columnsComprobantesCanjeados: [
             {
                 id: 'tipo',
                 title: 'Documento',
@@ -658,7 +658,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'id',
+                id: 'serie_correlativo',
                 title: 'Número',
                 width: '8rem',
                 show: true,
@@ -828,7 +828,10 @@ export default {
     methods: {
         async loadCajaApertura() {
             const qry = {
-                fltr: { estado: { op: 'Es', val: '1' } },
+                fltr: {
+                    estado: { op: 'Es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 cols: [
                     'createdAt',
                     'updatedAt',
@@ -846,6 +849,12 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            if (res.data.length == 0) {
+                this.vista.caja_apertura = null
+                this.vista.resumen = null
+                return
+            }
 
             this.vista.caja_apertura = res.data[0]
             if (this.vista.caja_apertura) this.loadResumen()
@@ -894,42 +903,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.tablero {
-    height: 100%;
-    overflow-y: auto;
-    // padding: 0 1rem;
-}
-
-.tablero-head {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-    // position: sticky;
-    top: 0;
-    background-color: var(--bg-color2);
-    padding: 1rem 0;
-    z-index: 3;
-
-    strong {
-        font-size: 1.4rem;
-    }
-
-    .buttons {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-    }
-}
-
-.card {
-    padding: 1rem;
-    background-color: var(--bg-color);
-    border-radius: 1rem;
-    box-shadow: 0 0 0.5rem var(--shadow-color);
-    overflow: hidden;
-}
-
 .icon {
     display: grid;
     place-content: center;
@@ -940,6 +913,10 @@ export default {
     i {
         color: var(--text-color3);
     }
+}
+
+.card {
+    box-shadow: 0 0 0.5rem var(--shadow-color);
 }
 
 .card-head {
@@ -968,8 +945,9 @@ export default {
     margin-bottom: 2rem;
 
     .caja {
-        .card-head {
+        .caja-head {
             height: 5rem;
+            display: flex;
             justify-content: center;
             align-items: center;
             border-radius: 0.5rem;

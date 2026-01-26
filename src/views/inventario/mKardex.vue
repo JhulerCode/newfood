@@ -34,7 +34,6 @@
                 <template v-if="item.comprobante1">
                     {{ item.comprobante1?.serie_correlativo }}
                 </template>
-                {{ item.observacion }}
             </template>
         </JdTable>
     </JdModal>
@@ -89,15 +88,6 @@ export default {
                 seek: true,
                 sort: true,
             },
-            // {
-            //     id: 'pu',
-            //     title: 'Precio unitario',
-            //     toRight: true,
-            //     width: '8rem',
-            //     show: true,
-            //     seek: true,
-            //     sort: true,
-            // },
             {
                 id: 'cantidad',
                 title: 'Cantidad',
@@ -105,26 +95,33 @@ export default {
                 toRight: true,
                 width: '8rem',
                 show: true,
-                seek: true,
-                sort: true,
             },
             {
-                id: 'articulo_unidad',
+                id: 'articulo1.unidad',
                 title: 'Unidad',
                 prop: 'articulo1.unidad',
                 width: '5rem',
                 show: true,
-                seek: false,
-                sort: false,
             },
             {
-                id: 'more_info',
-                title: '...',
+                id: 'comprobante',
+                title: 'Comprobante',
                 slot: 'cMoreInfo',
-                width: '20rem',
+                width: '10rem',
                 show: true,
-                seek: true,
-                sort: true,
+            },
+            {
+                id: 'transaccion1.socio',
+                title: 'Socio',
+                prop: 'transaccion1.socio1.nombres',
+                width: '10rem',
+                show: true,
+            },
+            {
+                id: 'observacion',
+                title: 'Observación',
+                width: '10rem',
+                show: true,
             },
         ],
         tableRowOptions: [
@@ -132,7 +129,7 @@ export default {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
-                permiso: ['vInsumos:ajusteStock', 'vProductos:ajusteStock'],
+                permiso: ['vInventarioInsumos:ajusteStock', 'vInventarioProductos:ajusteStock'],
                 ocultar: { tipo: [1, 2] },
             },
         ],
@@ -147,8 +144,18 @@ export default {
             this.modal.qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['articulo1', 'transaccion1', 'comprobante1'],
+                iccl: {
+                    comprobante1: {
+                        incl: ['socio1'],
+                    },
+                    transaccion1: {
+                        cols: ['compra_comprobante_serie', 'compra_comprobante_correlativo'],
+                        incl: ['socio1'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.modal.qry)

@@ -36,7 +36,7 @@
             </div>
         </div>
 
-        <template v-if="vista.venta_canal == 1">
+        <div class="card" v-if="vista.venta_canal == 1">
             <div class="salones-head">
                 <ul class="container-salones">
                     <li
@@ -63,7 +63,7 @@
                         icon="fa-solid fa-rotate-right"
                         text="Recargar"
                         tipo="2"
-                        @click="loadPedidos()"
+                        @click="loadSalones()"
                         v-if="useAuth.verifyPermiso('vPedidos:listar')"
                     />
                 </div>
@@ -113,21 +113,25 @@
                     </div>
                 </li>
             </ul>
-        </template>
+        </div>
 
-        <template v-if="vista.venta_canal != 1">
+        <div class="card" v-if="vista.venta_canal != 1">
             <JdTable
                 :name="tableName"
                 :columns="columns"
                 :datos="pedidosFiltered || []"
                 :colNro="true"
                 :colAct="true"
+                :configRowSelect="true"
                 :reload="loadPedidos"
+                :actions="tableActions"
+                @actionClick="runMethod"
                 :rowOptions="tableRowOptions"
                 @rowOptionSelected="runMethod"
+                ref="jdtable"
             >
             </JdTable>
-        </template>
+        </div>
     </div>
 
     <mMesasUnir v-if="useModals.show.mMesasUnir" />
@@ -262,6 +266,14 @@ export default {
                 show: true,
             },
         ],
+        tableActions: [
+            {
+                icon: 'fa-solid fa-flag-checkered',
+                text: 'Confirmar entrega',
+                action: 'entregarBulk',
+                permiso: 'vPedidos:entregar',
+            },
+        ],
         tableRowOptions: [
             {
                 label: 'Ver',
@@ -274,6 +286,7 @@ export default {
                 icon: 'fa-regular fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPedidos:editar',
+                ocultar: { venta_facturado: true },
             },
             {
                 label: 'Editar detalles',
@@ -392,15 +405,12 @@ export default {
         clearInterval(this.vista.intervalAgo)
     },
     methods: {
-        initFiltros() {
-            this.columns[0].op = 'Es'
-            this.columns[0].val = dayjs().format('YYYY-MM-DD')
-        },
         setQuery() {
             this.vista.qry = {
                 fltr: {
                     tipo: { op: 'Es', val: 2 },
                     estado: { op: 'Es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 cols: [],
                 incl: ['createdBy1'],
@@ -423,6 +433,11 @@ export default {
             if (this.vista.venta_canal == 1) {
                 this.vista.qry.cols.push('venta_mesa')
                 this.vista.qry.incl.push('venta_mesa1')
+                this.vista.qry.iccl = {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                }
             }
         },
         async loadPedidos() {
@@ -445,9 +460,11 @@ export default {
             this.vista.qry1 = {
                 fltr: {
                     activo: { op: 'Es', val: true },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 cols: ['nombre'],
                 incl: ['mesas'],
+                ordr: [['nombre', 'ASC']],
             }
         },
         async loadSalones() {
@@ -547,7 +564,7 @@ export default {
                     return acc
                 }, {})
 
-            console.log(conteoPorTipo)
+            // console.log(conteoPorTipo)
             this.vista.mesaPendientes = conteoPorTipo[1] || 0
             this.vista.llevarPendientes = conteoPorTipo[2] || 0
             this.vista.deliveryPendientes = conteoPorTipo[3] || 0
@@ -561,7 +578,7 @@ export default {
             let send = {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
-                socio: `${this.useAuth.usuario.empresa.subdominio}-CLIENTES-VARIOS`,
+                socio: `${this.useAuth.empresa.subdominio}-CLIENTES-VARIOS`,
                 venta_socio_datos: {
                     doc_tipo: '0',
                     doc_numero: '00000000',
@@ -588,12 +605,46 @@ export default {
         runMethod(method, item, item2) {
             this[method](item, item2)
         },
-        async ver(item) {
+        async loadPedido(item) {
+            const qry = {
+                incl: ['socio1', 'venta_mesa1', 'venta_pago_metodo1'],
+                iccl: {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+            if (res.code != 0) return false
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+                ordr: [['createdAt', 'ASC']],
+                iccl: {
+                    articulo1: {
+                        incl: ['produccion_area1'],
+                    },
+                },
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return false
+
+            res.data.transaccion_items = res1.data
+
+            return res
+        },
+        async ver(item) {
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -616,11 +667,8 @@ export default {
             )
         },
         async editar(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -636,20 +684,10 @@ export default {
             }
 
             this.useVistas.showVista('vComanda', `Editar pedido N° ${item.venta_codigo}`, send)
-            // this.useModals.setModal(
-            //     'mPedidoDetalles',
-            //     `Editar pedido N° ${item.venta_codigo}`,
-            //     2,
-            //     send,
-            //     true,
-            // )
         },
         async editarDetalles(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -709,14 +747,10 @@ export default {
             this.useAuth.socket.emit('vPedidos:anular', item)
         },
         async imprimirComanda(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             let atencion = ''
-
             if (res.data.venta_canal == 1) {
                 atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
@@ -732,32 +766,16 @@ export default {
                 cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
-            // console.log(send)
+
             this.useAuth.socket.emit('vComanda:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async imprimirPrecuenta(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             let atencion = ''
-
             if (res.data.venta_canal == 1) {
                 atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
             } else if (res.data.venta_canal == 2) {
@@ -767,7 +785,7 @@ export default {
             }
 
             const send = {
-                empresa_datos: this.useAuth.usuario.empresa,
+                empresa_datos: this.useAuth.empresa,
                 fecha: res.data.fecha,
                 venta_canal: res.data.venta_canal,
                 atencion,
@@ -777,33 +795,14 @@ export default {
                 venta_socio_datos: res.data.venta_socio_datos,
                 venta_pago_metodo1: res.data.venta_pago_metodo1,
                 venta_pago_con: res.data.venta_pago_con,
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vComanda:imprimirPrecuenta', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/precuenta.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async generarComprobante(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const comprobante_items = res.data.transaccion_items
                 .filter((a) => a.cantidad > a.venta_entregado)
@@ -878,6 +877,27 @@ export default {
             if (res.code != 0) return
 
             this.useAuth.socket.emit('vPedidos:entregar', res.data)
+        },
+        async entregarBulk() {
+            const ids = this.vista.pedidos.filter((a) => a.selected).map((b) => b.id)
+
+            const resQst = await jqst(`¿Está seguro de entregar ${ids.length} los pedidos?`)
+            if (resQst.isConfirmed == false) return
+
+            const send = { ids }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await post(
+                `${urls.transacciones}/entregar-bulk`,
+                send,
+                'Pedido entregado con éxito',
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useAuth.socket.emit('vPedidos:entregarBulk', ids)
+            this.$refs['jdtable'].toogleSelectItems()
         },
 
         async abrirComandaMesa(mesa) {
@@ -1054,7 +1074,7 @@ export default {
     }
 
     .tipo-activo {
-        background-color: var(--bg-color2);
+        background-color: var(--bg-color);
         // color: white;
     }
 }
@@ -1096,6 +1116,7 @@ export default {
 
 .container-mesas {
     max-height: 100%;
+    // height: 10rem;
     overflow-y: auto;
     display: flex;
     flex-wrap: wrap;
@@ -1179,6 +1200,7 @@ export default {
 @media (max-width: 540px) {
     .container-mesas {
         gap: 1rem;
+        overflow-y: auto;
 
         .mesa {
             width: 11rem;

@@ -1,45 +1,45 @@
 <template>
-    <JdModal modal="mProduccionArea" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal modal="mSucursal" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
             <JdInput
-                label="Nombre"
+                label="Codigo"
                 :nec="true"
-                v-model="modal.item.nombre"
-                :disabled="modal.mode == 3 || modal.item.nombre == 'CAJA'"
-            />
-
-            <JdSelect
-                label="Tipo de impresora"
-                :nec="true"
-                :lista="modal.impresora_tipos"
-                v-model="modal.item.impresora_tipo"
+                v-model="modal.item.codigo"
                 :disabled="modal.mode == 3"
             />
 
             <JdInput
-                :label="modal.item.impresora_tipo == 1 ? 'Impresora nombre' : 'Impresora ip'"
+                label="Dirección"
                 :nec="true"
-                v-model="modal.item.impresora"
+                v-model="modal.item.direccion"
                 :disabled="modal.mode == 3"
             />
 
-            <JdSwitch
-                label="Activo"
-                v-model="modal.item.activo"
-                :disabled="modal.mode == 3 || modal.item.nombre == 'CAJA'"
+            <JdInput
+                label="Teléfono"
+                v-model="modal.item.telefono"
+                :disabled="modal.mode == 3"
             />
+
+            <JdInput
+                label="Correo"
+                v-model="modal.item.correo"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdSwitch label="Activo" v-model="modal.item.activo" :disabled="modal.mode == 3" />
         </div>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdSelect } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post, patch } from '@/utils/crud'
+import { urls, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
 
@@ -48,7 +48,6 @@ export default {
         JdModal,
         JdInput,
         JdSwitch,
-        JdSelect,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -62,19 +61,18 @@ export default {
             {
                 text: 'Grabar',
                 action: 'crear',
-                permiso: 'vProduccionAreas:crear',
+                permiso: 'vSucursales:crear',
             },
             {
                 text: 'Actualizar',
                 action: 'modificar',
-                permiso: 'vProduccionAreas:editar',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
     created() {
-        this.modal = this.useModals.mProduccionArea
+        this.modal = this.useModals.mSucursal
         this.setButtons()
-        this.loadDatosSistema()
     },
     methods: {
         setButtons() {
@@ -87,7 +85,7 @@ export default {
             }
         },
         checkDatos() {
-            const props = ['nombre', 'impresora_tipo', 'impresora', 'activo']
+            const props = ['codigo', 'direccion', 'activo']
 
             if (incompleteData(this.modal.item, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -100,34 +98,25 @@ export default {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.produccion_areas, this.modal.item)
+            const res = await post(urls.sucursales, this.modal.item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vProduccionAreas', 'produccion_areas', res.data)
-            this.useModals.show.mProduccionArea = false
+            this.useVistas.addItem('vSucursales', 'sucursales', res.data)
+            this.useModals.show.mSucursal = false
         },
         async modificar() {
             if (this.checkDatos()) return
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.produccion_areas, this.modal.item)
+            const res = await patch(urls.sucursales, this.modal.item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vProduccionAreas', 'produccion_areas', res.data)
-            this.useModals.show.mProduccionArea = false
-        },
-
-        async loadDatosSistema() {
-            const qry = ['impresora_tipos']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
+            this.useVistas.updateItem('vSucursales', 'sucursales', res.data)
+            this.useModals.show.mSucursal = false
         },
     },
 }

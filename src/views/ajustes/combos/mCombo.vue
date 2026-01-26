@@ -5,6 +5,8 @@
                 label="Categoria"
                 :nec="true"
                 :lista="modal.articulo_categorias || []"
+                :loaded="modal.articulo_categoriasLoaded"
+                @reload="loadCategorias"
                 v-model="articulo.categoria"
                 style="grid-column: 1/4"
             />
@@ -24,7 +26,7 @@
                 style="grid-column: 1/4"
             />
 
-            <template v-if="useAuth.usuario.empresa.tipo == 1">
+            <template v-if="useAuth.empresa.tipo == 1">
                 <JdSelect
                     label="Área de impresión"
                     :nec="true"
@@ -213,6 +215,7 @@ export default {
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
                 cols: ['nombre', 'unidad', 'igv_afectacion'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true
@@ -243,7 +246,7 @@ export default {
             this.articulo.combo_articulos.push({
                 id: genId(this.articulo.combo_articulos),
                 articulo: this.nuevo.articulo,
-                articulo1: { nombre: this.nuevo.nombre },
+                articulo1: { nombre: this.nuevo.nombre, unidad: this.nuevo.unidad },
                 cantidad: this.nuevo.cantidad,
             })
 
@@ -255,9 +258,9 @@ export default {
         },
 
         checkDatos() {
-            const props = ['tipo', 'categoria', 'nombre', 'igv_afectacion']
+            const props = ['tipo', 'categoria', 'nombre', 'igv_afectacion', 'precio_venta']
 
-            if (this.useAuth.usuario.empresa.tipo == 1) {
+            if (this.useAuth.empresa.tipo == 1) {
                 if (this.articulo.tipo == 2) props.push('produccion_area')
             }
 
@@ -322,11 +325,15 @@ export default {
                     tipo: { op: 'Es', val: '2' },
                     activo: { op: 'Es', val: true },
                 },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_categorias = []
+            this.modal.articulo_categoriasLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
+            this.modal.articulo_categoriasLoaded = true
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -339,6 +346,7 @@ export default {
                     activo: { op: 'Es', val: true },
                 },
                 cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.produccion_areas = []

@@ -131,22 +131,9 @@ export default {
     created() {
         this.modal = this.useModals.mTransaccion
 
-        // this.showColumns()
-        this.loadEmpresa()
         this.sumarItems()
     },
     methods: {
-        // showColumns() {
-        //     if (this.modal.transaccion.tipo == 1) {
-        //         this.columns[2].show = false
-        //         // this.columns[6].show = false
-        //     } else {
-        //         this.columns[3].show = false
-        //         this.columns[4].show = false
-        //         // this.columns[7].show = false
-        //     }
-        // },
-
         async searchArticulos(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.articulos.length = 0
@@ -155,12 +142,13 @@ export default {
 
             const qry = {
                 fltr: {
-                    // tipo: { op: 'Es', val: this.modal.transaccion.tipo == 1 ? '1' : '2' },
                     has_receta: { op: 'No es', val: true },
+                    is_combo: { op: 'No es', val: true },
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['nombre', 'unidad', 'precio_venta', 'igv_afectacion'],
+                cols: ['nombre', 'unidad', 'precio_venta', 'igv_afectacion', 'has_receta'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.spinArticulos = true
@@ -182,6 +170,7 @@ export default {
             if (i !== -1) return jmsg('warning', 'El artículo ya fue agregado')
 
             const send = {
+                id: crypto.randomUUID(),
                 articulo: item.id,
                 articulo1: {
                     nombre: item.nombre,
@@ -192,7 +181,8 @@ export default {
 
                 pu: null,
                 igv_afectacion: item.igv_afectacion,
-                igv_porcentaje: item.igv_afectacion == '10' ? this.modal.empresa.igv_porcentaje : 0,
+                igv_porcentaje:
+                    item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
 
                 mtoValorVenta: 0,
                 igv: 0,
@@ -263,8 +253,14 @@ export default {
         async modificar(item) {
             if (this.modal.mode != 2) return
 
+            const send = {
+                tipo: this.modal.transaccion.tipo,
+                fecha: this.modal.transaccion.fecha,
+                ...item,
+            }
+
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.transaccion_items, item)
+            const res = await patch(urls.transaccion_items, send)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -287,21 +283,6 @@ export default {
             this.modal.transaccion.transaccion_items.splice(item.i, 1)
 
             this.calcularTotales()
-        },
-
-        async loadEmpresa() {
-            const qry = {
-                fltr: {},
-                cols: ['igv_porcentaje'],
-            }
-
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.empresa}?qry=${JSON.stringify(qry)}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.empresa = res.data
         },
 
         runMethod(method, item) {

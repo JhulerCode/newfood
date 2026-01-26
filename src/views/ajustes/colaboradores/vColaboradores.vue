@@ -4,12 +4,6 @@
             <strong>Colaboradores</strong>
 
             <div class="buttons">
-                <!-- <JdButton
-                    text="Actualizar todos"
-                    @click="actualizarTodos()"
-                    v-if="useAuth.verifyPermiso('vColaboradores:crear')"
-                /> -->
-
                 <JdButton
                     text="Nuevo"
                     @click="nuevo()"
@@ -18,18 +12,19 @@
             </div>
         </div>
 
-        <!-- :configCols="true" -->
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.colaboradores || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadColaboradores"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.colaboradores || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :configCols="true"
+                :reload="loadColaboradores"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mColaborador v-if="useModals.show.mColaborador" />
@@ -122,7 +117,7 @@ export default {
                 prop: 'activo1.nombre',
                 type: 'select',
                 format: 'yesno',
-                width: '5rem',
+                width: '7rem',
                 show: true,
                 seek: true,
                 sort: true,
@@ -218,6 +213,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -298,9 +294,6 @@ export default {
 
             this.useVistas.removeItem('vColaboradores', 'colaboradores', item)
         },
-        // actualizarTodos() {
-        //     this.useAuth.socket.emit('vColaboradores:actualizarTodos')
-        // },
 
         async loadDatosSistema() {
             const qry = [
@@ -319,5 +312,3 @@ export default {
     },
 }
 </script>
-
-<style lang="scss" scoped></style>

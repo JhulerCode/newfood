@@ -5,30 +5,34 @@
 
             <div class="buttons">
                 <JdCheckBox label="Incluir detalle" v-model="vista.incluir_detalle" />
+                <JdCheckBox label="Todos los sucursales" v-model="vista.sucursal_todos" />
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.comprobantes || []"
-            :configFiltros="openConfigFiltros"
-            :reload="loadComprobantes"
-            :colAct="true"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cVenta_canal="{ item }">
-                <template v-if="item.venta_canal == 1">
-                    {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.comprobantes || []"
+                :configFiltros="openConfigFiltros"
+                :reload="loadComprobantes"
+                :colAct="true"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cVenta_canal="{ item }">
+                    <template v-if="item.venta_canal == 1">
+                        {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+                    </template>
+                    <template v-else>
+                        {{ item.venta_canal1.nombre }}
+                    </template>
                 </template>
-                <template v-else>
-                    {{ item.venta_canal1.nombre }}
-                </template>
-            </template>
-        </JdTable>
+            </JdTable>
+        </div>
     </div>
 
+    <mComprobante v-if="useModals.show.mComprobante" />
     <mComprobantePagos
         v-if="useModals.show.mComprobantePagos"
         @pagosModificados="actualizarPagos"
@@ -52,6 +56,7 @@ import {
     mPdfViewer,
 } from '@jhuler/components'
 
+import mComprobante from '@/views/reportes/comprobantes/mComprobante.vue'
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
 import mComprobanteCorreo from '@/views/reportes/comprobantes/mComprobanteCorreo.vue'
@@ -74,6 +79,7 @@ export default {
         mConfigFiltros,
         mPdfViewer,
 
+        mComprobante,
         mComprobantePagos,
         mComprobanteCanjear,
         mComprobanteCorreo,
@@ -101,8 +107,9 @@ export default {
             {
                 id: 'doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'doc_tipo1.nombre',
+                prop: 'doc_tipo1.tipo1.nombre',
                 type: 'select',
+                mostrar: 'tipo_serie',
                 width: '10rem',
                 show: true,
                 sort: true,
@@ -112,6 +119,7 @@ export default {
                 id: 'serie',
                 title: 'Serie',
                 type: 'text',
+                filtrable: false,
                 width: '5rem',
                 show: true,
                 seek: true,
@@ -181,7 +189,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'pagos_monto',
+                id: 'comprobante_pagos_monto',
                 title: 'Cobrado',
                 type: 'number',
                 format: 'currency',
@@ -233,6 +241,12 @@ export default {
         ],
         tableRowOptions: [
             {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'ver',
+                permiso: 'vReporteComprobantes:anular',
+            },
+            {
                 label: 'Anular',
                 icon: 'fa-solid fa-ban',
                 action: 'anular',
@@ -251,21 +265,21 @@ export default {
                 icon: 'fa-solid fa-up-right-from-square',
                 action: 'verPagos',
                 permiso: 'vReporteComprobantes:verPagos',
-                ocultar: { estado: ['0', '4'], pagos_monto: 0 },
+                ocultar: { estado: ['0', '4'], comprobante_pagos_monto: 0 },
             },
             {
                 label: 'Modificar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'editarPagos',
                 permiso: 'vReporteComprobantes:editarPagos',
-                ocultar: { estado: ['0', '4'], pagos_monto: 0 },
+                ocultar: { estado: ['0', '4'], comprobante_pagos_monto: 0 },
             },
             {
                 label: 'Agregar pagos',
                 icon: 'fa-solid fa-dollar-sign',
                 action: 'agregarPagos',
                 permiso: 'vReporteComprobantes:agregarPagos',
-                ocultar: { estado: ['0', '4'], pagos_monto: { op: '>', val: 0 } },
+                ocultar: { estado: ['0', '4'], comprobante_pagos_monto: { op: '>', val: 0 } },
             },
             {
                 label: 'Enviar por email',
@@ -285,27 +299,27 @@ export default {
                 action: 'descargarPdf',
                 permiso: 'vReporteComprobantes:descargarPdf',
             },
-            {
-                label: 'Descargar XML',
-                icon: 'fa-solid fa-file-arrow-down',
-                action: 'descargarXml',
-                permiso: 'vReporteComprobantes:descargarXml',
-                ocultar: { estado: 0, doc_tipo: 'NV' },
-            },
-            {
-                label: 'Descargar CDR',
-                icon: 'fa-solid fa-file-arrow-down',
-                action: 'descargarCdr',
-                permiso: 'vReporteComprobantes:descargarCdr',
-                ocultar: { estado: 0, doc_tipo: 'NV' },
-            },
-            {
-                label: 'Consultar estado',
-                icon: 'fa-solid fa-question',
-                action: 'consultarEstado',
-                permiso: 'vReporteComprobantes:consultarEstado',
-                ocultar: { doc_tipo: 'NV' },
-            },
+            // {
+            //     label: 'Descargar XML',
+            //     icon: 'fa-solid fa-file-arrow-down',
+            //     action: 'descargarXml',
+            //     permiso: 'vReporteComprobantes:descargarXml',
+            //     ocultar: { estado: 0, doc_tipo: 'NV' },
+            // },
+            // {
+            //     label: 'Descargar CDR',
+            //     icon: 'fa-solid fa-file-arrow-down',
+            //     action: 'descargarCdr',
+            //     permiso: 'vReporteComprobantes:descargarCdr',
+            //     ocultar: { estado: 0, doc_tipo: 'NV' },
+            // },
+            // {
+            //     label: 'Consultar estado',
+            //     icon: 'fa-solid fa-question',
+            //     action: 'consultarEstado',
+            //     permiso: 'vReporteComprobantes:consultarEstado',
+            //     ocultar: { doc_tipo: 'NV' },
+            // },
         ],
     }),
     async created() {
@@ -327,14 +341,25 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
-                sqls: ['pagos_monto'],
-                incl: ['transaccion1', 'caja_apertura1', 'createdBy1'],
+                sqls: ['comprobante_pagos_monto'],
+                incl: ['doc_tipo1', 'socio1', 'transaccion1', 'caja_apertura1', 'createdBy1'],
+                iccl: {
+                    caja_apertura1: {
+                        cols: ['createdAt'],
+                    },
+                    transaccion1: {
+                        cols: ['venta_codigo'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('caja_apertura', 'empresa_datos', 'cliente_datos')
             if (this.vista.incluir_detalle) {
                 this.vista.qry.incl.push('comprobante_items')
+            }
+            if (!this.vista.sucursal_todos) {
+                this.vista.qry.fltr.sucursal = { op: 'Es', val: this.useAuth.sucursal.id }
             }
         },
         async loadComprobantes() {
@@ -375,45 +400,46 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.vista.pago_comprobantes = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.vista.pago_comprobantes = res.data
-        // },
         async loadComprobanteTipos() {
-            this.useAuth.setLoading(true, 'Cargando...')
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.vista.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
             this.vista.comprobanteTiposLoaded = false
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
             this.vista.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data
+            return this.vista.comprobante_tipos
         },
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadSocios()
-            // await this.loadPagoComprobantes()
-            await this.loadComprobanteTipos()
 
+            for (const a of this.columns) {
+                if (a.id == 'doc_tipo') a.reload = this.loadComprobanteTipos
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'estado') a.lista = this.vista.comprobante_estados
+                if (a.id == 'pago_condicion') a.lista = this.vista.pago_condiciones
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'doc_tipo').lista = this.vista.pago_comprobantes
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'estado').lista = this.vista.comprobante_estados
-            cols.find((a) => a.id == 'pago_condicion').lista = this.vista.pago_condiciones
 
             const send = {
                 table: this.tableName,
@@ -426,6 +452,20 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async ver(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                comprobante: { ...res.data },
+                comprobante_estados: [{ ...res.data.estado1 }],
+            }
+
+            this.useModals.setModal('mComprobante', 'Comprobante', null, send, true)
         },
         anular(item) {
             const send = {
@@ -505,7 +545,7 @@ export default {
         async enviarCorreo(item) {
             this.useModals.setModal(
                 'mComprobanteCorreo',
-                'Enviar comrpobante por email',
+                'Enviar comprobante por email',
                 null,
                 item,
             )
@@ -519,26 +559,10 @@ export default {
 
             const send = {
                 ...res.data,
-                impresora: {
-                    tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
-                    nombre: this.useAuth.usuario.impresora_caja.impresora,
-                },
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comprobante.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async descargarPdf(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -604,7 +628,7 @@ export default {
 
         actualizarPagos(item) {
             const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)
-            this.vista.comprobantes[i].pagos_monto = item.monto
+            this.vista.comprobantes[i].comprobante_pagos_monto = item.monto
         },
         comprobanteCanjedo(item) {
             const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)

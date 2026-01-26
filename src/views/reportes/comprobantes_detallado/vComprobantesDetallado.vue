@@ -6,22 +6,24 @@
             <div class="buttons"></div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.comprobantes || []"
-            :configFiltros="openConfigFiltros"
-            :reload="loadComprobantes"
-        >
-            <template v-slot:cVenta_canal="{ item }">
-                <template v-if="item.venta_canal == 1">
-                    {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.comprobantes || []"
+                :configFiltros="openConfigFiltros"
+                :reload="loadComprobantes"
+            >
+                <template v-slot:cVenta_canal="{ item }">
+                    <template v-if="item.venta_canal == 1">
+                        {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+                    </template>
+                    <template v-else>
+                        {{ item.venta_canal1.nombre }}
+                    </template>
                 </template>
-                <template v-else>
-                    {{ item.venta_canal1.nombre }}
-                </template>
-            </template>
-        </JdTable>
+            </JdTable>
+        </div>
     </div>
 
     <mComprobantePagos
@@ -67,7 +69,7 @@ export default {
         tableName: 'vComprobantesDetallado',
         columns: [
             {
-                id: 'comprobante_fecha',
+                id: 'comprobante1.fecha_emision',
                 title: 'Fecha',
                 prop: 'comprobante1.fecha_emision',
                 format: 'date',
@@ -78,27 +80,29 @@ export default {
                 sort: true,
             },
             {
-                id: 'comprobante_tipo',
+                id: 'comprobante1.doc_tipo',
                 title: 'Tipo compr.',
-                prop: 'comprobante1.doc_tipo1.nombre',
+                prop: 'comprobante1.doc_tipo1.tipo1.nombre',
                 type: 'select',
+                mostrar: 'tipo_serie',
                 width: '10rem',
                 show: true,
                 sort: true,
                 seek: true,
             },
             {
-                id: 'comprobante_serie',
+                id: 'comprobante1.serie',
                 title: 'Serie',
                 prop: 'comprobante1.serie',
                 type: 'text',
+                filtrable: false,
                 width: '5rem',
                 show: true,
                 seek: true,
                 sort: true,
             },
             {
-                id: 'comprobante_correlativo',
+                id: 'comprobante1.numero',
                 title: 'Correlativo',
                 prop: 'comprobante1.numero',
                 type: 'text',
@@ -108,9 +112,10 @@ export default {
                 sort: true,
             },
             {
-                id: 'articulo',
+                id: 'articulo1.nombre',
                 title: 'Producto',
                 prop: 'articulo1.nombre',
+                type: 'text',
                 width: '20rem',
                 show: true,
                 seek: true,
@@ -158,11 +163,11 @@ export default {
                 sort: true,
             },
             {
-                id: 'comprobante_estado',
+                id: 'comprobante1.estado',
                 title: 'Estado',
-                prop: 'comprobante_estado1.nombre',
+                prop: 'comprobante1.estado1.nombre',
                 type: 'select',
-                format: 'estado',
+                // format: 'estado',
                 width: '8rem',
                 show: true,
                 seek: false,
@@ -188,8 +193,15 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {},
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
                 incl: ['comprobante1', 'articulo1'],
+                iccl: {
+                    comprobante1: {
+                        incl: ['doc_tipo1']
+                    }
+                }
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -210,12 +222,12 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            // await this.loadPagoComprobantes()
-            await this.loadComprobanteTipos()
 
+            for (const a of this.columns) {
+                if (a.id == 'comprobante1.doc_tipo') a.reload = this.loadComprobanteTipos
+                if (a.id == 'comprobante1.estado') a.lista = this.vista.comprobante_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'comprobante_tipo').lista = this.vista.pago_comprobantes
-            cols.find((a) => a.id == 'comprobante_estado').lista = this.vista.comprobante_estados
 
             const send = {
                 table: this.tableName,
@@ -237,31 +249,32 @@ export default {
 
             Object.assign(this.vista, res.data)
         },
-        // async loadPagoComprobantes() {
-        //     const qry = {
-        //         fltr: { activo: { op: 'Es', val: true } },
-        //         cols: ['nombre', 'estandar'],
-        //     }
-
-        //     this.vista.pago_comprobantes = []
-        //     this.useAuth.loading = { show: true, text: 'Cargando...' }
-        //     const res = await get(`${urls.pago_comprobantes}?qry=${JSON.stringify(qry)}`)
-        //     this.useAuth.loading = { show: false, text: '' }
-
-        //     if (res.code != 0) return
-
-        //     this.vista.pago_comprobantes = res.data
-        // },
         async loadComprobanteTipos() {
-            this.useAuth.setLoading(true, 'Cargando...')
+            const qry = {
+                fltr: {
+                    activo: { op: 'Es', val: true },
+                    'sucursal_comprobante_tipos.sucursal': {
+                        op: 'Es',
+                        val: this.useAuth.sucursal.id,
+                    },
+                    'sucursal_comprobante_tipos.estado': { op: 'Es', val: true },
+                },
+                cols: ['tipo', 'serie', 'tipo_serie', 'estandar'],
+                incl: ['sucursal_comprobante_tipos'],
+                ordr: [['nombre', 'asc']],
+            }
+
+            this.vista.comprobante_tipos = []
+            this.useAuth.loading = { show: true, text: 'Cargando...' }
             this.vista.comprobanteTiposLoaded = false
-            const res = await get(urls.empresa)
-            this.useAuth.setLoading(false)
+            const res = await get(`${urls.comprobante_tipos}?qry=${JSON.stringify(qry)}`)
             this.vista.comprobanteTiposLoaded = true
+            this.useAuth.loading = { show: false, text: '' }
 
             if (res.code != 0) return
 
-            this.vista.pago_comprobantes = res.data.comprobante_tipos
+            this.vista.comprobante_tipos = res.data
+            return this.vista.comprobante_tipos
         },
     },
 }

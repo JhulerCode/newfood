@@ -20,19 +20,23 @@
         </div>
 
         <div class="body">
-            <JdTable
-                :name="tableName"
-                :columns="columns"
-                :datos="vista.salones || []"
-                :colAct="true"
-                :seeker="false"
-                :reload="loadSalones"
-                :rowOptions="tableRowOptions"
-                @rowOptionSelected="runMethod"
-            >
-            </JdTable>
+            <div class="card">
+                <strong>Salones</strong>
 
-            <div v-if="vista.salon?.id">
+                <JdTable
+                    :name="tableName"
+                    :columns="columns"
+                    :datos="vista.salones || []"
+                    :colAct="true"
+                    :reload="loadSalones"
+                    :rowOptions="tableRowOptions"
+                    @rowOptionSelected="runMethod"
+                    class="mrg-top1"
+                >
+                </JdTable>
+            </div>
+
+            <div v-if="vista.salon?.id" class="card">
                 <strong>Mesas de {{ vista.salon?.nombre }}</strong>
 
                 <JdTable
@@ -96,6 +100,15 @@ export default {
         tableName: 'vSalones',
         columns: [
             {
+                id: 'sucursal',
+                title: 'Sucursal',
+                prop: 'sucursal1.codigo',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 width: '10rem',
@@ -110,7 +123,6 @@ export default {
                 format: 'yesno',
                 width: '6rem',
                 show: true,
-                seek: true,
                 sort: true,
             },
         ],
@@ -184,6 +196,11 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                incl: ['sucursal1'],
+                ordr: [
+                    ['sucursal1', 'codigo', 'ASC'],
+                    ['nombre', 'ASC'],
+                ],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -240,6 +257,7 @@ export default {
         setQuery1() {
             this.vista.qry1 = {
                 fltr: { salon: { op: 'Es', val: this.vista.salon.id } },
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns1, this.vista.qry1)
@@ -290,7 +308,7 @@ export default {
 .body {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 5rem;
+    gap: 3rem;
     align-items: flex-start;
 }
 

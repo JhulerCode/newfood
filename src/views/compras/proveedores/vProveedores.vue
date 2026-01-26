@@ -12,18 +12,18 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.socios || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadSocios"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <!-- :configCols="true" -->
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.socios || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadSocios"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mSocio v-if="useModals.show.mSocio" />
@@ -155,6 +155,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: 1 } },
+                ordr: [['nombres', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -186,9 +187,11 @@ export default {
         async openConfigFiltros() {
             await this.loadDatosSistema()
 
+            for (const a of this.columns) {
+                if (a.id == 'doc_tipo') a.lista = this.vista.documentos_identidad
+                if (a.id == 'activo') a.lista = this.vista.activo_estados
+            }
             const cols = this.columns
-            cols.find((a) => (a.id = 'doc_tipo')).lista = this.vista.documentos_identidad
-            cols.find((a) => a.id == 'activo').lista = this.vista.activo_estados
 
             const send = {
                 table: this.tableName,

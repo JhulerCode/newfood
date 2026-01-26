@@ -6,21 +6,21 @@
             <div class="buttons"></div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.dinero_movimientos || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadMovimientos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cDetalle="{ item }">
-                {{ item.comprobante1?.serie_correlativo }}
-                {{ item.detalle }}
-            </template>
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.dinero_movimientos || []"
+                :configFiltros="openConfigFiltros"
+                :reload="loadMovimientos"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cDetalle="{ item }">
+                    {{ item.comprobante1?.serie_correlativo }}
+                    {{ item.detalle }}
+                </template>
+            </JdTable>
+        </div>
     </div>
 
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -124,7 +124,6 @@ export default {
                 sort: true,
             },
         ],
-        tableRowOptions: [],
     }),
     async created() {
         this.vista = this.useVistas.vDineroMovimientos
@@ -144,7 +143,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {
-                    // operacion: { op: 'No es', val: '1' },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['pago_metodo1', 'comprobante1'],
             }
@@ -170,13 +169,14 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadPagoMetodos()
 
+            for (const a of this.columns) {
+                if (a.id == 'tipo') a.lista = this.vista.caja_operacion_tipos
+                if (a.id == 'operacion') a.lista = this.vista.caja_operaciones
+                if (a.id == 'pago_metodo') a.reload = this.loadPagoMetodos
+                if (a.id == 'estado') a.lista = this.vista.dinero_movimiento_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'tipo').lista = this.vista.caja_operacion_tipos
-            cols.find((a) => a.id == 'operacion').lista = this.vista.caja_operaciones
-            cols.find((a) => a.id == 'pago_metodo').lista = this.vista.pago_metodos
-            cols.find((a) => a.id == 'estado').lista = this.vista.dinero_movimiento_estados
 
             const send = {
                 table: this.tableName,
@@ -211,6 +211,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.pago_metodos = res.data
+            return res.data
         },
 
         runMethod(method, item) {

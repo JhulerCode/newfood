@@ -13,16 +13,17 @@
             </div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.articulo_categorias || []"
-            :colAct="true"
-            :reload="loadCategorias"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-        </JdTable>
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.articulo_categorias || []"
+                :colAct="true"
+                :reload="loadCategorias"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            />
+        </div>
     </div>
 
     <mArticuloCategoria v-if="useModals.show.mArticuloCategoria" />

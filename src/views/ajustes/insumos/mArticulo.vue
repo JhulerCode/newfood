@@ -5,6 +5,8 @@
                 label="Categoria"
                 :nec="true"
                 :lista="modal.articulo_categorias || []"
+                :loaded="modal.articulo_categoriasLoaded"
+                @reload="loadCategorias"
                 v-model="articulo.categoria"
                 style="grid-column: 1/4"
             />
@@ -34,7 +36,7 @@
                 style="grid-column: 1/4"
             />
 
-            <template v-if="useAuth.usuario.empresa.tipo == 1">
+            <template v-if="useAuth.empresa.tipo == 1">
                 <JdSelect
                     label="Área de impresión"
                     :nec="true"
@@ -61,9 +63,10 @@
                 @handleFile="(file, blob) => ((articulo.archivo = file), (modal.blob = blob))"
                 @deleteFile="((articulo.archivo = null), (modal.blob = null))"
                 style="grid-column: 1/3"
+                v-if="articulo.tipo == 2"
             />
 
-            <template v-if="useAuth.usuario.empresa.tipo == 1">
+            <template v-if="useAuth.empresa.tipo == 1">
                 <JdSwitch
                     label="Es producto transformado?"
                     v-model="articulo.has_receta"
@@ -140,7 +143,7 @@ export default {
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'unidad', 'igv_afectacion']
 
-            if (this.useAuth.usuario.empresa.tipo == 1) {
+            if (this.useAuth.empresa.tipo == 1) {
                 if (this.articulo.tipo == 2) props.push('produccion_area', 'has_receta')
             }
 
@@ -203,11 +206,15 @@ export default {
                     tipo: { op: 'Es', val: this.articulo.tipo },
                     activo: { op: 'Es', val: true },
                 },
+                cols: ['nombre'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.modal.articulo_categorias = []
+            this.modal.articulo_categoriasLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(`${urls.articulo_categorias}?qry=${JSON.stringify(qry)}`)
+            this.modal.articulo_categoriasLoaded = true
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

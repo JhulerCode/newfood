@@ -1,16 +1,17 @@
 <template>
     <main>
-        <MainHead />
+        <ConsolaSideBar class="side-bar" />
 
         <div class="main-body">
-            <SideBar class="side-bar" />
+            <ConsolaHeader />
 
-            <MainCenter />
+            <ConsolaCenter v-if="useAuth?.usuario?.id" />
         </div>
     </main>
 
     <mUserMenu v-if="useModals?.show?.mUserMenu" class="user-menu" />
     <mUserPreferences v-if="useModals?.show?.mUserPreferences" />
+    <mSucursalCambiar v-if="useModals?.show?.mSucursalCambiar" />
 
     <mLogin v-if="useModals?.show?.mLogin" />
 </template>
@@ -18,12 +19,13 @@
 <script>
 import { mLogin } from '@jhuler/components'
 
-import MainHead from '@/views/_consola/MainHead.vue'
-import SideBar from '@/views/_consola/SideBar.vue'
-import MainCenter from '@/views/_consola/MainCenter.vue'
+import ConsolaHeader from '@/views/_consola/ConsolaHeader.vue'
+import ConsolaSideBar from '@/views/_consola/ConsolaSideBar.vue'
+import ConsolaCenter from '@/views/_consola/ConsolaCenter.vue'
 
 import mUserMenu from './mUserMenu.vue'
 import mUserPreferences from './mUserPreferences.vue'
+import mSucursalCambiar from './mSucursalCambiar.vue'
 
 import { useAuth } from '@/pinia/auth.js'
 import { useVistas } from '@/pinia/vistas.js'
@@ -31,12 +33,13 @@ import { useModals } from '@/pinia/modals.js'
 
 export default {
     components: {
-        MainHead,
-        SideBar,
-        MainCenter,
+        ConsolaHeader,
+        ConsolaSideBar,
+        ConsolaCenter,
 
         mUserMenu,
         mUserPreferences,
+        mSucursalCambiar,
 
         mLogin,
     },
@@ -45,6 +48,9 @@ export default {
         useVistas: useVistas(),
         useModals: useModals(),
     }),
+    created() {
+        this.useAuth.setLoading(false)
+    },
     mounted() {
         window.addEventListener('keydown', this.shortCuts)
     },
@@ -69,22 +75,21 @@ main {
     height: 100dvh;
     width: 100%;
     display: grid;
-    grid-template-rows: auto 1fr;
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr;
     overflow-x: hidden;
     background-color: var(--bg-color2);
 
     .main-body {
         height: 100%;
         display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-rows: auto 1fr;
         overflow-y: hidden;
-        padding: 0 1rem 1rem 1rem;
     }
 }
 
 .user-menu {
-    top: 4rem;
-    right: 2rem;
+    bottom: 6rem;
+    left: 0.5rem;
 }
 </style>

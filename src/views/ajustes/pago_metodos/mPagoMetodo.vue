@@ -58,8 +58,30 @@ export default {
                 permiso: 'vPagoMetodos:editar',
             },
         ],
+
+        columns: [
+            {
+                id: 'sucursal',
+                title: 'Sucursal',
+                prop: 'sucursal1.codigo',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
+                id: 'estado',
+                title: 'Estado',
+                slot: 'cEstado',
+                // format: 'yesno',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+        ],
     }),
-    created() {
+    async created() {
         this.modal = this.useModals.mPagoMetodo
         this.setButtons()
     },

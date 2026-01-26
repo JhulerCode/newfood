@@ -8,19 +8,27 @@
                     text="Recargar"
                     tipo="2"
                     @click="loadEmpresa"
-                    v-if="useAuth.verifyPermiso('vEmpresa:ver')"
+                    v-if="useAuth.verifyPermiso('vEmpresa:ver') && !vista.is_editing"
                 />
+
+                <JdButton
+                    text="Editar"
+                    @click="edit"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar') && !vista.is_editing"
+                />
+
+                <JdButton text="Cancelar" tipo="2" @click="cancelEdit" v-if="vista.is_editing" />
 
                 <JdButton
                     text="Modificar"
                     @click="modificar"
-                    v-if="useAuth.verifyPermiso('vEmpresa:editar')"
+                    v-if="useAuth.verifyPermiso('vEmpresa:editar') && vista.is_editing"
                 />
             </div>
         </div>
 
         <div class="container-datos">
-            <div class="datos-fiscales">
+            <div class="card datos-fiscales">
                 <strong style="grid-column: 1/3">Datos fiscales</strong>
 
                 <JdInput
@@ -28,6 +36,7 @@
                     :nec="true"
                     v-model="vista.empresa.ruc"
                     style="grid-column: 1/3"
+                    :disabled="true"
                 />
 
                 <JdInput
@@ -35,6 +44,7 @@
                     :nec="true"
                     v-model="vista.empresa.razon_social"
                     style="grid-column: 1/5"
+                    :disabled="true"
                 />
 
                 <JdInput
@@ -42,6 +52,7 @@
                     :nec="true"
                     v-model="vista.empresa.nombre_comercial"
                     style="grid-column: 1/5"
+                    :disabled="!vista.is_editing"
                 />
 
                 <JdInput
@@ -49,6 +60,7 @@
                     :nec="true"
                     v-model="vista.empresa.domicilio_fiscal"
                     style="grid-column: 1/5"
+                    :disabled="!vista.is_editing"
                 />
 
                 <JdInput
@@ -56,6 +68,7 @@
                     :nec="true"
                     v-model="vista.empresa.ubigeo"
                     style="grid-column: 1/4"
+                    :disabled="!vista.is_editing"
                 />
 
                 <!-- <JdInput
@@ -78,14 +91,33 @@
                     v-model="vista.empresa.departamento"
                     style="grid-column: 1/4"
                 /> -->
+
+                <JdInput
+                    label="Impuesto (%)"
+                    :nec="true"
+                    type="number"
+                    v-model="vista.empresa.igv_porcentaje"
+                    style="grid-column: 1/4"
+                    :disabled="!vista.is_editing"
+                />
             </div>
 
-            <div class="datos-secundarios">
+            <div class="card datos-secundarios">
                 <strong>Datos generales</strong>
 
-                <JdInput label="Teléfono" :nec="true" v-model="vista.empresa.telefono" />
+                <JdInput
+                    label="Teléfono"
+                    :nec="true"
+                    v-model="vista.empresa.telefono"
+                    :disabled="!vista.is_editing"
+                />
 
-                <JdInput label="Correo" :nec="true" v-model="vista.empresa.correo" />
+                <JdInput
+                    label="Correo"
+                    :nec="true"
+                    v-model="vista.empresa.correo"
+                    :disabled="!vista.is_editing"
+                />
 
                 <JdInputFile
                     label="Logo"
@@ -96,64 +128,21 @@
                         (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
                     "
                     @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
+                    :disabled="!vista.is_editing"
                 />
-
-                <div v-if="vista.empresa.archivo || vista.empresa.logo_url" class="empresa-logo">
-                    <img
-                        :src="vista.blob"
-                        :alt="'logo-' + vista.empresa.razon_social"
-                        v-if="vista.empresa.archivo"
-                    />
-                    <img
-                        :src="vista.empresa.logo_url"
-                        :alt="'logo-' + vista.empresa.razon_social"
-                        v-else
-                    />
-                </div>
             </div>
 
-            <div>
-                <div class="datos-secundarios">
-                    <strong>Facturación electrónica</strong>
-
-                    <JdInput
-                        label="Impuesto (%)"
-                        :nec="true"
-                        type="number"
-                        v-model="vista.empresa.igv_porcentaje"
-                    />
-
-                    <!-- <JdInput label="Usuario SOL" :nec="true" v-model="vista.empresa.sol_usuario" />
-
-                    <JdInputPassword
-                        label="Clave SOL"
-                        :nec="true"
-                        v-model="vista.empresa.sol_clave"
-                    />
-
-                    <JdButton text="Subir certificado" tipo="2" @click="subirCdt" /> -->
-
-                    <!-- <JdInputFile
-                        label="Certificado (CDT)"
-                        :nec="true"
-                        accept="image/*"
-                        v-model="vista.empresa.cdt"
-                        @handleFile="
-                            (file, blob) => ((vista.empresa.archivo = file), (vista.blob = blob))
-                        "
-                        @deleteFile="((vista.empresa.archivo = null), (vista.blob = null))"
-                    /> -->
-                </div>
-
-                <!-- <div class="datos-secundarios mrg-top2">
-                    <strong>Impresión</strong>
-
-                    <JdInput
-                        label="Pc principal"
-                        :nec="true"
-                        v-model="vista.empresa.pc_principal_ip"
-                    />
-                </div> -->
+            <div v-if="vista.empresa.archivo || vista.empresa.foto" class="empresa-logo">
+                <img
+                    :src="vista.blob"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-if="vista.empresa.archivo"
+                />
+                <img
+                    :src="vista.empresa.foto.url"
+                    :alt="'logo-' + vista.empresa.razon_social"
+                    v-else
+                />
             </div>
         </div>
     </div>
@@ -200,7 +189,7 @@ export default {
     methods: {
         async loadEmpresa() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(urls.empresa)
+            const res = await get(`${urls.empresa}/uno/${this.useAuth.empresa.id}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -209,23 +198,23 @@ export default {
             this.vista.empresa = res.data
         },
 
+        edit() {
+            this.vista.is_editing = true
+        },
+        cancelEdit() {
+            this.vista.is_editing = false
+        },
         checkDatos() {
             const props = [
-                'ruc',
-                'razon_social',
                 'nombre_comercial',
+
                 'domicilio_fiscal',
                 'ubigeo',
+                'igv_porcentaje',
 
                 'telefono',
                 'correo',
                 'logo',
-
-                'igv_porcentaje',
-                // 'sol_usuario',
-                // 'sol_clave',
-
-                // 'pc_principal_ip',
             ]
 
             if (incompleteData(this.vista.empresa, props)) {
@@ -248,17 +237,17 @@ export default {
 
             if (res.code != 0) return
 
-            this.vista.empresa = res.data
+            // this.vista.empresa = res.data
         },
 
-        subirCdt() {
-            this.useModals.setModal(
-                'mEmpresaCdt',
-                'Subir certificado digital tributario',
-                null,
-                this.vista.empresa,
-            )
-        },
+        // subirCdt() {
+        //     this.useModals.setModal(
+        //         'mEmpresaCdt',
+        //         'Subir certificado digital tributario',
+        //         null,
+        //         this.vista.empresa,
+        //     )
+        // },
     },
 }
 </script>
@@ -269,7 +258,7 @@ export default {
     grid-template-columns: 1fr 1fr 1fr;
     // display: flex;
     // flex-wrap: wrap;
-    gap: 4rem;
+    gap: 2rem;
     overflow-y: auto;
 
     .datos-fiscales {
@@ -288,6 +277,7 @@ export default {
     }
 
     .empresa-logo {
+        height: fit-content;
         // width: 100%;
         padding: 0.5rem;
         box-shadow: 0 0 0.5rem var(--shadow-color);

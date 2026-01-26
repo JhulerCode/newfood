@@ -6,25 +6,27 @@
             <div class="buttons"></div>
         </div>
 
-        <JdTable
-            :name="tableName"
-            :columns="columns"
-            :datos="vista.transacciones || []"
-            :colAct="true"
-            :configFiltros="openConfigFiltros"
-            :reload="loadPedidos"
-            :rowOptions="tableRowOptions"
-            @rowOptionSelected="runMethod"
-        >
-            <template v-slot:cVenta_canal="{ item }">
-                <template v-if="item.venta_canal == 1">
-                    {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+        <div class="card">
+            <JdTable
+                :name="tableName"
+                :columns="columns"
+                :datos="vista.transacciones || []"
+                :colAct="true"
+                :configFiltros="openConfigFiltros"
+                :reload="loadPedidos"
+                :rowOptions="tableRowOptions"
+                @rowOptionSelected="runMethod"
+            >
+                <template v-slot:cVenta_canal="{ item }">
+                    <template v-if="item.venta_canal == 1">
+                        {{ item.venta_mesa1.salon1.nombre }} - {{ item.venta_mesa1.nombre }}
+                    </template>
+                    <template v-else>
+                        {{ item.venta_canal1.nombre }}
+                    </template>
                 </template>
-                <template v-else>
-                    {{ item.venta_canal1.nombre }}
-                </template>
-            </template>
-        </JdTable>
+            </JdTable>
+        </div>
     </div>
 
     <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" />
@@ -197,8 +199,16 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: { tipo: { op: 'Es', val: 2 } },
-                incl: ['createdBy1', 'venta_mesa1'],
+                fltr: {
+                    tipo: { op: 'Es', val: 2 },
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                },
+                incl: ['createdBy1', 'venta_mesa1', 'socio1'],
+                iccl: {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -220,14 +230,14 @@ export default {
 
         async openConfigFiltros() {
             await this.loadDatosSistema()
-            await this.loadColaboradores()
-            await this.loadSocios()
 
+            for (const a of this.columns) {
+                if (a.id == 'createdBy') a.reload = this.loadColaboradores
+                if (a.id == 'socio') a.reload = this.loadSocios
+                if (a.id == 'venta_canal') a.lista = this.vista.venta_canales
+                if (a.id == 'estado') a.lista = this.vista.transaccion_estados
+            }
             const cols = this.columns
-            cols.find((a) => a.id == 'createdBy').lista = this.vista.colaboradores
-            cols.find((a) => a.id == 'socio').lista = this.vista.socios
-            cols.find((a) => a.id == 'venta_canal').lista = this.vista.venta_canales
-            cols.find((a) => a.id == 'estado').lista = this.vista.transaccion_estados
 
             const send = {
                 table: this.tableName,
@@ -241,12 +251,41 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
-        async ver(item) {
+        async loadPedido(item) {
+            const qry = {
+                incl: ['socio1', 'venta_mesa1', 'venta_pago_metodo1'],
+                iccl: {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                },
+            }
+
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
 
-            if (res.code != 0) return
+            if (res.code != 0) return false
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+                ordr: [['createdAt', 'ASC']],
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return false
+
+            res.data.transaccion_items = res1.data
+
+            return res
+        },
+        async ver(item) {
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             const send = {
                 pedido: { ...res.data },
@@ -269,11 +308,8 @@ export default {
             )
         },
         async imprimir(item) {
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.transacciones}/uno/${item.id}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
+            const res = await this.loadPedido(item)
+            if (res == false) return
 
             let atencion = ''
 
@@ -292,22 +328,10 @@ export default {
                 cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
-                subdominio: this.useAuth.usuario.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.usuario.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
         async verComprobantes(item) {
             const send = {
@@ -349,6 +373,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.colaboradores = res.data
+            return res.data
         },
         async loadSocios() {
             const qry = {
@@ -364,6 +389,7 @@ export default {
             if (res.code !== 0) return
 
             this.vista.socios = res.data
+            return res.data
         },
     },
 }

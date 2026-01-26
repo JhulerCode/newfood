@@ -242,7 +242,7 @@ export default {
                 .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
 
-            const tipo = this.useAuth.usuario.empresa?.tipo
+            const tipo = this.useAuth.empresa.tipo
 
             if (tipo === 1) {
                 vistas = vistas.filter((c) => c.id !== 'vPos')
@@ -251,7 +251,7 @@ export default {
                     (c) =>
                         c.id !== 'vPedidos' &&
                         c.id !== 'vInsumos' &&
-                        c.id !== 'vProduccionAreas' &&
+                        c.id !== 'vImpresionAreas' &&
                         c.id !== 'vSalones',
                 )
             }
@@ -504,7 +504,7 @@ export default {
         menuFiltradoPorTipoNegocio() {
             const menu = JSON.parse(JSON.stringify(this.useAuth.menu))
 
-            const tipo = this.useAuth.usuario.empresa?.tipo
+            const tipo = this.useAuth.empresa.tipo
 
             const ventas = menu.find((s) => s.id === 'ventas')
             if (ventas && Array.isArray(ventas.children)) {
@@ -526,7 +526,7 @@ export default {
             if (ajustes && Array.isArray(ajustes.children)) {
                 if (tipo === 2) {
                     ajustes.children = ajustes.children.filter(
-                        (c) => c.goto !== 'vSalones' && c.goto !== 'vProduccionAreas',
+                        (c) => c.goto !== 'vSalones' && c.goto !== 'vImpresionAreas',
                     )
                 }
             }
