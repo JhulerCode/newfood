@@ -813,22 +813,10 @@ export default {
                 cliente_datos: data.venta_socio_datos,
                 is_reprint: false,
                 productos: this.vista.pedido.transaccion_items,
-                subdominio: this.useAuth.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', send)
-
-            // const uriEncoded = `http://${this.useAuth.empresa.pc_principal_ip}/imprimir/comanda.php?data=${encodeURIComponent(JSON.stringify(send))}`
-            // console.log(uriEncoded)
-            // const nuevaVentana = window.open(
-            //     uriEncoded,
-            //     '_blank',
-            //     'width=1,height=1,top=0,left=0,scrollbars=no,toolbar=no,location=no,status=no,menubar=no',
-            // )
-
-            // setTimeout(() => {
-            //     nuevaVentana.close()
-            // }, 500)
         },
 
         runMethod(method, item) {

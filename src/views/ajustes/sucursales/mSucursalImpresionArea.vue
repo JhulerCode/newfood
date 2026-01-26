@@ -1,17 +1,6 @@
 <template>
-    <JdModal modal="mProduccionArea" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal modal="mSucursalImpresionArea" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdSelect
-                label="Sucursal"
-                :nec="true"
-                :lista="modal.sucursales || []"
-                mostrar="codigo"
-                :loaded="modal.sucursalesLoaded"
-                @reload="loadSucursales"
-                v-model="modal.item.sucursal"
-                :disabled="modal.mode == 3 || modal.mode == 2"
-            />
-
             <JdInput
                 label="Nombre"
                 :nec="true"
@@ -83,10 +72,9 @@ export default {
         ],
     }),
     created() {
-        this.modal = this.useModals.mProduccionArea
+        this.modal = this.useModals.mSucursalImpresionArea
         this.setButtons()
         this.loadDatosSistema()
-        this.loadSucursales()
     },
     methods: {
         setButtons() {
@@ -117,8 +105,9 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.addItem('vImpresionAreas', 'produccion_areas', res.data)
-            this.useModals.show.mProduccionArea = false
+            // this.useVistas.addItem('vImpresionAreas', 'produccion_areas', res.data)
+            this.$emit('creado', res.data)
+            this.useModals.show.mSucursalImpresionArea = false
         },
         async modificar() {
             if (this.checkDatos()) return
@@ -129,8 +118,9 @@ export default {
 
             if (res.code != 0) return
 
-            this.useVistas.updateItem('vImpresionAreas', 'produccion_areas', res.data)
-            this.useModals.show.mProduccionArea = false
+            // this.useVistas.updateItem('vImpresionAreas', 'produccion_areas', res.data)
+            this.$emit('modificado', res.data)
+            this.useModals.show.mSucursalImpresionArea = false
         },
 
         async loadDatosSistema() {
@@ -140,26 +130,6 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
-        },
-        async loadSucursales() {
-            const qry = {
-                fltr: {
-                    activo: { op: 'Es', val: true },
-                },
-                cols: ['codigo'],
-                ordr: [['codigo', 'ASC']],
-            }
-
-            this.modal.sucursales = []
-            this.modal.sucursalesLoaded = false
-            this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.sucursales}?qry=${JSON.stringify(qry)}`)
-            this.modal.sucursalesLoaded = true
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.modal.sucursales = res.data
         },
     },
 }

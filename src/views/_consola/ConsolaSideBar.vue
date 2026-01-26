@@ -5,7 +5,7 @@
                 <i class="fa-solid fa-bars"></i>
             </div>
 
-            <img :src="useAuth.empresa.foto.url" v-if="useAuth.showNavbar" />
+            <img :src="useAuth.empresa?.foto?.url" v-if="useAuth.showNavbar" />
         </div>
 
         <div class="menu">

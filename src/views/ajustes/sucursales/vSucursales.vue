@@ -27,6 +27,7 @@
     </div>
 
     <mSucursal v-if="useModals.show.mSucursal" />
+    <mSucursalImpresionAreas v-if="useModals.show.mSucursalImpresionAreas" />
     <mSucursalArticulos v-if="useModals.show.mSucursalArticulos" />
     <mSucursalComprobanteTipos v-if="useModals.show.mSucursalComprobanteTipos" />
     <mSucursalPagoMetodos v-if="useModals.show.mSucursalPagoMetodos" />
@@ -36,6 +37,7 @@
 import { JdButton, JdTable } from '@jhuler/components'
 
 import mSucursal from './mSucursal.vue'
+import mSucursalImpresionAreas from './mSucursalImpresionAreas.vue'
 import mSucursalArticulos from './mSucursalArticulos.vue'
 import mSucursalComprobanteTipos from './mSucursalComprobanteTipos.vue'
 import mSucursalPagoMetodos from './mSucursalPagoMetodos.vue'
@@ -53,6 +55,7 @@ export default {
         JdTable,
 
         mSucursal,
+        mSucursalImpresionAreas,
         mSucursalArticulos,
         mSucursalComprobanteTipos,
         mSucursalPagoMetodos,
@@ -121,6 +124,12 @@ export default {
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vSucursales:eliminar',
+            },
+            {
+                label: 'Áreas de impresión',
+                icon: 'fa-solid fa-print',
+                action: 'editarImpresionAreas',
+                permiso: 'vSucursales:editar',
             },
             {
                 label: 'Tipos de comprobante',
@@ -209,6 +218,19 @@ export default {
             this.useVistas.removeItem('vSucursales', 'sucursales', item)
         },
 
+        editarImpresionAreas(item) {
+            const send = {
+                sucursal: item.id,
+            }
+
+            this.useModals.setModal(
+                'mSucursalImpresionAreas',
+                `${item.codigo} - Áreas de impresión`,
+                null,
+                send,
+                true,
+            )
+        },
         editarComprobanteTipos(item) {
             this.useModals.setModal(
                 'mSucursalComprobanteTipos',
@@ -228,16 +250,28 @@ export default {
         editarInsumos(item) {
             const send = {
                 item,
-                tipo: '1'
+                tipo: '1',
             }
-            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, send, true)
+            this.useModals.setModal(
+                'mSucursalArticulos',
+                `${item.codigo} - Productos`,
+                2,
+                send,
+                true,
+            )
         },
         editarProductos(item) {
             const send = {
                 item,
-                tipo: '2'
+                tipo: '2',
             }
-            this.useModals.setModal('mSucursalArticulos', `${item.codigo} - Productos`, 2, send, true)
+            this.useModals.setModal(
+                'mSucursalArticulos',
+                `${item.codigo} - Productos`,
+                2,
+                send,
+                true,
+            )
         },
     },
 }

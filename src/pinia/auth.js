@@ -247,12 +247,12 @@ export const useAuth = defineStore('auth', {
                     },
                     {
                         label: 'Áreas de impresión',
-                        goto: 'vProduccionAreas',
+                        goto: 'vImpresionAreas',
                         permisos: [
-                            { id: 'vProduccionAreas:listar', label: 'Listar' },
-                            { id: 'vProduccionAreas:crear', label: 'Crear' },
-                            { id: 'vProduccionAreas:editar', label: 'Editar' },
-                            { id: 'vProduccionAreas:eliminar', label: 'Eliminar' },
+                            { id: 'vImpresionAreas:listar', label: 'Listar' },
+                            { id: 'vImpresionAreas:crear', label: 'Crear' },
+                            { id: 'vImpresionAreas:editar', label: 'Editar' },
+                            { id: 'vImpresionAreas:eliminar', label: 'Eliminar' },
                         ],
                     },
                     {
@@ -426,18 +426,12 @@ export const useAuth = defineStore('auth', {
             })
 
             this.socket.on('connect', () => {
-                this.socket.emit('joinEmpresa', {
-                    empresa: {
-                        id: this.empresa.id,
-                        razon_social: this.empresa.razon_social,
-                        subdominio: this.empresa.subdominio,
-                    },
-                    colaborador: {
-                        id: this.usuario.colaborador,
-                        nombres: this.usuario.nombres,
-                        apellidos: this.usuario.apellidos,
-                        cargo: this.usuario.cargo,
-                    },
+                this.socket.emit('joinUser', {
+                    id: this.usuario.colaborador,
+                    nombres: this.usuario.nombres,
+                    apellidos: this.usuario.apellidos,
+                    empresa: this.empresa.id,
+                    sucursal: this.sucursal.id,
                 })
 
                 this.listenSocket()

@@ -229,7 +229,7 @@ export default {
                 venta_canales,
                 venta_pago_metodos,
                 venta_comprobantes,
-                subdominio: this.useAuth.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vCajaAperturas:imprimirResumen', send)

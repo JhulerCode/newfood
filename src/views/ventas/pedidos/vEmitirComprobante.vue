@@ -1114,7 +1114,7 @@ export default {
                     tipo: this.useAuth.usuario.impresora_caja.impresora_tipo,
                     nombre: this.useAuth.usuario.impresora_caja.impresora,
                 },
-                subdominio: this.useAuth.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vEmitirComprobante:imprimir', send)

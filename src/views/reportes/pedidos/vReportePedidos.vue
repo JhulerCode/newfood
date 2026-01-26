@@ -328,7 +328,7 @@ export default {
                 cliente_datos: res.data.venta_socio_datos,
                 is_reprint: true,
                 productos: res.data.transaccion_items,
-                subdominio: this.useAuth.empresa.subdominio,
+                sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', send)
