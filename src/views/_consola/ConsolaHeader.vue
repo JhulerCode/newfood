@@ -8,6 +8,7 @@
                     pointer: this.useAuth.verifyPermiso('vSucursales:cambiarSucursal'),
                     // pointer: true,
                 }"
+                v-if="useAuth.sucursal.codigo"
             >
                 <small>Sucursal: </small>
                 <span>{{ useAuth.sucursal.codigo }}</span>

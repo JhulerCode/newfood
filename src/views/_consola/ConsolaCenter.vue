@@ -33,6 +33,8 @@
         <vProductos v-if="useVistas.show.vProductos" />
         <vCombos v-if="useVistas.show.vCombos" />
         <vColaboradores v-if="useVistas.show.vColaboradores" />
+
+        <vTenants v-if="useVistas.show.vTenants" />
     </section>
 </template>
 
@@ -78,6 +80,9 @@ import vProductos from '@/views/ajustes/productos/vProductos.vue'
 import vCombos from '@/views/ajustes/combos/vCombos.vue'
 import vColaboradores from '@/views/ajustes/colaboradores/vColaboradores.vue'
 
+//--- ADMIN ---//
+import vTenants from '@/views/_admin/tenants/vTenants.vue'
+
 export default {
     components: {
         vProveedores,
@@ -113,6 +118,8 @@ export default {
         vProductos,
         vCombos,
         vColaboradores,
+
+        vTenants,
     },
     data: () => ({
         useVistas: useVistas(),
