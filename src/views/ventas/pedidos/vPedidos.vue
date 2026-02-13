@@ -577,13 +577,8 @@ export default {
             let send = {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
-                socio: `${this.useAuth.empresa.subdominio}-CLIENTES-VARIOS`,
-                venta_socio_datos: {
-                    doc_tipo: '0',
-                    doc_numero: '00000000',
-                    doc_nombres: '00000000 - CLIENTES VARIOS',
-                    nombres: 'CLIENTES VARIOS',
-                },
+                socio: this.useAuth.empresa.clientes_varios.id,
+                venta_socio_datos: { ...this.useAuth.empresa.clientes_varios },
                 pago_condicion: 1,
                 estado: 1,
                 venta_entregado: false,

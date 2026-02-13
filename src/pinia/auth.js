@@ -350,24 +350,24 @@ export const useAuth = defineStore('auth', {
                     },
                 ],
             },
-            {
-                id: 'tenats',
-                label: 'Admin',
-                icon: 'fa-solid fa-cart-shopping',
-                children: [
-                    {
-                        label: 'Clientes',
-                        goto: 'vTenants',
-                        permisos: [
-                            { id: 'vTenants:listar', label: 'Listar' },
-                            { id: 'vTenants:crear', label: 'Crear' },
-                            { id: 'vTenants:ver', label: 'Ver' },
-                            { id: 'vTenants:editar', label: 'Editar' },
-                            { id: 'vTenants:eliminar', label: 'Eliminar' },
-                        ],
-                    },
-                ],
-            },
+            // {
+            //     id: 'tenats',
+            //     label: 'Admin',
+            //     icon: 'fa-solid fa-cart-shopping',
+            //     children: [
+            //         {
+            //             label: 'Clientes',
+            //             goto: 'vTenants',
+            //             permisos: [
+            //                 { id: 'vTenants:listar', label: 'Listar' },
+            //                 { id: 'vTenants:crear', label: 'Crear' },
+            //                 { id: 'vTenants:ver', label: 'Ver' },
+            //                 { id: 'vTenants:editar', label: 'Editar' },
+            //                 { id: 'vTenants:eliminar', label: 'Eliminar' },
+            //             ],
+            //         },
+            //     ],
+            // },
         ],
 
         showNavbar: true,

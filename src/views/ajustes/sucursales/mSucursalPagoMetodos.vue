@@ -84,6 +84,7 @@ export default {
                 },
                 incl: ['pago_metodo1'],
                 cols: ['estado'],
+                ordr: [['pago_metodo1', 'nombre', 'ASC']],
             }
 
             this.modal.pago_metodos = []

@@ -189,7 +189,7 @@ export default {
     methods: {
         async loadEmpresa() {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.empresa}/uno/${this.useAuth.empresa.id}`)
+            const res = await get(`${urls.empresas}/uno/${this.useAuth.empresa.id}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -232,7 +232,7 @@ export default {
             this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await patch(urls.empresa, this.vista.empresa)
+            const res = await patch(urls.empresas, this.vista.empresa)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

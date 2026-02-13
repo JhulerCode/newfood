@@ -45,14 +45,14 @@ export default {
                 show: true,
             },
             {
-                id: 'tributo',
+                id: 'igv_afectacion',
                 title: 'Tributo',
-                prop: 'tributo1.nombre',
+                prop: 'igv_afectacion1.nombre',
                 width: '18rem',
                 show: true,
             },
             {
-                id: 'has_receta',
+                id: 'Es transformado?',
                 title: 'Es transformado?',
                 width: '8rem',
                 show: true,
@@ -80,7 +80,7 @@ export default {
         if (this.modal.tipo == 1) {
             this.columns[4].show = false
             this.columns[5].show = false
-            this.columns[6].show = false
+            // this.columns[6].show = false
         }
 
         if (this.modal.tipo == 2) {

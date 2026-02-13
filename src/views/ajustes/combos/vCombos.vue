@@ -272,6 +272,7 @@ export default {
                     is_combo: { op: 'Es', val: true },
                 },
                 incl: ['produccion_area1', 'categoria1'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -320,13 +321,7 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = [
-                    'Nombre',
-                    'Categoria',
-                    'Tributo',
-                    'Precio de venta',
-                    'Área de impresión',
-                ]
+                const headers = ['Nombre', 'Precio de venta', 'Categoría', 'Tributo']
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -346,25 +341,16 @@ export default {
                     {},
                 )
 
-                await this.loadProduccionAreas()
-                const produccion_areasMap = this.vista.produccion_areas.reduce(
-                    (obj, a) => ((obj[a.nombre] = a), obj),
-                    {},
-                )
-
                 for (const a of res.data) {
                     a.nombre = a.Nombre
                     a.precio_venta = a['Precio de venta']
                     a.is_combo = true
 
-                    a.categoria1 = categoriasMap[a.Categoria]
+                    a.categoria1 = categoriasMap[a.Categoría]
                     a.categoria = a.categoria1?.id
 
-                    a.tributo1 = igv_afectacionesMap[a.Tributo]
-                    a.tributo = a.tributo1?.id
-
-                    a.produccion_area1 = { ...produccion_areasMap[a['Área de impresión']] }
-                    a.produccion_area = a.produccion_area1?.id
+                    a.igv_afectacion1 = igv_afectacionesMap[a.Tributo]
+                    a.igv_afectacion = a.igv_afectacion1?.id
                 }
 
                 this.useAuth.setLoading(false)
@@ -411,7 +397,7 @@ export default {
 
                     a.articulo1 = productosMap[a.Componente]
                     a.articulo = a.articulo1?.id
-                    console.log(a.articulo_principal1, a.articulo1)
+                    // console.log(a.articulo_principal1, a.articulo1)
 
                     a.cantidad = a.Cantidad
                 }

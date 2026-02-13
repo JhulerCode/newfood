@@ -81,7 +81,7 @@ export default {
             },
             {
                 id: 'numero',
-                title: 'Número',
+                title: 'Empieza en',
                 type: 'text',
                 width: '10rem',
                 show: true,

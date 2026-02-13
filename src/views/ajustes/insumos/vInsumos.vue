@@ -211,6 +211,7 @@ export default {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: '1' } },
                 incl: ['categoria1'],
+                ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -256,7 +257,7 @@ export default {
             const reader = new FileReader()
 
             reader.onload = async () => {
-                const headers = ['Nombre', 'Categoria', 'Unidad', 'Tributo']
+                const headers = ['Nombre', 'Unidad', 'Categoría', 'Tributo']
                 const res = await tryOficialExcel(this.$refs.excel, file, reader, headers)
 
                 if (res.code != 0) {
@@ -280,11 +281,11 @@ export default {
                     a.nombre = a.Nombre
                     a.unidad = a.Unidad
 
-                    a.categoria1 = categoriasMap[a.Categoria]
+                    a.categoria1 = categoriasMap[a.Categoría]
                     a.categoria = a.categoria1?.id
 
-                    a.tributo1 = igv_afectacionesMap[a.Tributo]
-                    a.tributo = a.tributo1?.id
+                    a.igv_afectacion1 = igv_afectacionesMap[a.Tributo]
+                    a.igv_afectacion = a.igv_afectacion1?.id
                 }
 
                 this.useAuth.setLoading(false)

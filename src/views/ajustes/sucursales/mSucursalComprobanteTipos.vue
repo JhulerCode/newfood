@@ -84,6 +84,7 @@ export default {
                 },
                 incl: ['comprobante_tipo1'],
                 cols: ['estado'],
+                ordr: [['comprobante_tipo1', 'serie', 'ASC']],
             }
 
             this.modal.comprobante_tipos = []

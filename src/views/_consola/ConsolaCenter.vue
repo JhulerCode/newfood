@@ -12,7 +12,6 @@
         <vCajaResumen v-if="useVistas.show.vCajaResumen" />
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
 
-        <vArticuloCategorias v-if="useVistas.show.vArticuloCategorias" />
         <vInventarioInsumos v-if="useVistas.show.vInventarioInsumos" />
         <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
 

@@ -169,6 +169,7 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: {},
+                ordr: [['codigo', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)

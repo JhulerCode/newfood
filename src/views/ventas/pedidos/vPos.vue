@@ -414,13 +414,8 @@ export default {
             this.vista.pedido = {
                 tipo: 2,
                 venta_canal: 4,
-                socio: `${this.useAuth.empresa.subdominio}-CLIENTES-VARIOS`,
-                venta_socio_datos: {
-                    doc_tipo: '0',
-                    doc_numero: '00000000',
-                    doc_nombres: '00000000 - CLIENTES VARIOS',
-                    nombres: 'CLIENTES VARIOS',
-                },
+                socio: this.useAuth.empresa.clientes_varios.id,
+                venta_socio_datos: { ...this.useAuth.empresa.clientes_varios },
                 pago_condicion: 1,
                 estado: 1,
                 venta_entregado: false,
@@ -453,9 +448,7 @@ export default {
                     pu: this.showPrecio(item),
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
-                        item.igv_afectacion == '10'
-                            ? this.useAuth.empresa.igv_porcentaje
-                            : 0,
+                        item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
 
                     observacion: '',
 
