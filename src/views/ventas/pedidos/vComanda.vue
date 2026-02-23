@@ -283,8 +283,7 @@
                     <template
                         v-if="
                             vista.pedido.venta_canal == 3 &&
-                            vista.pedido.venta_pago_metodo ==
-                                `${useAuth.empresa.subdominio}-EFECTIVO`
+                            venta_pago_metodo_actual.nombre == 'EFECTIVO'
                         "
                     >
                         <div class="pedido-paga">
@@ -393,6 +392,13 @@ export default {
             } else {
                 return this.vista.pedido.venta_canal == 2 ? '(PARA LLEVAR)' : '(DELIVERY)'
             }
+        },
+        venta_pago_metodo_actual() {
+            const pago_metodo = this.vista.pago_metodos.find(
+                (item) => item.id == this.vista.pedido.venta_pago_metodo,
+            )
+
+            return pago_metodo ? pago_metodo : ''
         },
     },
     async created() {
@@ -723,8 +729,7 @@ export default {
                 }
 
                 if (
-                    this.vista.pedido.venta_pago_metodo ==
-                        `${this.useAuth.empresa.subdominio}-EFECTIVO` &&
+                    this.venta_pago_metodo_actual.nombre == 'EFECTIVO' &&
                     (this.vista.pedido.venta_pago_con || 0) <
                         Number(this.vista.mtoImpVenta.toFixed(2))
                 ) {
@@ -738,9 +743,7 @@ export default {
             this.vista.pedido.venta_codigo = genId()
             this.vista.pedido.monto = this.vista.mtoImpVenta
 
-            if (
-                this.vista.pedido.venta_pago_metodo != `${this.useAuth.empresa.subdominio}-EFECTIVO`
-            ) {
+            if (this.venta_pago_metodo_actual.nombre != 'EFECTIVO') {
                 this.vista.pedido.venta_pago_con = null
             }
         },

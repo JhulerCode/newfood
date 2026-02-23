@@ -95,6 +95,7 @@ export default {
 
         this.showButtons()
         this.loadDatosSistema()
+        this.loadPagoMetodos()
     },
     methods: {
         showButtons() {
@@ -104,6 +105,22 @@ export default {
                 this.buttons[1].show = true
             }
         },
+        async loadPagoMetodos() {
+            const qry = {
+                fltr: { activo: { op: 'Es', val: true }, nombre: { op: 'Es', val: 'EFECTIVO' } },
+                cols: ['nombre'],
+            }
+
+            this.modal.pago_metodos = []
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.pago_metodos}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.pago_metodos = res.data
+        },
+
         checkDatos() {
             const props = ['fecha', 'tipo', 'operacion', 'detalle', 'monto']
 
@@ -114,8 +131,8 @@ export default {
 
             return false
         },
-        shapeDatos(){
-            this.dinero_movimiento.pago_metodo = `${this.useAuth.empresa.subdominio}-EFECTIVO`
+        shapeDatos() {
+            this.dinero_movimiento.pago_metodo = this.modal.pago_metodos[0].id
         },
         async crear() {
             if (this.checkDatos()) return

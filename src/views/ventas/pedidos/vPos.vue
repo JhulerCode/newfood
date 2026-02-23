@@ -180,8 +180,7 @@
                     <template
                         v-if="
                             vista.pedido.venta_canal == 3 &&
-                            vista.pedido.venta_pago_metodo ==
-                                `${useAuth.empresa.subdominio}-EFECTIVO`
+                            venta_pago_metodo_actual.nombre == 'EFECTIVO'
                         "
                     >
                         <div class="pedido-paga">
@@ -293,6 +292,13 @@ export default {
             } else {
                 return ''
             }
+        },
+        venta_pago_metodo_actual() {
+            const pago_metodo = this.modal.pago_metodos.find(
+                (item) => item.id == this.modal.pedido.venta_pago_metodo,
+            )
+
+            return pago_metodo ? pago_metodo : ''
         },
     },
     async created() {

@@ -110,8 +110,7 @@
                     :disabled="modal.mode == 3"
                     v-if="
                         modal.pedido.venta_canal == 3 &&
-                        modal.pedido.venta_pago_metodo ==
-                            `${useAuth.empresa.subdominio}-EFECTIVO`
+                        venta_pago_metodo_actual.nombre == 'EFECTIVO'
                     "
                     style="grid-column: 1/3"
                 />
@@ -196,12 +195,6 @@ export default {
 
         buttons: [
             {
-                text: 'Imprimir',
-                action: 'modificar',
-                show: false,
-                tipo: '2',
-            },
-            {
                 text: 'Actualizar',
                 action: 'modificar',
             },
@@ -252,6 +245,13 @@ export default {
                 return this.modal.pedido.venta_canal == 2 ? 'PARA LLEVAR' : 'DELIVERY'
             }
         },
+        venta_pago_metodo_actual() {
+            const pago_metodo = this.modal.pago_metodos.find(
+                (item) => item.id == this.modal.pedido.venta_pago_metodo,
+            )
+
+            return pago_metodo ? pago_metodo : ''
+        },
     },
     created() {
         this.modal = this.useModals.mPedidoDetalles
@@ -260,7 +260,7 @@ export default {
         this.sumarItems()
 
         if (this.modal.mode == 2) {
-            this.buttons[1].show = true
+            this.buttons[0].show = true
             if (this.modal.pedido.venta_canal == 3) {
                 this.loadPagoMetodos()
             }
@@ -412,8 +412,7 @@ export default {
                 }
 
                 if (
-                    this.modal.pedido.venta_pago_metodo ==
-                        `${this.useAuth.empresa.subdominio}-EFECTIVO` &&
+                    this.venta_pago_metodo_actual.nombre == 'EFECTIVO' &&
                     (this.modal.pedido.venta_pago_con || 0) <
                         Number(this.modal.mtoImpVenta.toFixed(2))
                 ) {
@@ -423,10 +422,7 @@ export default {
             }
         },
         shapeDatos() {
-            if (
-                this.modal.pedido.venta_pago_metodo !=
-                `${this.useAuth.empresa.subdominio}-EFECTIVO`
-            ) {
+            if (this.venta_pago_metodo_actual.nombre != 'EFECTIVO') {
                 this.modal.pedido.venta_pago_con = null
             }
 

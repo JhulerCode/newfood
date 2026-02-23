@@ -94,14 +94,14 @@ export default {
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
                 permiso: 'vPagoMetodos:editar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+                ocultar: { nombre: `EFECTIVO` },
             },
             {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash',
                 action: 'eliminar',
                 permiso: 'vPagoMetodos:eliminar',
-                ocultar: { id: `${useAuth().empresa.subdominio}-EFECTIVO` },
+                ocultar: { nombre: `EFECTIVO` },
             },
             {
                 label: 'Sucursales',
@@ -179,7 +179,13 @@ export default {
                 column: 'pago_metodo',
             }
 
-            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
+            this.useModals.setModal(
+                'mRelacionadoSucursales',
+                `${item.nombre} - sucursales`,
+                2,
+                send,
+                true,
+            )
         },
     },
 }
