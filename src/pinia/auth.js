@@ -14,7 +14,7 @@ export const useAuth = defineStore('auth', {
         socket: null,
         empresa: {},
         sucursal: {},
-        app_version: '1.6.9',
+        app_version: '1.7.0',
 
         menu: [
             {

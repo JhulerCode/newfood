@@ -394,11 +394,14 @@ export default {
             }
         },
         venta_pago_metodo_actual() {
-            const pago_metodo = this.vista.pago_metodos.find(
-                (item) => item.id == this.vista.pedido.venta_pago_metodo,
-            )
+            if (this.vista.pago_metodos && this.vista.pedido.venta_pago_metodo) {
+                const pago_metodo = this.vista.pago_metodos.find(
+                    (item) => item.id == this.vista.pedido.venta_pago_metodo,
+                )
+                return pago_metodo ? pago_metodo : {}
+            }
 
-            return pago_metodo ? pago_metodo : ''
+            return {}
         },
     },
     async created() {
