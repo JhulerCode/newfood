@@ -39,6 +39,7 @@
     />
     <mComprobanteCanjear v-if="useModals.show.mComprobanteCanjear" @canjeado="comprobanteCanjedo" />
     <mComprobanteCorreo v-if="useModals.show.mComprobanteCorreo" />
+    <mComprobanteWhatsapp v-if="useModals.show.mComprobanteWhatsapp" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -60,6 +61,7 @@ import mComprobante from '@/views/reportes/comprobantes/mComprobante.vue'
 import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 import mComprobanteCanjear from '@/views/reportes/comprobantes/mComprobanteCanjear.vue'
 import mComprobanteCorreo from '@/views/reportes/comprobantes/mComprobanteCorreo.vue'
+import mComprobanteWhatsapp from '@/views/reportes/comprobantes/mComprobanteWhatsapp.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -83,6 +85,7 @@ export default {
         mComprobantePagos,
         mComprobanteCanjear,
         mComprobanteCorreo,
+        mComprobanteWhatsapp,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -286,6 +289,12 @@ export default {
                 icon: 'fa-regular fa-envelope',
                 action: 'enviarCorreo',
                 permiso: 'vReporteComprobantes:enviarCorreo',
+            },
+            {
+                label: 'Enviar por whatsapp',
+                icon: 'fa-brands fa-whatsapp',
+                action: 'enviarWhatsapp',
+                permiso: 'vReporteComprobantes:enviarWhatsapp',
             },
             {
                 label: 'Imprimir',
@@ -547,6 +556,14 @@ export default {
             this.useModals.setModal(
                 'mComprobanteCorreo',
                 'Enviar comprobante por email',
+                null,
+                item,
+            )
+        },
+        async enviarWhatsapp(item) {
+            this.useModals.setModal(
+                'mComprobanteWhatsapp',
+                'Enviar comprobante por whatsapp',
                 null,
                 item,
             )

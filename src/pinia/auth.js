@@ -170,6 +170,7 @@ export const useAuth = defineStore('auth', {
                             { id: 'vReporteComprobantes:agregarPagos', label: 'Agregar pagos' },
                             { id: 'vReporteComprobantes:editarPagos', label: 'Editar pagos' },
                             { id: 'vReporteComprobantes:enviarCorreo', label: 'Enviar por email' },
+                            { id: 'vReporteComprobantes:enviarWhatsapp', label: 'Enviar por whatsapp' },
                             { id: 'vReporteComprobantes:imprimir', label: 'Imprimir' },
                             { id: 'vReporteComprobantes:descargarPdf', label: 'Descargar PDF' },
                             { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },

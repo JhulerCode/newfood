@@ -462,6 +462,7 @@ export default {
                     'vReporteComprobantes:agregarPagos',
                     'vReporteComprobantes:editarPagos',
                     'vReporteComprobantes:enviarCorreo',
+                    'vReporteComprobantes:enviarWhatsapp',
                     'vReporteComprobantes:imprimir',
                     'vReporteComprobantes:descargarPdf',
                 ],
