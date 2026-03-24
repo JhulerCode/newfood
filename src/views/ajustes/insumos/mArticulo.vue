@@ -144,7 +144,7 @@ export default {
             const props = ['tipo', 'categoria', 'nombre', 'unidad', 'igv_afectacion']
 
             if (this.useAuth.empresa.tipo == 1) {
-                if (this.articulo.tipo == 2) props.push('produccion_area', 'has_receta')
+                if (this.articulo.tipo == 2) props.push('has_receta')
             }
 
             if (this.articulo.tipo == 2) props.push('precio_venta')
