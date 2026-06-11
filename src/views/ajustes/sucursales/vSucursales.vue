@@ -46,8 +46,9 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
+import { urls, get, post, delet } from '@/utils/crud'
+import { jmsg, jqst } from '@/utils/swal'
+import Swal from 'sweetalert2'
 
 export default {
     components: {
@@ -111,6 +112,14 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'printer_status',
+                title: 'Agente impresión',
+                width: '9rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         tableRowOptions: [
             {
@@ -129,6 +138,12 @@ export default {
                 label: 'Áreas de impresión',
                 icon: 'fa-solid fa-print',
                 action: 'editarImpresionAreas',
+                permiso: 'vSucursales:editar',
+            },
+            {
+                label: 'Generar token impresión',
+                icon: 'fa-solid fa-key',
+                action: 'generarPrinterToken',
                 permiso: 'vSucursales:editar',
             },
             {
@@ -231,6 +246,39 @@ export default {
                 send,
                 true,
             )
+        },
+        async generarPrinterToken(item) {
+            const resQst = await jqst(
+                '¿Generar nuevo token?',
+                'El token anterior dejará de servir para la aplicación de impresión de esta sucursal.',
+            )
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Generando token...')
+            const res = await post(`${urls.printer}/sucursales/${item.id}/token`, {}, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const token = res.data.token
+            try {
+                await navigator.clipboard.writeText(token)
+                jmsg('success', 'Token copiado al portapapeles')
+            } catch (error) {
+                jmsg('warning', 'No se pudo copiar automáticamente')
+            }
+
+            await Swal.fire({
+                icon: 'success',
+                title: 'Token de impresión',
+                html: `<textarea style="width:100%;height:8rem">${token}</textarea>`,
+                confirmButtonText: 'Cerrar',
+                confirmButtonColor: 'var(--primary-color)',
+                background: 'var(--bg-color)',
+                color: 'var(--text-color2)',
+            })
+
+            this.loadSucursales()
         },
         editarComprobanteTipos(item) {
             this.useModals.setModal(

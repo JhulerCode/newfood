@@ -16,12 +16,15 @@
                 :disabled="modal.mode == 3"
             />
 
-            <JdInput
-                :label="modal.item.impresora_tipo == 1 ? 'Impresora nombre' : 'Impresora ip'"
+            <JdSelect
+                label="Impresora instalada"
                 :nec="true"
+                :lista="modal.impresoras || []"
                 v-model="modal.item.impresora"
                 :disabled="modal.mode == 3"
             />
+
+            <JdButton text="Actualizar impresoras" @click="loadImpresoras()" v-if="modal.mode != 3" />
 
             <JdSwitch
                 label="Activo"
@@ -33,7 +36,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdSelect } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch, JdSelect, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -49,6 +52,7 @@ export default {
         JdInput,
         JdSwitch,
         JdSelect,
+        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -74,7 +78,9 @@ export default {
     created() {
         this.modal = this.useModals.mSucursalImpresionArea
         this.setButtons()
+        if (!this.modal.item.impresora_tipo) this.modal.item.impresora_tipo = 1
         this.loadDatosSistema()
+        this.loadImpresoras()
     },
     methods: {
         setButtons() {
@@ -98,6 +104,7 @@ export default {
         },
         async crear() {
             if (this.checkDatos()) return
+            this.setImpresoraData()
 
             this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.produccion_areas, this.modal.item)
@@ -111,6 +118,7 @@ export default {
         },
         async modificar() {
             if (this.checkDatos()) return
+            this.setImpresoraData()
 
             this.useAuth.setLoading(true, 'Actualizando...')
             const res = await patch(urls.produccion_areas, this.modal.item)
@@ -130,6 +138,31 @@ export default {
             if (res.code != 0) return
 
             Object.assign(this.modal, res.data)
+        },
+        async loadImpresoras() {
+            if (!this.modal.item.sucursal) return
+
+            this.useAuth.setLoading(true, 'Consultando impresoras...')
+            const res = await get(`${urls.printer}/sucursales/${this.modal.item.sucursal}/printers`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.impresoras = res.data.map((printer) => ({
+                id: printer.name || printer.displayName,
+                nombre: printer.displayName || printer.name,
+                raw: printer,
+            }))
+        },
+        setImpresoraData() {
+            const selected = this.modal.impresoras?.find((item) => item.id == this.modal.item.impresora)
+            if (!selected) return
+
+            this.modal.item.impresora_display_name = selected.nombre
+            this.modal.item.impresora_config = {
+                isDefault: Boolean(selected.raw?.isDefault),
+                status: selected.raw?.status,
+            }
         },
     },
 }
