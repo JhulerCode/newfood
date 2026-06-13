@@ -16,6 +16,13 @@
                 :disabled="modal.mode == 3"
             />
 
+            <JdInput
+                label="Impresora instalada"
+                :nec="true"
+                v-model="modal.item.impresora"
+                :disabled="modal.mode == 3"
+            />
+
             <JdSelect
                 label="Impresora instalada"
                 :nec="true"

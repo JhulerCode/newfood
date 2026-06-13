@@ -587,6 +587,8 @@ export default {
             const res = await get(`${urls.comprobantes}/pdf/${item.id}`, true)
             this.useAuth.setLoading(false)
 
+            if (!(res instanceof Blob)) return
+
             const pdfUrl = URL.createObjectURL(res)
             this.useModals.setModal('mPdfViewer', 'Comprobante', null, pdfUrl)
         },
