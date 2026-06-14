@@ -791,6 +791,10 @@ export default {
         async addProductos(print) {
             if (this.checkDatos()) return
             this.vista.pedido.monto = this.vista.mtoImpVenta
+            const transaccion_items = this.vista.pedido.transaccion_items.map((item) => ({
+                ...item,
+                articulo1: { ...item.articulo1 },
+            }))
 
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await patch(`${urls.transacciones}/add-productos`, this.vista.pedido)
@@ -800,13 +804,14 @@ export default {
 
             this.useAuth.socket.emit('vComanda:addProductos', res.data)
 
-            if (print == true) this.imprimir(res.data)
+            if (print == true) this.imprimir(res.data, transaccion_items)
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        async imprimir(data) {
+        async imprimir(data, transaccion_items) {
             const res = await this.loadPedido(data)
             if (res == false) return
+            if (transaccion_items) res.data.transaccion_items = transaccion_items
             console.log(res.data)
             // --- cargar impresion_area1 actuales en cada articulo --- //
             const articulos_ids = res.data.transaccion_items.map((a) => a.articulo)

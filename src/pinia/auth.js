@@ -14,7 +14,7 @@ export const useAuth = defineStore('auth', {
         socket: null,
         empresa: {},
         sucursal: {},
-        app_version: '1.7.0',
+        app_version: '1.7.1',
 
         menu: [
             {
@@ -428,8 +428,12 @@ export const useAuth = defineStore('auth', {
 
             const sucursales = this.empresa.sucursales || []
             const usuarioSucursal = sucursales.find((a) => a.id == this.usuario.sucursal)
+            const sucursalActual = sucursales.find((a) => a.id == this.sucursal?.id)
+            const puedeCambiarSucursal = this.verifyPermiso('vSucursales:cambiarSucursal')
 
-            if (usuarioSucursal) {
+            if (puedeCambiarSucursal && sucursalActual) {
+                this.sucursal = deepCopy(sucursalActual)
+            } else if (usuarioSucursal) {
                 this.sucursal = deepCopy(usuarioSucursal)
             } else if (!this.sucursal.id || !sucursales.some((a) => a.id == this.sucursal.id)) {
                 if (sucursales[0]) {
