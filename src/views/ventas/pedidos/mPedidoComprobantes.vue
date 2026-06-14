@@ -12,10 +12,13 @@
             </JdTable>
         </div>
     </JdModal>
+
+    <mComprobantePagos v-if="useModals.show.mComprobantePagos" />
 </template>
 
 <script>
 import { JdModal, JdTable } from '@jhuler/components'
+import mComprobantePagos from '@/views/reportes/comprobantes/mComprobantePagos.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -27,6 +30,7 @@ export default {
     components: {
         JdModal,
         JdTable,
+        mComprobantePagos,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -115,6 +119,13 @@ export default {
         ],
         tableRowOptions: [
             {
+                label: 'Ver pagos',
+                icon: 'fa-solid fa-up-right-from-square',
+                action: 'verPagos',
+                permiso: 'vReporteComprobantes:verPagos',
+                ocultar: { estado: ['0', '4'], comprobante_pagos_monto: 0 },
+            },
+            {
                 label: 'Imprimir',
                 icon: 'fa-solid fa-print',
                 action: 'imprimir',
@@ -155,6 +166,20 @@ export default {
 
         runMethod(method, item) {
             this[method](item)
+        },
+        async verPagos(item) {
+            const send = {
+                comprobante: item,
+                pagos: [],
+            }
+
+            this.useModals.setModal(
+                'mComprobantePagos',
+                `Pagos de ${item.serie} - ${item.numero}`,
+                3,
+                send,
+                true,
+            )
         },
         async imprimir(item) {
             this.useAuth.setLoading(true, 'Cargando...')
