@@ -147,6 +147,12 @@ export default {
                 permiso: 'vSucursales:editar',
             },
             {
+                label: 'Eliminar token de impresión',
+                icon: 'fa-solid fa-key-slash',
+                action: 'eliminarPrinterToken',
+                permiso: 'vSucursales:editar',
+            },
+            {
                 label: 'Tipos de comprobante',
                 icon: 'fa-regular fa-file-lines',
                 action: 'editarComprobanteTipos',
@@ -265,19 +271,36 @@ export default {
                 await navigator.clipboard.writeText(token)
                 jmsg('success', 'Token copiado al portapapeles')
             } catch (error) {
+                console.log('Error al copiar token al portapapeles:', error)
                 jmsg('warning', 'No se pudo copiar automáticamente')
             }
 
             await Swal.fire({
                 icon: 'success',
                 title: 'Token de impresión',
-                html: `<textarea style="width:100%;height:8rem">${token}</textarea>`,
+                html: `<textarea style="width:100%;height:8rem;background:var(--bg-color)">${token}</textarea>`,
                 confirmButtonText: 'Cerrar',
                 confirmButtonColor: 'var(--primary-color)',
                 background: 'var(--bg-color)',
                 color: 'var(--text-color2)',
             })
 
+            this.loadSucursales()
+        },
+        async eliminarPrinterToken(item) {
+            const resQst = await jqst(
+                'Eliminar token de impresión',
+                'El agente de impresión conectado con este token se desconectará y ya no podrá reconectarse.',
+            )
+            if (resQst.isConfirmed == false) return
+
+            this.useAuth.setLoading(true, 'Eliminando token...')
+            const res = await post(`${urls.printer}/sucursales/${item.id}/token/delete`, {}, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            jmsg('success', 'Token de impresión eliminado')
             this.loadSucursales()
         },
         editarComprobanteTipos(item) {
