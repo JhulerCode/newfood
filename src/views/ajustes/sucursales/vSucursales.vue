@@ -114,6 +114,9 @@ export default {
             },
             {
                 id: 'printer_status',
+                type: 'select',
+                prop: 'printer_status1.nombre',
+                format: 'estado',
                 title: 'Agente impresión',
                 width: '9rem',
                 show: true,
@@ -178,8 +181,9 @@ export default {
             },
         ],
     }),
-    created() {
+    async created() {
         this.vista = this.useVistas.vSucursales
+        await this.loadDatosSistema()
         this.useAuth.setColumns(this.tableName, this.columns)
 
         if (this.vista.loaded) return
@@ -207,6 +211,15 @@ export default {
             if (res.code != 0) return
 
             this.vista.sucursales = res.data
+        },
+        async loadDatosSistema() {
+            const qry = ['printer_estados']
+            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) return
+
+            Object.assign(this.vista, res.data)
+            this.columns.find((a) => a.id == 'printer_status').lista = this.vista.printer_estados
         },
 
         nuevo() {
