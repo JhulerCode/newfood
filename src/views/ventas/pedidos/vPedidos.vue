@@ -792,27 +792,10 @@ export default {
             const res = await this.loadPedido(item)
             if (res == false) return
 
-            let atencion = ''
-            if (res.data.venta_canal == 1) {
-                atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
-            } else if (res.data.venta_canal == 2) {
-                atencion = 'PARA LLEVAR'
-            } else if (res.data.venta_canal == 3) {
-                atencion = 'DELIVERY'
-            }
-
             const send = {
-                empresa_datos: this.useAuth.empresa,
-                fecha: res.data.fecha,
-                venta_canal: res.data.venta_canal,
-                atencion,
-                venta_codigo: res.data.venta_codigo,
-                is_reprint: true,
-                productos: res.data.transaccion_items,
-                venta_socio_datos: res.data.venta_socio_datos,
-                venta_pago_metodo1: res.data.venta_pago_metodo1,
-                venta_pago_con: res.data.venta_pago_con,
+                ...res.data,
                 sucursal: this.useAuth.sucursal.id,
+                empresa_datos: this.useAuth.empresa,
             }
 
             this.useAuth.socket.emit('vComanda:imprimirPrecuenta', send)
