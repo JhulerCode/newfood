@@ -426,12 +426,14 @@ export const useAuth = defineStore('auth', {
                 this.empresa = deepCopy(result.empresa)
             }
 
-            if (
-                !this.sucursal.id ||
-                !this.empresa.sucursales.some((a) => a.id == this.sucursal.id)
-            ) {
-                if (this.empresa.sucursales[0]) {
-                    this.sucursal = deepCopy(this.empresa.sucursales[0])
+            const sucursales = this.empresa.sucursales || []
+            const usuarioSucursal = sucursales.find((a) => a.id == this.usuario.sucursal)
+
+            if (usuarioSucursal) {
+                this.sucursal = deepCopy(usuarioSucursal)
+            } else if (!this.sucursal.id || !sucursales.some((a) => a.id == this.sucursal.id)) {
+                if (sucursales[0]) {
+                    this.sucursal = deepCopy(sucursales[0])
                 }
             }
         },

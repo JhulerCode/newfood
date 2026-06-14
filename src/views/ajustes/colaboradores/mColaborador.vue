@@ -113,6 +113,15 @@
                         groupBy="menu"
                     />
 
+                    <JdSelect
+                        label="Sucursal"
+                        :nec="true"
+                        v-model="colaborador.sucursal"
+                        :lista="useAuth.empresa.sucursales || []"
+                        mostrar="codigo"
+                        :disabled="modal.mode == 3"
+                    />
+
                     <JdInput
                         label="Usuario"
                         :nec="true"
@@ -288,7 +297,9 @@ export default {
                 'has_signin',
             ]
 
-            if (this.colaborador.has_signin) props.push('vista_inicial', 'usuario', 'contrasena')
+            if (this.colaborador.has_signin) {
+                props.push('vista_inicial', 'sucursal', 'usuario', 'contrasena')
+            }
 
             if (incompleteData(this.colaborador, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
