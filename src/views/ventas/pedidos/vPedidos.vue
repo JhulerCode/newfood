@@ -319,7 +319,7 @@ export default {
             {
                 label: 'Reimprimir pedido',
                 icon: 'fa-solid fa-print',
-                action: 'imprimirComanda',
+                action: 'reimprimirComanda',
                 permiso: 'vPedidos:imprimirComanda',
                 ocultar: { estado: 0, venta_facturado: true },
             },
@@ -620,16 +620,6 @@ export default {
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
                 ordr: [['createdAt', 'ASC']],
-                // iccl: {
-                //     // articulo1: {
-                //     //     incl: ['produccion_area1'],
-                //     // },
-                //     // iccl: {
-                //     //     articulo1: {
-                //     //         incl: ['sucural_articulos']
-                //     //     }
-                //     // }
-                // },
             }
             this.useAuth.setLoading(true, 'Cargando...')
             const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
@@ -718,12 +708,15 @@ export default {
             const resQst = await jqst('¿Está seguro de eliminar?')
             if (resQst.isConfirmed == false) return
 
+            const pedido = await this.loadPedidoForPrint(item)
+
             this.useAuth.setLoading(true, 'Eliminando...')
             const res = await delet(urls.transacciones, item)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
+            if (pedido) this.imprimirComandaEstado(pedido, 'ELIMINADO')
             this.useAuth.socket.emit('vPedidos:eliminar', item)
         },
         anular(item) {
@@ -743,22 +736,34 @@ export default {
             )
         },
         async anulado(item) {
+            const pedido = await this.loadPedidoForPrint(item)
+            if (pedido) this.imprimirComandaEstado(pedido, 'ANULADO')
+
             this.useAuth.socket.emit('vPedidos:anular', item)
         },
-        async imprimirComanda(item) {
+        async reimprimirComanda(item) {
             const res = await this.loadPedido(item)
             if (res == false) return
 
-            let atencion = ''
-            if (res.data.venta_canal == 1) {
-                atencion = `${res.data.venta_mesa1.salon1.nombre} - ${res.data.venta_mesa1.nombre}`
-            } else if (res.data.venta_canal == 2) {
-                atencion = 'PARA LLEVAR'
-            } else if (res.data.venta_canal == 3) {
-                atencion = 'DELIVERY'
+            await this.loadItemsImpresionAreas(res.data.transaccion_items)
+
+            const send = {
+                ...res.data,
+                is_reprint: true,
+                sucursal: this.useAuth.sucursal.id,
             }
 
-            const articulos_ids = res.data.transaccion_items.map((a) => a.articulo)
+            this.useAuth.socket.emit('vComanda:imprimir', send)
+        },
+        async loadPedidoForPrint(item) {
+            const res = await this.loadPedido(item)
+            if (res == false) return null
+
+            await this.loadItemsImpresionAreas(res.data.transaccion_items)
+            return res.data
+        },
+        async loadItemsImpresionAreas(items) {
+            const articulos_ids = items.map((a) => a.articulo)
             const qry = {
                 fltr: {
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
@@ -771,18 +776,15 @@ export default {
                 `${urls.sucursal_articulos}?qry=${JSON.stringify(qry)}`,
             )
 
-            for (const a of res.data.transaccion_items) {
+            for (const a of items) {
                 const i = sucursal_articulos.data.find((b) => b.articulo == a.articulo)
                 if (i) a.articulo1.impresion_area1 = i.impresion_area1
             }
-
+        },
+        imprimirComandaEstado(data, print_status) {
             const send = {
-                createdAt: res.data.createdAt,
-                atencion,
-                venta_codigo: res.data.venta_codigo,
-                cliente_datos: res.data.venta_socio_datos,
-                is_reprint: true,
-                productos: res.data.transaccion_items,
+                ...data,
+                print_status,
                 sucursal: this.useAuth.sucursal.id,
             }
 

@@ -804,28 +804,68 @@ export default {
 
             this.useVistas.closePestana('vComanda', 'vPedidos')
         },
-        imprimir(data) {
-            let atencion = ''
+        async imprimir(data) {
+            const res = await this.loadPedido(data)
+            if (res == false) return
+            console.log(res.data)
+            // --- cargar impresion_area1 actuales en cada articulo --- //
+            const articulos_ids = res.data.transaccion_items.map((a) => a.articulo)
+            const qry = {
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                    articulo: { op: 'Es', val: articulos_ids },
+                },
+                cols: ['articulo'],
+                incl: ['impresion_area1'],
+            }
+            const sucursal_articulos = await get(
+                `${urls.sucursal_articulos}?qry=${JSON.stringify(qry)}`,
+            )
 
-            if (data.venta_canal == 1) {
-                atencion = `${data.venta_mesa1.salon1.nombre} - ${data.venta_mesa1.nombre}`
-            } else if (data.venta_canal == 2) {
-                atencion = 'PARA LLEVAR'
-            } else if (data.venta_canal == 3) {
-                atencion = 'DELIVERY'
+            for (const a of res.data.transaccion_items) {
+                const i = sucursal_articulos.data.find((b) => b.articulo == a.articulo)
+                if (i) a.articulo1.impresion_area1 = i.impresion_area1
             }
 
             const send = {
-                createdAt: data.createdAt,
-                atencion,
-                venta_codigo: data.venta_codigo,
-                cliente_datos: data.venta_socio_datos,
+                ...res.data,
                 is_reprint: false,
-                productos: this.vista.pedido.transaccion_items,
                 sucursal: this.useAuth.sucursal.id,
             }
 
             this.useAuth.socket.emit('vComanda:imprimir', send)
+        },
+        async loadPedido(item) {
+            const qry = {
+                incl: ['socio1', 'venta_mesa1', 'venta_pago_metodo1'],
+                iccl: {
+                    venta_mesa1: {
+                        incl: ['salon1'],
+                    },
+                },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return false
+
+            const qry1 = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+                ordr: [['createdAt', 'ASC']],
+            }
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res1 = await get(`${urls.transaccion_items}?qry=${JSON.stringify(qry1)}`)
+            this.useAuth.setLoading(false)
+
+            if (res1.code != 0) return false
+
+            res.data.transaccion_items = res1.data
+
+            return res
         },
 
         runMethod(method, item) {
