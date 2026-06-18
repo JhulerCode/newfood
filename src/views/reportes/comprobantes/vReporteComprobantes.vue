@@ -3,9 +3,10 @@
         <div class="head">
             <strong>Comprobantes</strong>
 
-            <div class="buttons">
+            <div class="buttons" v-if="useAuth.verifyPermiso('vSucursales:cambiarSucursal')">
                 <JdCheckBox label="Incluir detalle" v-model="vista.incluir_detalle" />
                 <JdCheckBox label="Todos los sucursales" v-model="vista.sucursal_todos" />
+                <JdButton text="Copiar JSON al portapapeles" tipo="2" @click="copiarData" />
             </div>
         </div>
 
@@ -50,6 +51,7 @@
 <script>
 import {
     JdTable,
+    JdButton,
     JdCheckBox,
     mConfigCols,
     mConfigFiltros,
@@ -68,6 +70,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
+import { copyToClipboard } from '@/utils/mine'
 
 import dayjs from 'dayjs'
 // import { saveAs } from 'file-saver'
@@ -75,6 +78,7 @@ import dayjs from 'dayjs'
 export default {
     components: {
         JdTable,
+        JdButton,
         JdCheckBox,
         mAnular,
         mConfigCols,
@@ -654,6 +658,9 @@ export default {
             const i = this.vista.comprobantes.findIndex((a) => a.id == item.id)
             this.vista.comprobantes[i].estado = 4
             this.vista.comprobantes[i].estado1 = { id: 4, nombre: 'CANJEADO' }
+        },
+        copiarData() {
+            copyToClipboard(JSON.stringify(this.vista.comprobantes || []), 'Comprobantes JSON')
         },
     },
 }

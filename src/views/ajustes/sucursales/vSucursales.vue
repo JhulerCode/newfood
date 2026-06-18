@@ -47,6 +47,7 @@ import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
 import { urls, get, post, delet } from '@/utils/crud'
+import { copyToClipboard } from '@/utils/mine'
 import { jmsg, jqst } from '@/utils/swal'
 import Swal from 'sweetalert2'
 
@@ -280,13 +281,7 @@ export default {
             if (res.code != 0) return
 
             const token = res.data.token
-            try {
-                await navigator.clipboard.writeText(token)
-                jmsg('success', 'Token copiado al portapapeles')
-            } catch (error) {
-                console.log('Error al copiar token al portapapeles:', error)
-                jmsg('warning', 'No se pudo copiar automáticamente')
-            }
+            copyToClipboard(token, 'Token')
 
             await Swal.fire({
                 icon: 'success',
