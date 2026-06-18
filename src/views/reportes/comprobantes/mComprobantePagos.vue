@@ -260,7 +260,7 @@ export default {
         display: grid;
         grid-template-columns: 15rem 15rem;
         gap: 1rem;
-        max-height: 10rem;
+        max-height: 80vh;
         overflow-y: auto;
 
         li {

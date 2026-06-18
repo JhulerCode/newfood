@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Ingresos y egresos</strong>
+            <strong>Ingresos y egresos de la caja aperturada</strong>
 
             <div class="buttons">
                 <JdButton
@@ -142,9 +142,8 @@ export default {
 
         if (this.vista.loaded) return
 
-        await this.loadCajaApertura()
-        if (this.useAuth.verifyPermiso('vCajaMovimientos:listar') == true) {
-            if (this.vista.caja_apertura) this.loadMovimientos()
+        if (this.useAuth.verifyPermiso('vCajaMovimientos:listar')) {
+            this.loadMovimientos()
         }
     },
     methods: {
@@ -155,6 +154,7 @@ export default {
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 cols: ['fecha_apertura', 'monto_apertura'],
+                ordr: [['createdAt', 'DESC']],
             }
 
             this.useAuth.setLoading(true, 'Cargando...')
@@ -177,8 +177,14 @@ export default {
             this.useAuth.updateQuery(this.columns, this.vista.qry)
         },
         async loadMovimientos() {
-            this.setQuery()
+            await this.loadCajaApertura()
+            if (!this.vista.caja_apertura) {
+                this.vista.dinero_movimientos = []
+                this.vista.loaded = true
+                return
+            }
 
+            this.setQuery()
             this.vista.dinero_movimientos = []
             this.useAuth.setLoading(true, 'Cargando...')
             const res = await get(

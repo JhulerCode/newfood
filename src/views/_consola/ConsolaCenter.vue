@@ -11,6 +11,8 @@
 
         <vCajaResumen v-if="useVistas.show.vCajaResumen" />
         <vCajaMovimientos v-if="useVistas.show.vCajaMovimientos" />
+        <vCajaPedidos v-if="useVistas.show.vCajaPedidos" />
+        <vCajaComprobantes v-if="useVistas.show.vCajaComprobantes" />
 
         <vInventarioInsumos v-if="useVistas.show.vInventarioInsumos" />
         <vInventarioProductos v-if="useVistas.show.vInventarioProductos" />
@@ -54,6 +56,8 @@ import vPos from '@/views/ventas/pedidos/vPos.vue'
 //----- CAJA --- //
 import vCajaResumen from '@/views/caja/resumen/vCajaResumen.vue'
 import vCajaMovimientos from '@/views/caja/movimientos/vCajaMovimientos.vue'
+import vCajaPedidos from '@/views/caja/pedidos/vCajaPedidos.vue'
+import vCajaComprobantes from '@/views/caja/comprobantes/vCajaComprobantes.vue'
 
 //----- INVENTARIO --- //
 import vInventarioInsumos from '@/views/inventario/vInventarioInsumos.vue'
@@ -95,6 +99,8 @@ export default {
 
         vCajaResumen,
         vCajaMovimientos,
+        vCajaPedidos,
+        vCajaComprobantes,
 
         vInventarioInsumos,
         vInventarioProductos,

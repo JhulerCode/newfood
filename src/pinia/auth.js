@@ -117,6 +117,35 @@ export const useAuth = defineStore('auth', {
                             { id: 'vCajaMovimientos:eliminar', label: 'Eliminar' },
                         ],
                     },
+                    {
+                        label: 'Pedidos',
+                        goto: 'vCajaPedidos',
+                        permisos: [
+                            { id: 'vCajaPedidos:listar', label: 'Listar' },
+                            { id: 'vCajaPedidos:ver', label: 'Ver' },
+                            { id: 'vCajaPedidos:verComprobantes', label: 'Ver comprobantes' },
+                        ],
+                    },
+                    {
+                        label: 'Comprobantes',
+                        goto: 'vCajaComprobantes',
+                        permisos: [
+                            { id: 'vCajaComprobantes:listar', label: 'Listar' },
+                            { id: 'vCajaComprobantes:ver', label: 'Ver' },
+                            { id: 'vCajaComprobantes:anular', label: 'Anular' },
+                            { id: 'vCajaComprobantes:canjear', label: 'Canjear' },
+                            { id: 'vCajaComprobantes:verPagos', label: 'Ver pagos' },
+                            { id: 'vCajaComprobantes:agregarPagos', label: 'Agregar pagos' },
+                            { id: 'vCajaComprobantes:editarPagos', label: 'Editar pagos' },
+                            { id: 'vCajaComprobantes:enviarCorreo', label: 'Enviar por email' },
+                            {
+                                id: 'vCajaComprobantes:enviarWhatsapp',
+                                label: 'Enviar por whatsapp',
+                            },
+                            { id: 'vCajaComprobantes:imprimir', label: 'Imprimir' },
+                            { id: 'vCajaComprobantes:descargarPdf', label: 'Descargar PDF' },
+                        ],
+                    },
                 ],
             },
             {
@@ -155,7 +184,6 @@ export const useAuth = defineStore('auth', {
                         permisos: [
                             { id: 'vReportePedidos:listar', label: 'Listar' },
                             { id: 'vReportePedidos:ver', label: 'Ver' },
-                            { id: 'vReportePedidos:imprimirComanda', label: 'Imprimir' },
                             { id: 'vReportePedidos:verComprobantes', label: 'Ver comprobantes' },
                         ],
                     },
@@ -173,8 +201,8 @@ export const useAuth = defineStore('auth', {
                             { id: 'vReporteComprobantes:enviarWhatsapp', label: 'Enviar por whatsapp' },
                             { id: 'vReporteComprobantes:imprimir', label: 'Imprimir' },
                             { id: 'vReporteComprobantes:descargarPdf', label: 'Descargar PDF' },
-                            { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },
-                            { id: 'vReporteComprobantes:descargarCdr', label: 'Descargar CDR' },
+                            // { id: 'vReporteComprobantes:descargarXml', label: 'Descargar XML' },
+                            // { id: 'vReporteComprobantes:descargarCdr', label: 'Descargar CDR' },
                             {
                                 id: 'vReporteComprobantes:consultarEstado',
                                 label: 'Consultar estado',
