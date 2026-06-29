@@ -11,10 +11,21 @@
 
         <div class="comanda">
             <!-- <div class="left"> -->
-                <div class="card container-categorias">
-                    <div v-if="isSmallScreen" class="container-header">
-                        <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
+            <div class="card container-categorias">
+                <div v-if="isSmallScreen" class="container-header">
+                    <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
 
+                    <JdButton
+                        title="Recargar"
+                        icon="fa-solid fa-rotate-right"
+                        tipo="2"
+                        @click="loadCategorias"
+                    />
+                </div>
+
+                <template v-else>
+                    <div class="container-header">
+                        <strong>Categorias:</strong>
                         <JdButton
                             title="Recargar"
                             icon="fa-solid fa-rotate-right"
@@ -23,85 +34,71 @@
                         />
                     </div>
 
-                    <template v-else>
-                        <div class="container-header">
-                            <strong>Categorias:</strong>
-                            <JdButton
-                                title="Recargar"
-                                icon="fa-solid fa-rotate-right"
-                                tipo="2"
-                                @click="loadCategorias"
-                            />
-                        </div>
-
-                        <ul class="categorias">
-                            <li
-                                v-for="(a, i) in vista.categorias || []"
-                                :key="i"
-                                class="categoria-li"
-                                @click="vista.categoria = a.id"
-                            >
-                                <!-- <div v-if="a.id == vista.categoria">ASD</div> -->
-                                <i
-                                    class="fa-solid fa-caret-right"
-                                    v-if="a.id == vista.categoria"
-                                ></i>
-                                <div
-                                    class="categoria-box max-1line"
-                                    :style="{ backgroundColor: a.color }"
-                                    :class="{ 'categoria-selected': a.id == vista.categoria }"
-                                >
-                                    {{ a.nombre }}
-                                </div>
-                            </li>
-                        </ul>
-                    </template>
-                </div>
-
-                <div class="container-articulos">
-                    <div class="container-buscar">
-                        <JdInput
-                            icon="fa-solid fa-magnifying-glass"
-                            type="search"
-                            placeholder="Buscar por nombre..."
-                            v-model="vista.txtBuscarArticulo"
-                        />
-
-                        <JdButton
-                            title="Recargar"
-                            icon="fa-solid fa-rotate-right"
-                            tipo="2"
-                            @click="loadArticulos"
-                        />
-                    </div>
-
-                    <ul class="articulos">
+                    <ul class="categorias">
                         <li
-                            v-for="(a, i) in articulosFiltered || []"
+                            v-for="(a, i) in vista.categorias || []"
                             :key="i"
-                            class="articulo"
-                            @click="addArticulo(a)"
-                            :title="a.nombre"
+                            class="categoria-li"
+                            @click="vista.categoria = a.id"
                         >
-                            <div class="articulo-foto">
-                                <img :src="a.foto_url" v-if="a.foto_url" />
-                                <img
-                                    src="https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg"
-                                    alt="no-image"
-                                    v-else
-                                />
-                            </div>
-
-                            <div class="articulo-name max-2lines">
+                            <!-- <div v-if="a.id == vista.categoria">ASD</div> -->
+                            <i class="fa-solid fa-caret-right" v-if="a.id == vista.categoria"></i>
+                            <div
+                                class="categoria-box max-1line"
+                                :style="{ backgroundColor: a.color }"
+                                :class="{ 'categoria-selected': a.id == vista.categoria }"
+                            >
                                 {{ a.nombre }}
-                            </div>
-
-                            <div class="articulo-precio" v-if="a.precio_venta">
-                                {{ redondear(showPrecio(a)) }}
                             </div>
                         </li>
                     </ul>
+                </template>
+            </div>
+
+            <div class="container-articulos">
+                <div class="container-buscar">
+                    <JdInput
+                        icon="fa-solid fa-magnifying-glass"
+                        type="search"
+                        placeholder="Buscar por nombre..."
+                        v-model="vista.txtBuscarArticulo"
+                    />
+
+                    <JdButton
+                        title="Recargar"
+                        icon="fa-solid fa-rotate-right"
+                        tipo="2"
+                        @click="loadArticulos"
+                    />
                 </div>
+
+                <ul class="articulos">
+                    <li
+                        v-for="(a, i) in articulosFiltered || []"
+                        :key="i"
+                        class="articulo"
+                        @click="addArticulo(a)"
+                        :title="a.nombre"
+                    >
+                        <div class="articulo-foto">
+                            <img :src="a.foto_url" v-if="a.foto_url" />
+                            <img
+                                src="https://static.vecteezy.com/system/resources/previews/022/059/000/non_2x/no-image-available-icon-vector.jpg"
+                                alt="no-image"
+                                v-else
+                            />
+                        </div>
+
+                        <div class="articulo-name max-2lines">
+                            {{ a.nombre }}
+                        </div>
+
+                        <div class="articulo-precio" v-if="a.precio_venta">
+                            {{ redondear(showPrecio(a)) }}
+                        </div>
+                    </li>
+                </ul>
+            </div>
             <!-- </div> -->
 
             <div class="card container-resumen" style="grid-template-rows: 1fr auto">
@@ -176,34 +173,6 @@
                         <span>Total (S/)</span>
                         <p>{{ redondear(vista.mtoImpVenta) }}</p>
                     </div>
-
-                    <template
-                        v-if="
-                            vista.pedido.venta_canal == 3 &&
-                            venta_pago_metodo_actual.nombre == 'EFECTIVO'
-                        "
-                    >
-                        <div class="pedido-paga">
-                            <span>Paga con</span>
-                            <JdInput
-                                v-model="vista.pedido.venta_pago_con"
-                                type="number"
-                                class="input-paga"
-                                :toRight="true"
-                            />
-                        </div>
-
-                        <div class="pedido-total">
-                            <span>Vuelto</span>
-                            <p>
-                                {{
-                                    redondear(
-                                        (vista.pedido.venta_pago_con || 0) - vista.mtoImpVenta,
-                                    )
-                                }}
-                            </p>
-                        </div>
-                    </template>
                 </div>
             </div>
         </div>
@@ -293,21 +262,13 @@ export default {
                 return ''
             }
         },
-        venta_pago_metodo_actual() {
-            const pago_metodo = this.modal.pago_metodos.find(
-                (item) => item.id == this.modal.pedido.venta_pago_metodo,
-            )
-
-            return pago_metodo ? pago_metodo : ''
-        },
     },
     async created() {
-        this.handleResize()
-
         this.vista = this.useVistas.vPos
         this.vista.loadCategorias = this.loadCategorias
         this.vista.loadArticulos = this.loadArticulos
         this.vista.initPedido = this.initPedido
+        this.handleResize()
 
         if (this.vista.pedido == null) this.initPedido()
         this.sumarItems()
@@ -354,7 +315,8 @@ export default {
             const qry = {
                 fltr: {
                     tipo: { op: 'Es', val: '2' },
-                    activo: { op: 'Es', val: true },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
                 cols: [
                     'nombre',
@@ -367,7 +329,15 @@ export default {
                     'foto_url',
                     'categoria',
                 ],
-                incl: ['receta_insumos', 'combo_articulos', 'produccion_area1'],
+                incl: ['receta_insumos', 'combo_articulos', 'sucursal_articulos'],
+                iccl: {
+                    combo_articulos: {
+                        incl: ['articulo1'],
+                    },
+                    sucursal_articulos: {
+                        incl: ['impresion_area1'],
+                    },
+                },
             }
 
             this.vista.articulosLoaded = false
@@ -430,13 +400,20 @@ export default {
         },
         showPrecio(item) {
             const numeroDiaSemana = dayjs().day()
-            const promocion_hoy = item.precios_semana.find((a) => a.id == numeroDiaSemana)
+            const promocion_hoy = (item.precios_semana || []).find((a) => a.id == numeroDiaSemana)
 
-            return promocion_hoy.pu ? promocion_hoy.pu : item.precio_venta
+            return promocion_hoy?.pu ? promocion_hoy.pu : item.precio_venta
+        },
+        getSucursalArticulo(item) {
+            if (Array.isArray(item.sucursal_articulos)) return item.sucursal_articulos[0] || {}
+
+            return item.sucursal1 || {}
         },
 
         async addArticulo(item) {
             const i = this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.id)
+            const sucursal_articulo = this.getSucursalArticulo(item)
+            const pu = this.showPrecio(item)
 
             if (i === -1) {
                 this.vista.pedido.transaccion_items.push({
@@ -446,12 +423,12 @@ export default {
                     articulo1: {
                         nombre: item.nombre,
                         unidad: item.unidad,
-                        produccion_area1: item.produccion_area1,
+                        impresion_area1: sucursal_articulo.impresion_area1,
                     },
 
                     cantidad: 1,
 
-                    pu: this.showPrecio(item),
+                    pu,
                     igv_afectacion: item.igv_afectacion,
                     igv_porcentaje:
                         item.igv_afectacion == '10' ? this.useAuth.empresa.igv_porcentaje : 0,
@@ -463,7 +440,7 @@ export default {
                     is_combo: item.is_combo,
                     combo_articulos: item.combo_articulos,
 
-                    importe: 1 * item.precio_venta,
+                    importe: pu,
                 })
 
                 this.sumarItems()

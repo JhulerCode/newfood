@@ -5,6 +5,14 @@
 
             <div class="buttons">
                 <JdButton
+                    icon="fa-solid fa-arrows-rotate"
+                    text="Sincronizar sucursales"
+                    tipo="2"
+                    @click="syncSucursales()"
+                    v-if="useAuth.verifyPermiso('vComprobanteTipos:crear')"
+                />
+
+                <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
@@ -40,8 +48,8 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
-import { jqst } from '@/utils/swal'
+import { urls, get, post, delet } from '@/utils/crud'
+import { jqst, jmsg } from '@/utils/swal'
 
 export default {
     components: {
@@ -165,6 +173,16 @@ export default {
             if (res.code != 0) return
 
             this.vista.comprobante_tipos = res.data
+        },
+        async syncSucursales() {
+            this.useAuth.setLoading(true, 'Sincronizando...')
+            const res = await post(`${urls.comprobante_tipos}/sync-sucursales`, {}, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            jmsg('success', `Relaciones creadas: ${res.data.created}`)
+            await this.loadPagoComprobantes()
         },
 
         nuevo() {

@@ -21,6 +21,14 @@
                 />
 
                 <JdButton
+                    icon="fa-solid fa-arrows-rotate"
+                    text="Sincronizar sucursales"
+                    tipo="2"
+                    @click="syncSucursales()"
+                    v-if="useAuth.verifyPermiso('vProductos:editarBulk')"
+                />
+
+                <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
@@ -71,7 +79,7 @@ import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, post, delet } from '@/utils/crud'
 import { tryOficialExcel } from '@/utils/mine'
 import { jqst, jmsg } from '@/utils/swal'
 
@@ -292,8 +300,8 @@ export default {
                 fltr: {
                     tipo: { op: 'Es', val: '2' },
                     is_combo: { op: 'Es', val: false },
-                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
-                    'sucursal_articulos.estado': { op: 'Es', val: true },
+                    // 'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    // 'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
                 incl: ['categoria1', 'produccion_area1', 'sucursal_articulos'],
                 ordr: [['nombre', 'ASC']],
@@ -314,6 +322,20 @@ export default {
             if (res.code != 0) return
 
             this.vista.articulos = res.data
+        },
+        async syncSucursales() {
+            this.useAuth.setLoading(true, 'Sincronizando...')
+            const res = await post(
+                `${urls.articulos}/sync-sucursales`,
+                { tipo: '2', is_combo: false },
+                false,
+            )
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            jmsg('success', `Relaciones creadas: ${res.data.created}`)
+            await this.loadArticulos()
         },
         verifyRowSelectIsActive() {
             if (this.vista.articulos && this.vista.articulos.some((a) => a.selected)) {
