@@ -284,10 +284,8 @@ export default {
     },
     methods: {
         hideColumns() {
-            if (this.useAuth.empresa.tipo == 2) {
-                this.columns[7].show = false
-                this.columns[8].show = false
-            }
+            const has_receta_col = this.columns.find((column) => column.id == 'has_receta')
+            if (has_receta_col) has_receta_col.show = this.useAuth.verifyFeature('recetas')
         },
         setQuery() {
             this.vista.qry = {

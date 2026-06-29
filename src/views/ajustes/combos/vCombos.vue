@@ -261,8 +261,9 @@ export default {
     },
     methods: {
         hideColumns() {
-            if (this.useAuth.empresa.tipo == 2) {
-                this.columns[6].show = false
+            const produccion_area_col = this.columns.find((column) => column.id == 'produccion_area')
+            if (produccion_area_col) {
+                produccion_area_col.show = this.useAuth.verifyFeature('areas_impresion')
             }
         },
         setQuery() {

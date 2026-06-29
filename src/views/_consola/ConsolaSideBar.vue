@@ -97,21 +97,7 @@ export default {
     }),
     computed: {
         menu() {
-            const menu = this.useAuth.menu
-                .map((seccion) => {
-                    const hijosFiltrados = seccion.children.filter((a) =>
-                        (this.useAuth.usuario.permisos || []).some((p) =>
-                            p.startsWith(a.goto + ':'),
-                        ),
-                    )
-
-                    return hijosFiltrados.length > 0
-                        ? { ...seccion, children: hijosFiltrados }
-                        : null
-                })
-                .filter((seccion) => seccion !== null)
-
-            return menu
+            return this.useAuth.menuByFeaturesAndPermisos
         },
     },
     methods: {

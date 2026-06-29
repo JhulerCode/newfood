@@ -47,7 +47,7 @@ export default {
                 if (this.$route.name != 'ConsolaView') {
                     this.$router.replace({ name: 'ConsolaView' })
                 }
-                this.useVistas.showVista(this.useAuth.usuario.vista_inicial)
+                this.useVistas.showVista(this.useAuth.vistaInicial)
             }
         },
     },

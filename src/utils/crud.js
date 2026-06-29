@@ -200,4 +200,4 @@ function getSucursal() {
     return useAuth().sucursal.id
 }
 
-export { host, urls, get, post, patch, delet }
+export { host, urls, get, post, patch, delet, getSubdominio }

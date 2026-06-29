@@ -36,7 +36,7 @@
                 style="grid-column: 1/4"
             />
 
-            <!-- <template v-if="useAuth.empresa.tipo == 1">
+            <!-- <template v-if="useAuth.verifyFeature('areas_impresion')">
                 <JdSelect
                     label="Área de impresión"
                     :nec="true"
@@ -66,7 +66,7 @@
                 v-if="articulo.tipo == 2"
             />
 
-            <template v-if="useAuth.empresa.tipo == 1">
+            <template v-if="useAuth.verifyFeature('recetas')">
                 <JdSwitch
                     label="Es producto transformado?"
                     v-model="articulo.has_receta"
@@ -143,7 +143,7 @@ export default {
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'unidad', 'igv_afectacion']
 
-            if (this.useAuth.empresa.tipo == 1) {
+            if (this.useAuth.verifyFeature('recetas')) {
                 if (this.articulo.tipo == 2) props.push('has_receta')
             }
 

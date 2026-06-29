@@ -1,7 +1,7 @@
 <template>
     <div class="vista vista-fill">
         <div class="head">
-            <strong>Tenants</strong>
+            <strong>Empresas</strong>
 
             <div class="buttons">
                 <JdButton
@@ -197,11 +197,13 @@ export default {
         nuevo() {
             const item = {
                 tipo: 1,
-                doc_tipo: 6,
                 activo: true,
+                igv_porcentaje: 18,
+                features: {},
+                sucursales: [],
             }
 
-            this.useModals.setModal('mTenant', 'Nuevo tenant', 1, item)
+            this.useModals.setModal('mTenant', 'Nueva empresa', 1, item)
         },
 
         runMethod(method, item) {
@@ -214,12 +216,7 @@ export default {
 
             if (res.code != 0) return
 
-            const send = {
-                item: res.data,
-                precio_listas: [{ ...res.data.precio_lista1 }],
-            }
-
-            this.useModals.setModal('mTenant', 'Ver proveedor', 3, send, true)
+            this.useModals.setModal('mTenant', 'Ver empresa', 3, res.data, true)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -228,7 +225,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mTenant', 'Editar proveedor', 2, res.data)
+            this.useModals.setModal('mTenant', 'Editar empresa', 2, res.data)
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

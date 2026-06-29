@@ -145,7 +145,7 @@
                         <strong>--- Permisos ---</strong>
                     </div>
 
-                    <div v-for="a in useAuth.menu || []" :key="a.id">
+                    <div v-for="a in menu || []" :key="a.id">
                         <div class="grupo-header" @click="toggleGrupo(a.id)">
                             {{ a.label }}
 
@@ -234,6 +234,7 @@ export default {
 
         modal: {},
         colaborador: {},
+        menu: [],
 
         buttons: [
             { text: 'Grabar', action: 'crear', spin: false, permiso: 'vColaboradores:crear' },
@@ -247,34 +248,18 @@ export default {
     }),
     computed: {
         vistas() {
-            let vistas = this.useAuth.menu
+            return this.menu
                 .map((a) => a.children.map((b) => ({ id: b.goto, label: b.label, menu: a.label })))
                 .flat()
-
-            const tipo = this.useAuth.empresa.tipo
-
-            if (tipo === 1) {
-                vistas = vistas.filter((c) => c.id !== 'vPos')
-            } else {
-                vistas = vistas.filter(
-                    (c) =>
-                        c.id !== 'vPedidos' &&
-                        c.id !== 'vInsumos' &&
-                        c.id !== 'vImpresionAreas' &&
-                        c.id !== 'vSalones',
-                )
-            }
-
-            return vistas
         },
     },
     created() {
         this.modal = this.useModals.mColaborador
         this.colaborador = this.useModals.mColaborador.item
+        this.menu = JSON.parse(JSON.stringify(this.useAuth.menuByFeatures))
 
         this.showButtons()
         this.loadDatosSistema()
-        this.menuFiltradoPorTipoNegocio()
         this.sincronizarChecksConPermisos()
     },
     methods: {
@@ -370,7 +355,7 @@ export default {
         sincronizarChecksConPermisos() {
             const permisos = this.colaborador.permisos || []
 
-            for (const a of this.useAuth.menu) {
+            for (const a of this.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.permisos) {
@@ -385,7 +370,7 @@ export default {
         recolectarPermisosSeleccionados() {
             const permisos = []
 
-            for (const a of this.useAuth.menu) {
+            for (const a of this.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.permisos) {
@@ -407,7 +392,7 @@ export default {
         },
 
         selectAll(id) {
-            for (const a of this.useAuth.menu) {
+            for (const a of this.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.goto == id) {
@@ -420,7 +405,7 @@ export default {
             }
         },
         selectNone(id) {
-            for (const a of this.useAuth.menu) {
+            for (const a of this.menu) {
                 if (a.children) {
                     for (const b of a.children) {
                         if (b.goto == id) {
@@ -505,7 +490,7 @@ export default {
             }
 
             if (this.colaborador.cargo == 'ADMINISTRADOR') {
-                for (const a of this.useAuth.menu) {
+                for (const a of this.menu) {
                     for (const b of a.children) {
                         for (const c of b.permisos) {
                             c.val = true
@@ -515,41 +500,8 @@ export default {
                 return
             }
 
-            this.colaborador.permisos = permisos[this.colaborador.cargo]
+            this.colaborador.permisos = permisos[this.colaborador.cargo] || []
             this.sincronizarChecksConPermisos()
-        },
-
-        menuFiltradoPorTipoNegocio() {
-            const menu = JSON.parse(JSON.stringify(this.useAuth.menu))
-
-            const tipo = this.useAuth.empresa.tipo
-
-            const ventas = menu.find((s) => s.id === 'ventas')
-            if (ventas && Array.isArray(ventas.children)) {
-                if (tipo === 1) {
-                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPos')
-                } else {
-                    ventas.children = ventas.children.filter((c) => c.goto !== 'vPedidos')
-                }
-            }
-
-            const articulos = menu.find((s) => s.id === 'articulos')
-            if (articulos && Array.isArray(articulos.children)) {
-                if (tipo === 2) {
-                    articulos.children = articulos.children.filter((c) => c.goto !== 'vInsumos')
-                }
-            }
-
-            const ajustes = menu.find((s) => s.id === 'ajustes')
-            if (ajustes && Array.isArray(ajustes.children)) {
-                if (tipo === 2) {
-                    ajustes.children = ajustes.children.filter(
-                        (c) => c.goto !== 'vSalones' && c.goto !== 'vImpresionAreas',
-                    )
-                }
-            }
-
-            this.useAuth.menu = menu
         },
     },
 }

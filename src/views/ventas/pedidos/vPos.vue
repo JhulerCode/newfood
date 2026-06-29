@@ -10,8 +10,8 @@
         </div>
 
         <div class="comanda">
-            <div class="left">
-                <div class="container-categorias">
+            <!-- <div class="left"> -->
+                <div class="card container-categorias">
                     <div v-if="isSmallScreen" class="container-header">
                         <JdSelect v-model="vista.categoria" :lista="vista.categorias || []" />
 
@@ -102,9 +102,9 @@
                         </li>
                     </ul>
                 </div>
-            </div>
+            <!-- </div> -->
 
-            <div class="right" style="grid-template-rows: 1fr auto">
+            <div class="card container-resumen" style="grid-template-rows: 1fr auto">
                 <JdTable
                     :columns="columns"
                     :datos="vista.pedido?.transaccion_items || []"
@@ -601,139 +601,135 @@ export default {
     height: 100%;
     overflow: hidden;
     display: grid;
-    grid-template-columns: 1fr 30rem;
+    grid-template-columns: 12rem 1fr 30rem;
     gap: 1rem;
 
-    .left {
+    // .left {
+    //     display: grid;
+    //     grid-template-columns: 12rem 1fr;
+    //     gap: 1rem;
+    //     overflow: hidden;
+
+    .container-categorias {
+        height: 100%;
         display: grid;
-        grid-template-columns: 12rem 1fr;
-        gap: 1rem;
+        grid-template-rows: auto 1fr;
         overflow: hidden;
+        // gap: 0.5rem;
 
-        .container-categorias {
-            height: 100%;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            overflow: hidden;
+        .container-header {
+            display: flex;
+            justify-content: space-between;
             gap: 0.5rem;
-
-            .container-header {
-                display: flex;
-                justify-content: space-between;
-                gap: 0.5rem;
-            }
-
-            select {
-                border-radius: 0.2rem;
-                border: var(--border);
-            }
-
-            .categorias {
-                overflow-y: auto;
-
-                .categoria-li {
-                    display: flex;
-                    align-items: center;
-                    gap: 0.5rem;
-
-                    .categoria-box {
-                        padding: 0.5rem;
-                        font-size: 0.9rem;
-                        height: fit-content;
-                        border-radius: 0.3rem;
-                        cursor: pointer;
-                        margin-bottom: 0.5rem;
-                        width: 100%;
-                    }
-                }
-
-                // .categoria-selected {
-                //     font-weight: bold;
-                //     // border: 1px solid var(--amarillo);
-                //     // box-shadow: 0 0 0.5rem var(--shadow-color);
-                // }
-            }
         }
 
-        .container-articulos {
-            height: 100%;
-            display: grid;
-            grid-template-rows: auto 1fr;
-            overflow: hidden;
-            gap: 0.5rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-            background-color: var(--bg-color2);
+        .categorias {
+            overflow-y: auto;
+            margin-top: 0.5rem;
 
-            .container-buscar {
+            .categoria-li {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
+
+                .categoria-box {
+                    padding: 0.5rem;
+                    font-size: 0.9rem;
+                    height: fit-content;
+                    border-radius: 0.3rem;
+                    cursor: pointer;
+                    margin-bottom: 0.5rem;
+                    width: 100%;
+                }
             }
 
-            .articulos {
-                height: 100%;
-                overflow-y: auto;
+            // .categoria-selected {
+            //     font-weight: bold;
+            //     // border: 1px solid var(--amarillo);
+            //     // box-shadow: 0 0 0.5rem var(--shadow-color);
+            // }
+        }
+    }
+
+    .container-articulos {
+        height: 100%;
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+        gap: 0.5rem;
+        // border-radius: 0 0.5rem 0.5rem 0;
+        background-color: var(--bg-color2);
+
+        .container-buscar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .articulos {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 0.5rem;
+            // padding: 1rem;
+
+            .articulo {
+                height: 10rem;
+                width: 10rem;
+                background-color: var(--bg-color);
+                position: relative;
+                border-radius: 0.5rem;
+                cursor: pointer;
                 overflow-x: hidden;
-                display: flex;
-                flex-wrap: wrap;
-                align-content: flex-start;
-                gap: 0.5rem;
-                padding: 1rem;
 
-                .articulo {
-                    height: 10rem;
-                    width: 10rem;
-                    background-color: var(--bg-color);
-                    position: relative;
-                    border-radius: 0.5rem;
-                    cursor: pointer;
-                    overflow-x: hidden;
+                .articulo-foto {
+                    height: 7rem;
+                    overflow: hidden;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
 
-                    .articulo-foto {
-                        height: 7rem;
-                        overflow: hidden;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-
-                        img {
-                            max-width: calc(100% - 0.5rem);
-                            max-height: calc(100% - 0.5rem);
-                            object-fit: cover;
-                        }
+                    img {
+                        max-width: calc(100% - 0.5rem);
+                        max-height: calc(100% - 0.5rem);
+                        object-fit: cover;
                     }
+                }
 
-                    .articulo-name {
-                        font-size: 1.1rem;
-                        height: 3rem;
-                        padding: 0rem 0.3rem 0.3rem 0.3rem;
-                    }
+                .articulo-name {
+                    font-size: 1.1rem;
+                    height: 3rem;
+                    padding: 0rem 0.3rem 0.3rem 0.3rem;
+                }
 
-                    .articulo-precio {
-                        position: absolute;
-                        padding: 0.3rem 0.5rem;
-                        color: white;
-                        background-color: var(--verde);
-                        top: 0.2rem;
-                        right: 0.2rem;
-                        border-radius: 0.3rem;
-                        width: 5rem;
-                        text-align: center;
-                        font-size: 0.9rem;
-                        // box-shadow: 0 0 1rem var(--shadow-color);
-                    }
+                .articulo-precio {
+                    position: absolute;
+                    padding: 0.3rem 0.5rem;
+                    color: white;
+                    background-color: var(--verde);
+                    top: 0.2rem;
+                    right: 0.2rem;
+                    border-radius: 0.3rem;
+                    width: 5rem;
+                    text-align: center;
+                    font-size: 0.9rem;
+                    // box-shadow: 0 0 1rem var(--shadow-color);
+                }
 
-                    &:hover {
-                        // border: 2px solid var(--amarillo);
-                        // background-color: var(--amarillo);
-                        box-shadow: 0 0 0.8rem var(--amarillo);
-                    }
+                &:hover {
+                    // border: 2px solid var(--amarillo);
+                    // background-color: var(--amarillo);
+                    box-shadow: 0 0 0.8rem var(--amarillo);
                 }
             }
         }
     }
+    // }
 
-    .right {
+    .container-resumen {
         height: 100%;
         display: grid;
         // grid-template-rows: auto 1fr auto;
@@ -764,10 +760,6 @@ export default {
 
                 p {
                     cursor: pointer;
-                }
-
-                &:hover {
-                    text-decoration: underline;
                 }
             }
 
@@ -850,25 +842,17 @@ export default {
     }
 }
 
-@media (max-width: 1016px) {
-    .comanda {
-        .left {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-
-            .container-categorias {
-                height: fit-content;
-                margin-bottom: 1rem;
-            }
-        }
-    }
-}
-
 @media (max-width: 540px) {
+    .vista-fill {
+        height: initial;
+        display: initial;
+        flex-direction: initial;
+        overflow: auto;
+    }
+
     .comanda {
         grid-template-columns: 1fr !important;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: auto 1fr 1fr !important;
 
         .right {
             .pedido-detalles {

@@ -1,105 +1,121 @@
 <template>
     <JdModal modal="mTenant" :buttons="buttons" @button-click="(action) => this[action]()">
         <div class="container-datos">
-            <JdSelect
-                label="Tipo doc"
-                :nec="true"
-                v-model="socio.doc_tipo"
-                :lista="modal.documentos_identidad || []"
-                mostrar="nombre"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
+            <section class="bloque">
+                <strong>Empresa</strong>
 
-            <JdInput
-                label="Nro documento"
-                :nec="true"
-                v-model="socio.doc_numero"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
+                <JdInput label="RUC" :nec="true" v-model="empresa.ruc" :disabled="is_readonly" />
+                <JdInput
+                    label="Razon social"
+                    :nec="true"
+                    v-model="empresa.razon_social"
+                    :disabled="is_readonly"
+                />
+                <JdInput
+                    label="Nombre comercial"
+                    :nec="true"
+                    v-model="empresa.nombre_comercial"
+                    :disabled="is_readonly"
+                />
+                <JdInput
+                    label="Subdominio"
+                    :nec="true"
+                    v-model="empresa.subdominio"
+                    :disabled="is_readonly"
+                />
+                <JdInput
+                    label="Domicilio fiscal"
+                    v-model="empresa.domicilio_fiscal"
+                    :disabled="is_readonly"
+                />
+                <JdInput label="Ubigeo" v-model="empresa.ubigeo" :disabled="is_readonly" />
+                <JdInput
+                    label="IGV (%)"
+                    type="number"
+                    v-model="empresa.igv_porcentaje"
+                    :disabled="is_readonly"
+                />
+                <JdInput label="Telefono" v-model="empresa.telefono" :disabled="is_readonly" />
+                <JdInput label="Correo" v-model="empresa.correo" :disabled="is_readonly" />
+                <JdSwitch label="Activo" v-model="empresa.activo" :disabled="is_readonly" />
+            </section>
 
-            <JdButton
-                icon="fa-solid fa-magnifying-glass"
-                title="Buscar DNI"
-                tipo="2"
-                :small="true"
-                @click="loadDni"
-                style="grid-column: 3/5"
-                v-if="socio.doc_tipo == 1"
-            />
+            <section class="bloque">
+                <strong>Features</strong>
 
-            <JdButton
-                icon="fa-solid fa-magnifying-glass"
-                title="Buscar RUC"
-                tipo="2"
-                :small="true"
-                @click="loadRuc"
-                style="grid-column: 3/5"
-                v-if="socio.doc_tipo == 6"
-            />
+                <JdSwitch
+                    v-for="feature in features_opciones"
+                    :key="feature.id"
+                    :label="feature.label"
+                    v-model="empresa.features[feature.id]"
+                    :disabled="is_readonly || !useAuth.verifyPermiso('vTenantFeatures:editar')"
+                />
+            </section>
 
-            <JdInput
-                label="Razón social o nombre"
-                :nec="true"
-                v-model="socio.nombres"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/5"
-            />
+            <section class="bloque sucursales">
+                <div class="bloque-head">
+                    <strong>Sucursales</strong>
+                    <JdButton
+                        text="Agregar"
+                        tipo="2"
+                        :small="true"
+                        @click="addSucursal"
+                        v-if="!is_readonly && useAuth.verifyPermiso('vTenantSucursales:crear')"
+                    />
+                </div>
 
-            <JdInput
-                label="Teléfono"
-                v-model="socio.telefono"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
-
-            <JdInput
-                label="E-mail"
-                v-model="socio.correo"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
-
-            <JdInput
-                label="Dirección"
-                v-model="socio.direccion"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/5"
-            />
-
-            <JdInput
-                label="Referencia"
-                v-model="socio.referencia"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/4"
-            />
-
-            <JdSwitch
-                label="Activo?"
-                v-model="socio.activo"
-                :disabled="modal.mode == 3"
-                style="grid-column: 1/3"
-            />
+                <div
+                    class="sucursal"
+                    v-for="(sucursal, index) in empresa.sucursales || []"
+                    :key="sucursal.id || index"
+                >
+                    <JdInput
+                        label="Codigo"
+                        :nec="true"
+                        v-model="sucursal.codigo"
+                        :disabled="is_readonly"
+                    />
+                    <JdInput
+                        label="Direccion"
+                        v-model="sucursal.direccion"
+                        :disabled="is_readonly"
+                    />
+                    <JdInput
+                        label="Telefono"
+                        v-model="sucursal.telefono"
+                        :disabled="is_readonly"
+                    />
+                    <JdInput label="Correo" v-model="sucursal.correo" :disabled="is_readonly" />
+                    <JdSwitch label="Activo" v-model="sucursal.activo" :disabled="is_readonly" />
+                    <JdButton
+                        icon="fa-solid fa-trash-can"
+                        title="Eliminar"
+                        tipo="2"
+                        :small="true"
+                        @click="removeSucursal(index)"
+                        v-if="!is_readonly && useAuth.verifyPermiso('vTenantSucursales:eliminar')"
+                    />
+                </div>
+            </section>
         </div>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSelect, JdSwitch, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch, JdButton } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, post, patch } from '@/utils/crud'
+import { urls, post, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
+import { empresa_features, normalizeFeatures } from '@/utils/menuFeatures'
 
 export default {
     components: {
         JdModal,
-        JdSelect,
         JdInput,
         JdSwitch,
         JdButton,
@@ -110,20 +126,26 @@ export default {
         useVistas: useVistas(),
 
         modal: {},
-        socio: {},
-        pestana: 1,
+        empresa: {},
+        features_opciones: empresa_features,
 
         buttons: [
-            { text: 'Grabar', action: 'crear', spin: false },
-            { text: 'Actualizar', action: 'modificar', spin: false },
+            { text: 'Grabar', action: 'crear', spin: false, permiso: 'vTenants:crear' },
+            { text: 'Actualizar', action: 'modificar', spin: false, permiso: 'vTenants:editar' },
         ],
     }),
+    computed: {
+        is_readonly() {
+            return this.modal.mode == 3
+        },
+    },
     created() {
         this.modal = this.useModals.mTenant
-        this.socio = this.useModals.mTenant.item
+        this.empresa = this.useModals.mTenant.item
+        this.shapeFeatures()
+        if (!Array.isArray(this.empresa.sucursales)) this.empresa.sucursales = []
 
         this.showButtons()
-        this.loadDatosSistema()
     },
     methods: {
         showButtons() {
@@ -133,81 +155,68 @@ export default {
                 this.buttons[1].show = true
             }
         },
+        shapeFeatures() {
+            this.empresa.features = normalizeFeatures(this.empresa.features)
+        },
         checkDatos() {
-            const props = ['tipo', 'doc_tipo', 'doc_numero', 'nombres']
+            const props = ['ruc', 'razon_social', 'nombre_comercial', 'subdominio']
 
-            if (incompleteData(this.socio, props)) {
+            if (incompleteData(this.empresa, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
+                return true
+            }
+
+            if ((this.empresa.sucursales || []).some((sucursal) => !sucursal.codigo)) {
+                jmsg('warning', 'Cada sucursal debe tener codigo')
                 return true
             }
 
             return false
         },
+        shapeDatos() {
+            this.shapeFeatures()
+            this.empresa.sucursales = (this.empresa.sucursales || []).map((sucursal) => ({
+                ...sucursal,
+                activo: sucursal.activo === true,
+            }))
+        },
         async crear() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Grabando...')
-            const res = await post(urls.socios, this.socio)
+            const res = await post(urls.empresas, this.empresa)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.socio.tipo == 1 ? 'vProveedores' : 'vClientes'
-            this.useVistas.addItem(vista, 'socios', res.data)
+            this.useVistas.addItem('vTenants', 'tenantes', res.data)
             this.useModals.show.mTenant = false
-
-            this.$emit('created', res.data)
         },
         async modificar() {
             if (this.checkDatos()) return
+            this.shapeDatos()
 
             this.useAuth.setLoading(true, 'Actualizando...')
-            const res = await patch(urls.socios, this.socio)
+            const res = await patch(urls.empresas, this.empresa)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            const vista = this.socio.tipo == 1 ? 'vProveedores' : 'vClientes'
-            this.useVistas.updateItem(vista, 'socios', res.data)
+            this.useVistas.updateItem('vTenants', 'tenantes', res.data)
             this.useModals.show.mTenant = false
         },
-
-        async loadDatosSistema() {
-            const qry = ['documentos_identidad']
-            const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
-
-            if (res.code != 0) return
-
-            Object.assign(this.modal, res.data)
+        addSucursal() {
+            this.empresa.sucursales.push({
+                codigo: '',
+                direccion: '',
+                telefono: '',
+                correo: '',
+                activo: true,
+            })
         },
-        async loadDni() {
-            if (!this.socio.doc_numero || this.socio.doc_numero.length != 8) {
-                jmsg('warning', 'Ingrese un DNI válido')
-                return
-            }
-
-            this.useAuth.setLoading(true, 'Buscando...')
-            const res = await get(`${urls.decolecta}/dni/${this.socio.doc_numero}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.socio.nombres = res.data.full_name
-        },
-        async loadRuc() {
-            if (!this.socio.doc_numero || this.socio.doc_numero.length != 11) {
-                jmsg('warning', 'Ingrese un RUC válido')
-                return
-            }
-
-            this.useAuth.setLoading(true, 'Buscando...')
-            const res = await get(`${urls.decolecta}/ruc/${this.socio.doc_numero}`)
-            this.useAuth.setLoading(false)
-
-            if (res.code != 0) return
-
-            this.socio.nombres = res.data.razon_social
-            this.socio.direccion = res.data.direccion
+        removeSucursal(index) {
+            this.empresa.sucursales.splice(index, 1)
         },
     },
 }
@@ -216,40 +225,42 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: repeat(4, 10rem);
+    grid-template-columns: 24rem 18rem 1fr;
+    gap: 1rem;
+    min-width: min(90vw, 80rem);
+}
+
+.bloque {
+    display: grid;
+    gap: 0.5rem;
+    height: fit-content;
+}
+
+.bloque-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.5rem;
 }
 
-.extra-datos {
-    border: var(--border);
-    margin-top: 2rem;
-
-    .pestanas {
-        display: flex;
-        background-color: var(--bg-color2);
-
-        li {
-            padding: 0.3rem 0.5rem;
-            cursor: pointer;
-        }
-
-        .pestana-activo {
-            background-color: var(--bg-color);
-        }
-    }
-
-    .pestana-body {
-        padding: 1rem;
-    }
+.sucursales {
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
-@media (max-width: 540px) {
-    .container-datos {
-        grid-template-columns: minmax(100%, 33.5rem) !important;
+.sucursal {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(8rem, 1fr)) auto;
+    align-items: end;
+    gap: 0.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: var(--border);
+}
 
-        > * {
-            grid-column: 1/2 !important;
-        }
+@media (max-width: 900px) {
+    .container-datos {
+        grid-template-columns: 1fr;
+        min-width: auto;
     }
 }
 </style>

@@ -26,7 +26,7 @@
                 style="grid-column: 1/4"
             />
 
-            <!-- <template v-if="useAuth.empresa.tipo == 1">
+            <!-- <template v-if="useAuth.verifyFeature('areas_impresion')">
                 <JdSelect
                     label="Área de impresión"
                     :nec="true"
@@ -260,7 +260,7 @@ export default {
         checkDatos() {
             const props = ['tipo', 'categoria', 'nombre', 'igv_afectacion', 'precio_venta']
 
-            // if (this.useAuth.empresa.tipo == 1) {
+            // if (this.useAuth.verifyFeature('areas_impresion')) {
             //     if (this.articulo.tipo == 2) props.push('produccion_area')
             // }
 

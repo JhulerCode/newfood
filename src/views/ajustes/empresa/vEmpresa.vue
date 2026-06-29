@@ -161,6 +161,7 @@ import { useModals } from '@/pinia/modals'
 import { urls, get, patch } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { jmsg } from '@/utils/swal'
+import { normalizeFeatures } from '@/utils/menuFeatures'
 
 export default {
     components: {
@@ -181,9 +182,12 @@ export default {
     created() {
         this.vista = this.useVistas.vEmpresa
 
-        if (this.vista.loaded) return
+        if (this.vista.loaded) {
+            this.shapeFeatures()
+            return
+        }
 
-        this.vista.empresa = {}
+        this.vista.empresa = { features: normalizeFeatures({}) }
         if (this.useAuth.verifyPermiso('vEmpresa:ver') == true) this.loadEmpresa()
     },
     methods: {
@@ -196,9 +200,11 @@ export default {
             if (res.code != 0) return
 
             this.vista.empresa = res.data
+            this.shapeFeatures()
         },
 
         edit() {
+            this.shapeFeatures()
             this.vista.is_editing = true
         },
         cancelEdit() {
@@ -225,7 +231,12 @@ export default {
             return false
         },
         shapeDatos() {
+            this.shapeFeatures()
             if (this.vista.empresa.archivo) this.vista.empresa.formData = true
+        },
+        shapeFeatures() {
+            if (!this.vista.empresa) this.vista.empresa = {}
+            this.vista.empresa.features = normalizeFeatures(this.vista.empresa.features)
         },
         async modificar() {
             if (this.checkDatos()) return
