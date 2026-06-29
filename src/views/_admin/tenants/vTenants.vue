@@ -26,12 +26,14 @@
     </div>
 
     <mTenant v-if="useModals.show.mTenant" />
+    <mTenantSucursales v-if="useModals.show.mTenantSucursales" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mTenant from '@/views/_admin/tenants/mTenant.vue'
+import mTenantSucursales from '@/views/_admin/tenants/mTenantSucursales.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -46,6 +48,7 @@ export default {
         JdButton,
 
         mTenant,
+        mTenantSucursales,
     },
     data: () => ({
         useModals: useModals(),
@@ -155,6 +158,12 @@ export default {
                 permiso: 'vTenants:editar',
             },
             {
+                label: 'Sucursales',
+                icon: 'fa-solid fa-store',
+                action: 'sucursales',
+                permiso: 'vTenantSucursales:listar',
+            },
+            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -200,7 +209,6 @@ export default {
                 activo: true,
                 igv_porcentaje: 18,
                 features: {},
-                sucursales: [],
             }
 
             this.useModals.setModal('mTenant', 'Nueva empresa', 1, item)
@@ -216,7 +224,7 @@ export default {
 
             if (res.code != 0) return
 
-            this.useModals.setModal('mTenant', 'Ver empresa', 3, res.data, true)
+            this.useModals.setModal('mTenant', 'Ver empresa', 3, res.data)
         },
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
@@ -238,6 +246,9 @@ export default {
             if (res.code != 0) return
 
             this.useVistas.removeItem('vTenants', 'tenantes', item)
+        },
+        sucursales(item) {
+            this.useModals.setModal('mTenantSucursales', 'Sucursales', 2, item)
         },
     },
 }

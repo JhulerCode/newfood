@@ -4,12 +4,12 @@
             <strong>Sucursales</strong>
 
             <div class="buttons">
-                <JdButton
+                <!-- <JdButton
                     text="Nuevo"
                     title="Crear nuevo"
                     @click="nuevo()"
                     v-if="useAuth.verifyPermiso('vSucursales:crear')"
-                />
+                /> -->
             </div>
         </div>
 
@@ -34,7 +34,7 @@
 </template>
 
 <script>
-import { JdButton, JdTable } from '@jhuler/components'
+import { JdTable } from '@jhuler/components'
 
 import mSucursal from './mSucursal.vue'
 import mSucursalImpresionAreas from './mSucursalImpresionAreas.vue'
@@ -53,7 +53,7 @@ import Swal from 'sweetalert2'
 
 export default {
     components: {
-        JdButton,
+        // JdButton,
         JdTable,
 
         mSucursal,

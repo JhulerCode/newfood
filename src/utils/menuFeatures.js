@@ -6,7 +6,6 @@ export const empresa_features = [
     { id: 'para_llevar', label: 'Para llevar' },
     { id: 'insumos', label: 'Insumos' },
     { id: 'recetas', label: 'Recetas' },
-    { id: 'areas_impresion', label: 'Areas de impresion' },
 ]
 
 const feature_ids = empresa_features.map((feature) => feature.id)
@@ -49,8 +48,6 @@ export function getVistaFeature(goto) {
 }
 
 export function getPermisoFeature(permiso_id) {
-    if (permiso_id?.startsWith('vImpresionAreas:')) return 'areas_impresion'
-
     return permiso_features[permiso_id] || null
 }
 

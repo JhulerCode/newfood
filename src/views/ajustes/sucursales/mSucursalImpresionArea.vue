@@ -1,5 +1,9 @@
 <template>
-    <JdModal modal="mSucursalImpresionArea" :buttons="buttons" @button-click="(action) => this[action]()">
+    <JdModal
+        modal="mSucursalImpresionArea"
+        :buttons="buttons"
+        @button-click="(action) => this[action]()"
+    >
         <div class="container-datos">
             <JdInput
                 label="Nombre"
@@ -16,22 +20,22 @@
                 :disabled="modal.mode == 3"
             />
 
-            <JdInput
+            <!-- <JdInput
                 label="Impresora instalada"
                 :nec="true"
                 v-model="modal.item.impresora"
                 :disabled="modal.mode == 3"
-            />
+            /> -->
 
             <JdSelect
                 label="Impresora instalada"
                 :nec="true"
+                :loaded="modal.impresoras_loaded"
+                @reload="loadImpresoras"
                 :lista="modal.impresoras || []"
                 v-model="modal.item.impresora"
                 :disabled="modal.mode == 3"
             />
-
-            <JdButton text="Actualizar impresoras" @click="loadImpresoras()" v-if="modal.mode != 3" />
 
             <JdSwitch
                 label="Activo"
@@ -43,7 +47,7 @@
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdSelect, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch, JdSelect } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -59,7 +63,6 @@ export default {
         JdInput,
         JdSwitch,
         JdSelect,
-        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -149,9 +152,11 @@ export default {
         async loadImpresoras() {
             if (!this.modal.item.sucursal) return
 
+            this.modal.impresoras_loaded = false
             this.useAuth.setLoading(true, 'Consultando impresoras...')
             const res = await get(`${urls.printer}/sucursales/${this.modal.item.sucursal}/printers`)
             this.useAuth.setLoading(false)
+            this.modal.impresoras_loaded = true
 
             if (res.code != 0) return
 
@@ -162,7 +167,9 @@ export default {
             }))
         },
         setImpresoraData() {
-            const selected = this.modal.impresoras?.find((item) => item.id == this.modal.item.impresora)
+            const selected = this.modal.impresoras?.find(
+                (item) => item.id == this.modal.item.impresora,
+            )
             if (!selected) return
 
             this.modal.item.impresora_display_name = selected.nombre
@@ -178,7 +185,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 20rem;
+    grid-template-columns: 30rem;
     gap: 0.5rem;
 }
 </style>

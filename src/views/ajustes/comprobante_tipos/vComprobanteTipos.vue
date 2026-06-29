@@ -123,7 +123,7 @@ export default {
         tableRowOptions: [
             {
                 label: 'Eliminar',
-                icon: 'fa-solid fa-pen-to-square',
+                icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
                 permiso: 'vComprobanteTipos:eliminar',
             },

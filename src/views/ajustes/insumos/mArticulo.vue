@@ -36,17 +36,6 @@
                 style="grid-column: 1/4"
             />
 
-            <!-- <template v-if="useAuth.verifyFeature('areas_impresion')">
-                <JdSelect
-                    label="Área de impresión"
-                    :nec="true"
-                    v-model="articulo.produccion_area"
-                    :lista="modal.produccion_areas || []"
-                    style="grid-column: 1/3"
-                    v-if="articulo.tipo == 2"
-                />
-            </template> -->
-
             <JdInput
                 label="Precio de venta"
                 :nec="true"

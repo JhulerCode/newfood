@@ -263,7 +263,7 @@ export default {
         hideColumns() {
             const produccion_area_col = this.columns.find((column) => column.id == 'produccion_area')
             if (produccion_area_col) {
-                produccion_area_col.show = this.useAuth.verifyFeature('areas_impresion')
+                produccion_area_col.show = true
             }
         },
         setQuery() {

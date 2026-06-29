@@ -226,7 +226,7 @@ export default {
 
             if (has_receta_col) has_receta_col.show = this.useAuth.verifyFeature('recetas')
             if (impresion_area_col) {
-                impresion_area_col.show = this.useAuth.verifyFeature('areas_impresion')
+                impresion_area_col.show = true
             }
         },
         setQuery() {

@@ -48,61 +48,15 @@
                     :key="feature.id"
                     :label="feature.label"
                     v-model="empresa.features[feature.id]"
-                    :disabled="is_readonly || !useAuth.verifyPermiso('vTenantFeatures:editar')"
+                    :disabled="is_readonly || !can_edit_features"
                 />
-            </section>
-
-            <section class="bloque sucursales">
-                <div class="bloque-head">
-                    <strong>Sucursales</strong>
-                    <JdButton
-                        text="Agregar"
-                        tipo="2"
-                        :small="true"
-                        @click="addSucursal"
-                        v-if="!is_readonly && useAuth.verifyPermiso('vTenantSucursales:crear')"
-                    />
-                </div>
-
-                <div
-                    class="sucursal"
-                    v-for="(sucursal, index) in empresa.sucursales || []"
-                    :key="sucursal.id || index"
-                >
-                    <JdInput
-                        label="Codigo"
-                        :nec="true"
-                        v-model="sucursal.codigo"
-                        :disabled="is_readonly"
-                    />
-                    <JdInput
-                        label="Direccion"
-                        v-model="sucursal.direccion"
-                        :disabled="is_readonly"
-                    />
-                    <JdInput
-                        label="Telefono"
-                        v-model="sucursal.telefono"
-                        :disabled="is_readonly"
-                    />
-                    <JdInput label="Correo" v-model="sucursal.correo" :disabled="is_readonly" />
-                    <JdSwitch label="Activo" v-model="sucursal.activo" :disabled="is_readonly" />
-                    <JdButton
-                        icon="fa-solid fa-trash-can"
-                        title="Eliminar"
-                        tipo="2"
-                        :small="true"
-                        @click="removeSucursal(index)"
-                        v-if="!is_readonly && useAuth.verifyPermiso('vTenantSucursales:eliminar')"
-                    />
-                </div>
             </section>
         </div>
     </JdModal>
 </template>
 
 <script>
-import { JdModal, JdInput, JdSwitch, JdButton } from '@jhuler/components'
+import { JdModal, JdInput, JdSwitch } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -118,7 +72,6 @@ export default {
         JdModal,
         JdInput,
         JdSwitch,
-        JdButton,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -138,12 +91,14 @@ export default {
         is_readonly() {
             return this.modal.mode == 3
         },
+        can_edit_features() {
+            return this.useAuth.verifyPermiso('vTenantFeatures:editar', 'vTenants:editar')
+        },
     },
     created() {
         this.modal = this.useModals.mTenant
-        this.empresa = this.useModals.mTenant.item
+        this.empresa = this.useModals.mTenant.item || {}
         this.shapeFeatures()
-        if (!Array.isArray(this.empresa.sucursales)) this.empresa.sucursales = []
 
         this.showButtons()
     },
@@ -166,19 +121,10 @@ export default {
                 return true
             }
 
-            if ((this.empresa.sucursales || []).some((sucursal) => !sucursal.codigo)) {
-                jmsg('warning', 'Cada sucursal debe tener codigo')
-                return true
-            }
-
             return false
         },
         shapeDatos() {
             this.shapeFeatures()
-            this.empresa.sucursales = (this.empresa.sucursales || []).map((sucursal) => ({
-                ...sucursal,
-                activo: sucursal.activo === true,
-            }))
         },
         async crear() {
             if (this.checkDatos()) return
@@ -206,18 +152,6 @@ export default {
             this.useVistas.updateItem('vTenants', 'tenantes', res.data)
             this.useModals.show.mTenant = false
         },
-        addSucursal() {
-            this.empresa.sucursales.push({
-                codigo: '',
-                direccion: '',
-                telefono: '',
-                correo: '',
-                activo: true,
-            })
-        },
-        removeSucursal(index) {
-            this.empresa.sucursales.splice(index, 1)
-        },
     },
 }
 </script>
@@ -225,36 +159,14 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 24rem 18rem 1fr;
+    grid-template-columns: 24rem 18rem;
     gap: 1rem;
-    min-width: min(90vw, 80rem);
 }
 
 .bloque {
     display: grid;
     gap: 0.5rem;
     height: fit-content;
-}
-
-.bloque-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.sucursales {
-    max-height: 70vh;
-    overflow-y: auto;
-}
-
-.sucursal {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(8rem, 1fr)) auto;
-    align-items: end;
-    gap: 0.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: var(--border);
 }
 
 @media (max-width: 900px) {
