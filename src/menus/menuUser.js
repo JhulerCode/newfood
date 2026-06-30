@@ -60,7 +60,6 @@ const menuUser = [
 
                             { id: 'vPedidos:imprimirComanda', label: 'Reimprimir pedido' },
                             { id: 'vPedidos:imprimirPrecuenta', label: 'Imprimir precuenta' },
-                            { id: 'vPedidos:generarComprobante', label: 'Generar comprobante' },
                             { id: 'vPedidos:verComprobantes', label: 'Ver comprobantes' },
                             { id: 'vPedidos:entregar', label: 'Confirmar entrega' },
 
@@ -113,6 +112,7 @@ const menuUser = [
                         goto: 'vCajaComprobantes',
                         permisos: [
                             { id: 'vCajaComprobantes:listar', label: 'Listar' },
+                            { id: 'vCajaComprobantes:crear', label: 'Crear' },
                             { id: 'vCajaComprobantes:ver', label: 'Ver' },
                             { id: 'vCajaComprobantes:anular', label: 'Anular' },
                             { id: 'vCajaComprobantes:canjear', label: 'Canjear' },

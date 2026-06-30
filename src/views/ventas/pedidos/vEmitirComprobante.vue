@@ -19,13 +19,13 @@
                     text="Grabar"
                     @click="grabar()"
                     tipo="2"
-                    v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
+                    v-if="useAuth.verifyPermiso('vCajaComprobantes:crear')"
                 />
 
                 <JdButton
                     text="Grabar e imprimir"
                     @click="grabar(true)"
-                    v-if="useAuth.verifyPermiso('vPedidos:generarComprobante')"
+                    v-if="useAuth.verifyPermiso('vCajaComprobantes:crear')"
                 />
             </div>
         </div>

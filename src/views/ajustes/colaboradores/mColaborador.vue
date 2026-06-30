@@ -436,7 +436,7 @@ export default {
                     'vPedidos:editarDetalles',
                     'vPedidos:imprimirComanda',
                     'vPedidos:imprimirPrecuenta',
-                    'vPedidos:generarComprobante',
+                    'vCajaComprobantes:crear',
                     'vPedidos:verComprobantes',
                     'vPedidos:entregar',
                     'vPedidos:unirMesas',

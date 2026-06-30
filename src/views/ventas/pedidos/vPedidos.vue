@@ -334,7 +334,7 @@ export default {
                 label: 'Generar comprobante',
                 icon: 'fa-solid fa-file-invoice',
                 action: 'generarComprobante',
-                permiso: 'vPedidos:generarComprobante',
+                permiso: 'vCajaComprobantes:crear',
                 ocultar: { estado: 0, venta_facturado: true },
             },
             {
