@@ -24,7 +24,7 @@
 
             <JdInput
                 label="Atención"
-                v-model="atencion"
+                v-model="modal.comprobante.atencion"
                 :disabled="true"
                 style="grid-column: 1/3"
             />

@@ -4,6 +4,7 @@
             <strong>Nuevo pedido</strong>
 
             <div class="buttons">
+                <JdButton text="Empezar nuevo" tipo="2" @click="nuevo()" />
                 <JdButton text="Continuar" icon="fa-solid fa-arrow-right" @click="continuar()" />
                 <!-- <JdButton text="Grabar e imprimir" @click="crear(true)" /> -->
             </div>
@@ -62,6 +63,15 @@
                         type="search"
                         placeholder="Buscar por nombre..."
                         v-model="vista.txtBuscarArticulo"
+                    />
+
+                    <JdInput
+                        ref="codigoBarraInput"
+                        icon="fa-solid fa-barcode"
+                        placeholder="Escanear codigo"
+                        v-model="codigoBarra"
+                        :disabled="buscandoCodigoBarra"
+                        @keydown.enter="buscarPorCodigoBarra"
                     />
 
                     <JdButton
@@ -193,7 +203,7 @@ import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 
 import { urls, get } from '@/utils/crud'
-import { jmsg } from '@/utils/swal'
+import { jmsg, jqst } from '@/utils/swal'
 import { getItemFromArray, redondear, incompleteData, genId } from '@/utils/mine'
 import dayjs from 'dayjs'
 
@@ -215,6 +225,8 @@ export default {
         urls: urls,
 
         vista: {},
+        codigoBarra: null,
+        buscandoCodigoBarra: false,
 
         columns: [
             { id: 'articulo', width: '13rem', title: 'Producto', slot: 'cNombre', show: true },
@@ -281,6 +293,7 @@ export default {
     },
     mounted() {
         window.addEventListener('resize', this.handleResize)
+        this.focusCodigoBarra()
     },
     beforeUnmount() {
         window.removeEventListener('resize', this.handleResize)
@@ -324,6 +337,7 @@ export default {
                     'has_receta',
                     'is_combo',
                     'igv_afectacion',
+                    'codigo_barra',
                     'precios_semana',
                     'foto_path',
                     'foto_url',
@@ -398,6 +412,18 @@ export default {
                 transaccion_items: [],
             }
         },
+        async nuevo() {
+            const hasItems = this.vista.pedido?.transaccion_items?.length > 0
+            if (hasItems) {
+                const resQst = await jqst('¿Está seguro de empezar un nuevo pedido?')
+                if (resQst.isConfirmed == false) return
+            }
+
+            this.codigoBarra = null
+            this.initPedido()
+            this.sumarItems()
+            this.focusCodigoBarra()
+        },
         showPrecio(item) {
             const numeroDiaSemana = dayjs().day()
             const promocion_hoy = (item.precios_semana || []).find((a) => a.id == numeroDiaSemana)
@@ -410,7 +436,80 @@ export default {
             return item.sucursal1 || {}
         },
 
-        async addArticulo(item) {
+        async buscarPorCodigoBarra() {
+            const codigo = String(this.codigoBarra || '').trim()
+            if (!codigo) {
+                this.focusCodigoBarra()
+                return
+            }
+
+            const i = this.vista.pedido.transaccion_items.findIndex(
+                (a) => a.codigo_barra == codigo || a.articulo1?.codigo_barra == codigo,
+            )
+            if (i !== -1) {
+                this.codigoBarra = null
+                this.sumarRestar(1, this.vista.pedido.transaccion_items[i])
+                this.focusCodigoBarra()
+                return
+            }
+
+            const articuloLocal = (this.vista.articulos || []).find((a) => a.codigo_barra == codigo)
+            if (articuloLocal) {
+                this.codigoBarra = null
+                await this.addArticulo(articuloLocal, true)
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    tipo: { op: 'Es', val: '2' },
+                    activo: { op: 'Es', val: true },
+                    codigo_barra: { op: 'Es', val: codigo },
+                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
+                    'sucursal_articulos.estado': { op: 'Es', val: true },
+                },
+                cols: [
+                    'nombre',
+                    'precio_venta',
+                    'has_receta',
+                    'is_combo',
+                    'igv_afectacion',
+                    'codigo_barra',
+                    'precios_semana',
+                    'foto_path',
+                    'foto_url',
+                    'categoria',
+                ],
+                incl: ['receta_insumos', 'combo_articulos', 'sucursal_articulos'],
+                iccl: {
+                    combo_articulos: {
+                        incl: ['articulo1'],
+                    },
+                    sucursal_articulos: {
+                        incl: ['impresion_area1'],
+                    },
+                },
+            }
+
+            this.buscandoCodigoBarra = true
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.buscandoCodigoBarra = false
+            this.codigoBarra = null
+
+            if (res.code !== 0) {
+                this.focusCodigoBarra()
+                return
+            }
+
+            if (!res.data.length) {
+                jmsg('warning', 'Articulo no encontrado')
+                this.focusCodigoBarra()
+                return
+            }
+
+            await this.addArticulo(res.data[0], true)
+        },
+        async addArticulo(item, fromScanner = false) {
             const i = this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.id)
             const sucursal_articulo = this.getSucursalArticulo(item)
             const pu = this.showPrecio(item)
@@ -418,11 +517,13 @@ export default {
             if (i === -1) {
                 this.vista.pedido.transaccion_items.push({
                     articulo: item.id,
+                    codigo_barra: item.codigo_barra,
                     nombre: item.nombre,
                     unidad: item.unidad,
                     articulo1: {
                         nombre: item.nombre,
                         unidad: item.unidad,
+                        codigo_barra: item.codigo_barra,
                         impresion_area1: sucursal_articulo.impresion_area1,
                     },
 
@@ -447,6 +548,9 @@ export default {
             } else {
                 this.sumarRestar(1, this.vista.pedido.transaccion_items[i])
             }
+
+            if (fromScanner) this.codigoBarra = null
+            this.focusCodigoBarra()
         },
         calcularUno(item) {
             item.vu =
@@ -569,6 +673,15 @@ export default {
         handleResize() {
             this.vista.screenWidth = window.innerWidth
         },
+        focusCodigoBarra() {
+            this.$nextTick(() => {
+                const component = this.$refs.codigoBarraInput
+                const input = component?.$el?.querySelector?.('input')
+
+                input?.focus()
+                input?.select?.()
+            })
+        },
     },
 }
 </script>
@@ -638,7 +751,8 @@ export default {
         background-color: var(--bg-color2);
 
         .container-buscar {
-            display: flex;
+            display: grid;
+            grid-template-columns: 2fr 1fr auto;
             align-items: center;
             gap: 0.5rem;
         }
