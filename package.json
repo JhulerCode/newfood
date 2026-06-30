@@ -1,7 +1,10 @@
 {
-  "name": "frontend",
+  "name": "divergerest-frontend",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": "24.x"
+  },
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -31,7 +34,6 @@
     "globals": "16.0.0",
     "prettier": "3.5.3",
     "vite": "6.2.4",
-    "vite-plugin-pwa": "1.0.3",
     "vite-plugin-vue-devtools": "7.7.2"
   },
   "packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e"
