@@ -59,7 +59,7 @@ export default {
             }
         },
         getUrl() {
-            return `${urls.empresas}/${this.empresa.id}/sucursales`
+            return `${urls.sucursales}/empresas/${this.empresa.id}`
         },
         checkDatos() {
             if (incompleteData(this.sucursal, ['codigo'])) {
