@@ -18,6 +18,12 @@
                 style="grid-column: 1/5"
             />
 
+            <JdInput
+                label="Código de barras"
+                v-model="articulo.codigo_barra"
+                style="grid-column: 1/5"
+            />
+
             <JdSelect
                 label="Unidad"
                 :nec="true"

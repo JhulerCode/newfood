@@ -3,12 +3,21 @@
         <div class="agregar" v-if="modal.mode != 3">
             <JdSelectQuery
                 icon="fa-solid fa-magnifying-glass"
-                placeholder="Busca artículos"
+                placeholder="Buscar por mombre"
                 v-model="nuevo"
                 :spin="spinArticulos"
                 :lista="modal.articulos"
                 @search="searchArticulos"
                 @elegir="addArticulo"
+            />
+
+            <JdInput
+                ref="codigoBarraInput"
+                icon="fa-solid fa-barcode"
+                placeholder="Escanear codigo"
+                v-model="codigoBarra"
+                :disabled="buscandoCodigoBarra"
+                @keydown.enter="buscarPorCodigoBarra"
             />
         </div>
 
@@ -41,7 +50,7 @@
 </template>
 
 <script>
-import { JdSelectQuery, JdButton, JdTable } from '@jhuler/components'
+import { JdSelectQuery, JdButton, JdInput, JdTable } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -54,6 +63,7 @@ export default {
     components: {
         JdSelectQuery,
         JdButton,
+        JdInput,
         JdTable,
     },
     data: () => ({
@@ -64,7 +74,9 @@ export default {
         modal: {},
 
         spinArticulos: false,
+        buscandoCodigoBarra: false,
         nuevo: null,
+        codigoBarra: null,
 
         columns: [
             {
@@ -133,6 +145,9 @@ export default {
 
         this.sumarItems()
     },
+    mounted() {
+        this.focusCodigoBarra()
+    },
     methods: {
         async searchArticulos(txtBuscar) {
             if (!txtBuscar) {
@@ -147,7 +162,14 @@ export default {
                     activo: { op: 'Es', val: true },
                     nombre: { op: 'Contiene', val: txtBuscar },
                 },
-                cols: ['nombre', 'unidad', 'precio_venta', 'igv_afectacion', 'has_receta'],
+                cols: [
+                    'nombre',
+                    'unidad',
+                    'precio_venta',
+                    'igv_afectacion',
+                    'has_receta',
+                    'codigo_barra',
+                ],
                 ordr: [['nombre', 'ASC']],
             }
 
@@ -159,14 +181,80 @@ export default {
 
             this.modal.articulos = JSON.parse(JSON.stringify(res.data))
         },
-        async addArticulo(item) {
-            if (this.nuevo == null) return
+        async buscarPorCodigoBarra() {
+            const codigo = String(this.codigoBarra || '').trim()
+            if (!codigo) {
+                this.focusCodigoBarra()
+                return
+            }
+
+            const i = this.modal.transaccion.transaccion_items.findIndex(
+                (a) => a.codigo_barra == codigo || a.articulo1?.codigo_barra == codigo,
+            )
+            if (i !== -1) {
+                const current = this.modal.transaccion.transaccion_items[i]
+                current.cantidad = Number(current.cantidad || 0) + 1
+                this.codigoBarra = null
+                this.sumarUno(current)
+                await this.modificar(current)
+                this.focusCodigoBarra()
+                return
+            }
+
+            const qry = {
+                fltr: {
+                    has_receta: { op: 'No es', val: true },
+                    is_combo: { op: 'No es', val: true },
+                    activo: { op: 'Es', val: true },
+                    codigo_barra: { op: 'Es', val: codigo },
+                },
+                cols: [
+                    'nombre',
+                    'unidad',
+                    'precio_venta',
+                    'igv_afectacion',
+                    'has_receta',
+                    'codigo_barra',
+                ],
+            }
+
+            this.useAuth.setLoading(true, 'Buscando producto...')
+            this.buscandoCodigoBarra = true
+            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            this.buscandoCodigoBarra = false
+            this.useAuth.setLoading(false)
+            this.codigoBarra = null
+
+            if (res.code !== 0) {
+                this.focusCodigoBarra()
+                return
+            }
+
+            if (!res.data.length) {
+                jmsg('warning', 'Articulo no encontrado')
+                this.focusCodigoBarra()
+                return
+            }
+
+            await this.addArticulo(res.data[0], true)
+        },
+        async addArticulo(item, fromScanner = false) {
+            if (!fromScanner && this.nuevo == null) return
             this.nuevo = null
+            this.codigoBarra = null
             this.modal.articulos = []
 
             const i = this.modal.transaccion.transaccion_items.findIndex(
                 (a) => a.articulo == item.id,
             )
+            if (i !== -1 && fromScanner) {
+                const current = this.modal.transaccion.transaccion_items[i]
+                current.cantidad = Number(current.cantidad || 0) + 1
+                this.sumarUno(current)
+                await this.modificar(current)
+                this.focusCodigoBarra()
+                return
+            }
             if (i !== -1) return jmsg('warning', 'El artículo ya fue agregado')
 
             const send = {
@@ -175,9 +263,11 @@ export default {
                 articulo1: {
                     nombre: item.nombre,
                     unidad: item.unidad,
+                    codigo_barra: item.codigo_barra,
                 },
 
-                cantidad: null,
+                codigo_barra: item.codigo_barra,
+                cantidad: fromScanner ? 1 : null,
 
                 pu: null,
                 igv_afectacion: item.igv_afectacion,
@@ -198,13 +288,18 @@ export default {
                 const res = await post(urls.transaccion_items, send, 'Agregado con éxito')
                 this.useAuth.setLoading(false)
 
-                if (res.code != 0) return
+                if (res.code != 0) {
+                    this.focusCodigoBarra()
+                    return
+                }
 
                 send.id = res.data.id
                 send.cantidad_anterior = 0
             }
 
             this.modal.transaccion.transaccion_items.push(send)
+            this.sumarUno(send)
+            this.focusCodigoBarra()
         },
 
         calcularUno(item) {
@@ -288,6 +383,15 @@ export default {
         runMethod(method, item) {
             this[method](item)
         },
+        focusCodigoBarra() {
+            this.$nextTick(() => {
+                const component = this.$refs.codigoBarraInput
+                const input = component?.$el?.querySelector?.('input')
+
+                input?.focus()
+                input?.select?.()
+            })
+        },
     },
 }
 </script>
@@ -295,7 +399,7 @@ export default {
 <style scoped>
 .agregar {
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr 14rem;
     gap: 0.5rem;
     margin-bottom: 1rem;
 }
