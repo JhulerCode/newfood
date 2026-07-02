@@ -27,6 +27,7 @@
 
     <mTenant v-if="useModals.show.mTenant" />
     <mTenantSucursales v-if="useModals.show.mTenantSucursales" />
+    <mTenantSockets v-if="useModals.show.mTenantSockets" />
 </template>
 
 <script>
@@ -34,6 +35,7 @@ import { JdTable, JdButton } from '@jhuler/components'
 
 import mTenant from '@/views/_admin/tenants/mTenant.vue'
 import mTenantSucursales from '@/views/_admin/tenants/mTenantSucursales.vue'
+import mTenantSockets from '@/views/_admin/tenants/mTenantSockets.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -49,6 +51,7 @@ export default {
 
         mTenant,
         mTenantSucursales,
+        mTenantSockets,
     },
     data: () => ({
         useModals: useModals(),
@@ -164,6 +167,12 @@ export default {
                 permiso: 'vTenantSucursales:listar',
             },
             {
+                label: 'Conectados',
+                icon: 'fa-solid fa-users-viewfinder',
+                action: 'sockets',
+                permiso: 'vTenants:listar',
+            },
+            {
                 label: 'Eliminar',
                 icon: 'fa-solid fa-trash-can',
                 action: 'eliminar',
@@ -249,6 +258,9 @@ export default {
         },
         sucursales(item) {
             this.useModals.setModal('mTenantSucursales', 'Sucursales', 2, item)
+        },
+        sockets(item) {
+            this.useModals.setModal('mTenantSockets', 'Usuarios conectados', 2, item)
         },
     },
 }

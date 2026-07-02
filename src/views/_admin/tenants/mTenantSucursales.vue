@@ -2,7 +2,7 @@
     <JdModal modal="mTenantSucursales">
         <div class="container-sucursales">
             <div class="head">
-                <strong>{{ empresa.nombre_comercial || empresa.razon_social }}</strong>
+                <strong>{{ empresa.razon_social || empresa.nombre_comercial }}</strong>
 
                 <JdButton
                     text="Nueva sucursal"
