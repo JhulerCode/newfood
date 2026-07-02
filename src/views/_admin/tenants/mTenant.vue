@@ -35,6 +35,18 @@
                     v-model="empresa.igv_porcentaje"
                     :disabled="is_readonly"
                 />
+                <JdInput
+                    label="Usuario SOL"
+                    type="text"
+                    v-model="empresa.sol_usuario"
+                    :disabled="is_readonly"
+                />
+                <JdInput
+                    label="Clave SOL"
+                    type="text"
+                    v-model="empresa.sol_clave"
+                    :disabled="is_readonly"
+                />
                 <JdInput label="Telefono" v-model="empresa.telefono" :disabled="is_readonly" />
                 <JdInput label="Correo" v-model="empresa.correo" :disabled="is_readonly" />
                 <div class="field">

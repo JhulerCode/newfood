@@ -102,6 +102,14 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'anydesk_id',
+                title: 'AnyDesk ID',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         table_row_options: [
             {
@@ -134,7 +142,15 @@ export default {
         },
         async loadSucursales() {
             const qry = {
-                cols: ['codigo', 'direccion', 'telefono', 'correo', 'activo', 'fecha_fin'],
+                cols: [
+                    'codigo',
+                    'direccion',
+                    'telefono',
+                    'correo',
+                    'activo',
+                    'fecha_fin',
+                    'anydesk_id',
+                ],
                 ordr: [['codigo', 'ASC']],
             }
 
@@ -153,6 +169,8 @@ export default {
                 telefono: '',
                 correo: '',
                 activo: true,
+                fecha_fin: null,
+                anydesk_id: '',
             }
 
             this.useModals.setModal(

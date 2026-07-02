@@ -21,6 +21,13 @@
 
             <JdInput
                 v-if="is_admin_mode"
+                label="AnyDesk ID"
+                v-model="modal.item.anydesk_id"
+                :disabled="modal.mode == 3"
+            />
+
+            <JdInput
+                v-if="is_admin_mode"
                 label="Fecha límite"
                 type="date"
                 v-model="modal.item.fecha_fin"
