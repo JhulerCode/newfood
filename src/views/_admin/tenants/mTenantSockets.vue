@@ -88,6 +88,14 @@ export default {
                 sort: true,
             },
             {
+                id: 'app_version',
+                title: 'App',
+                width: '8rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'ip',
                 title: 'IP',
                 width: '10rem',
@@ -122,8 +130,11 @@ export default {
             const pc_principal = this.sockets.filter(
                 (socket) => socket.tipo == 'pc_principal',
             ).length
+            const printer_agent = this.sockets.filter(
+                (socket) => socket.tipo == 'printer_agent',
+            ).length
 
-            return `${total} conectados | ${usuarios} usuarios | ${pc_principal} PC principal`
+            return `${total} conectados | ${usuarios} usuarios | ${pc_principal} PC principal | ${printer_agent} agentes`
         },
     },
     created() {
