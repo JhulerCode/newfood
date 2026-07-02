@@ -3,8 +3,12 @@
         <JdTable
             :columns="columns"
             :datos="modal.articulos || []"
+            :configRowSelect="true"
             :reload="loadArticulos"
             :download="false"
+            :actions="tableActions"
+            @actionClick="runMethod"
+            ref="jdtable"
         >
             <template v-slot:cEstado="{ item }">
                 <JdSelect
@@ -27,10 +31,12 @@
             </template>
         </JdTable>
     </JdModal>
+
+    <mEditar v-if="useModals.show.mEditar" @updated="updatedBulk" />
 </template>
 
 <script>
-import { JdModal, JdTable, JdSelect } from '@jhuler/components'
+import { JdModal, JdTable, JdSelect, mEditar } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -43,6 +49,7 @@ export default {
         JdModal,
         JdTable,
         JdSelect,
+        mEditar,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -82,6 +89,8 @@ export default {
             {
                 id: 'estado',
                 title: 'Estado',
+                type: 'select',
+                editable: true,
                 slot: 'cEstado',
                 width: '10rem',
                 show: true,
@@ -90,10 +99,20 @@ export default {
             {
                 id: 'impresion_area',
                 title: 'Área de impresión',
+                type: 'select',
+                editable: true,
                 slot: 'cImpresionArea',
                 width: '15rem',
                 show: true,
                 sort: true,
+            },
+        ],
+        tableActions: [
+            {
+                icon: 'fa-solid fa-pen-to-square',
+                text: 'Editar',
+                action: 'editarBulk',
+                permiso: 'vSucursales:editar',
             },
         ],
     }),
@@ -159,6 +178,41 @@ export default {
             if (res.code != 0) return
 
             this.modal.impresion_areas = res.data
+            return res.data
+        },
+        runMethod(method, item) {
+            this[method](item)
+        },
+        async editarBulk() {
+            for (const a of this.columns) {
+                if (a.id == 'estado') a.lista = this.modal.activo_estados
+                if (a.id == 'impresion_area') a.lista = this.modal.impresion_areas
+            }
+
+            const cols = this.columns.filter(
+                (a) => ['estado', 'impresion_area'].includes(a.id) && a.show != false,
+            )
+            const ids = this.modal.articulos.filter((a) => a.selected).map((b) => b.id)
+
+            const send = {
+                uri: 'sucursal_articulos',
+                nuevo: {},
+                cols,
+                ids,
+            }
+
+            this.useModals.setModal('mEditar', `Editar ${ids.length} registros`, null, send, true)
+        },
+        updatedBulk(item) {
+            for (const a of this.modal.articulos) {
+                if (!item.ids.includes(a.id)) continue
+
+                a.selected = false
+                a[item.prop] = item.val
+                if (item.val1) a[`${item.prop}1`] = item.val1
+            }
+
+            this.$refs['jdtable'].toogleSelectItems()
         },
         async modificar(item) {
             const send = {
