@@ -6,6 +6,7 @@ import { useVistas } from '@/pinia/vistas.js'
 import { io } from 'socket.io-client'
 import { host } from '@/utils/crud.js'
 import { jmsg } from '@/utils/swal'
+import Swal from 'sweetalert2'
 import {
     getMenuByFeatures,
     getPermisoFeature,
@@ -32,6 +33,7 @@ export const useAuth = defineStore('auth', {
         isDarkMode: null,
         tables: {},
         avances: {},
+        access_notice: null,
     }),
     getters: {
         isAdminSubdominio() {
@@ -80,9 +82,14 @@ export const useAuth = defineStore('auth', {
             const result = await get(`${urls.colaboradores}/login`)
             this.setLoading(false)
 
-            if (result.code != 0) return false
+            if (result.code != 0) {
+                this.token = null
+                this.disconnectSocket()
+                return false
+            }
 
             this.setSessionDatos(result)
+            this.showAccessNotice(this.access_notice)
 
             // this.usuario = deepCopy(result.data)
             // this.permisos = this.usuario.permisos
@@ -99,6 +106,7 @@ export const useAuth = defineStore('auth', {
         setSessionDatos(result) {
             this.usuario = deepCopy(result.data)
             this.permisos = this.usuario.permisos
+            this.access_notice = result.access_notice || this.usuario.access_notice || null
 
             this.setTheme(this.usuario.theme)
             this.setPrimaryColor(this.usuario.color)
@@ -117,25 +125,44 @@ export const useAuth = defineStore('auth', {
             const sucursalActual = sucursalesDisponibles.find((a) => a.id == this.sucursal?.id)
             const puedeCambiarSucursal = this.verifyPermiso('vSucursales:cambiarSucursal')
 
-            if (puedeCambiarSucursal && sucursalActual) {
-                this.sucursal = deepCopy(sucursalActual)
-            } else if (usuarioSucursal) {
+            if (usuarioSucursal) {
                 this.sucursal = deepCopy(usuarioSucursal)
-            } else if (!this.sucursal.id || !sucursales.some((a) => a.id == this.sucursal.id)) {
-                if (sucursalesDisponibles[0]) {
-                    this.sucursal = deepCopy(sucursalesDisponibles[0])
-                }
+            } else if (puedeCambiarSucursal && sucursalActual) {
+                this.sucursal = deepCopy(sucursalActual)
+            } else if (puedeCambiarSucursal && sucursalesDisponibles[0]) {
+                this.sucursal = deepCopy(sucursalesDisponibles[0])
+            } else {
+                this.sucursal = {}
             }
         },
         isSucursalDisponible(sucursal) {
             if (!sucursal || sucursal.activo === false) return false
-            if (!sucursal.fecha_fin) return true
+            if (!sucursal.fecha_fin) return false
 
             const hoy = new Date()
             hoy.setHours(0, 0, 0, 0)
 
             const fechaFin = new Date(`${sucursal.fecha_fin}T00:00:00`)
+            fechaFin.setDate(fechaFin.getDate() + 2)
+
             return fechaFin >= hoy
+        },
+        showAccessNotice(access_notice) {
+            if (!access_notice || this.isAdminSubdominio) return
+
+            const key = `access_notice:${this.token}:${access_notice.title}:${access_notice.text}`
+            if (sessionStorage.getItem(key)) return
+
+            sessionStorage.setItem(key, 'true')
+            Swal.fire({
+                icon: access_notice.icon || 'warning',
+                title: access_notice.title,
+                text: access_notice.text,
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: 'var(--primary-color)',
+                background: 'var(--bg-color)',
+                color: 'var(--text-color2)',
+            })
         },
         connectSocket() {
             this.disconnectSocket()

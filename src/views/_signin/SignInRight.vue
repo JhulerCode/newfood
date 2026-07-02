@@ -101,7 +101,8 @@ export default {
             if (code != 0) return
 
             this.useAuth.token = token
-            await this.useAuth.login()
+            const login = await this.useAuth.login()
+            if (!login) return
 
             this.useAuth.setLoading(true, 'Preparando vista...')
             localStorage.setItem('remember-usuario', this.usuario)
