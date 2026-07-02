@@ -127,14 +127,11 @@ export default {
         resumen() {
             const total = this.sockets.length
             const usuarios = this.sockets.filter((socket) => socket.tipo == 'usuario').length
-            const pc_principal = this.sockets.filter(
-                (socket) => socket.tipo == 'pc_principal',
-            ).length
             const printer_agent = this.sockets.filter(
                 (socket) => socket.tipo == 'printer_agent',
             ).length
 
-            return `${total} conectados | ${usuarios} usuarios | ${pc_principal} PC principal | ${printer_agent} agentes`
+            return `${total} conectados | ${usuarios} usuarios | ${printer_agent} agentes`
         },
     },
     created() {
