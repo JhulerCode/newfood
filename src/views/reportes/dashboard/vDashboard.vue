@@ -4,9 +4,12 @@
             <strong>Dashboard ventas</strong>
 
             <div class="buttons">
-                <JdInput type="date" style="width: 10rem" v-model="columns[0].val" />
-                <JdInput type="date" style="width: 10rem" v-model="columns[0].val1" />
-                <JdButton text="Buscar" tipo="2" @click="loadResumen" />
+                <JdSelect
+                    style="width: 10rem"
+                    v-model="selectedYear"
+                    :lista="yearOptions"
+                    @elegir="elegirAnio"
+                />
             </div>
         </div>
 
@@ -55,6 +58,16 @@
                         <p>Suma general</p>
                     </div>
                 </div>
+
+                <div class="card">
+                    <div class="icon" style="background-color: var(--verde)">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                    <div>
+                        <span>S/ {{ redondear(vista.data.ventas.sunat_aceptadas_total) }}</span>
+                        <p>Aceptado por SUNAT</p>
+                    </div>
+                </div>
             </div>
 
             <div class="second" v-if="vista.data">
@@ -64,7 +77,7 @@
 
                 <div class="card">
                     <div class="card-head">
-                        <p>Top 10 productos</p>
+                        <p>Top de productos</p>
                     </div>
 
                     <JdTable
@@ -119,7 +132,7 @@
 </template>
 
 <script>
-import { JdTable, JdInput, JdButton } from '@jhuler/components'
+import { JdTable, JdSelect } from '@jhuler/components'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -153,8 +166,7 @@ use([
 
 export default {
     components: {
-        JdInput,
-        JdButton,
+        JdSelect,
         JdTable,
         VChart,
     },
@@ -163,6 +175,11 @@ export default {
         useVistas: useVistas(),
         useModals: useModals(),
         redondear,
+        selectedYear: dayjs().year().toString(),
+        yearOptions: Array.from({ length: 8 }, (_, i) => {
+            const year = dayjs().year() - i
+            return { id: year.toString(), nombre: year.toString() }
+        }),
 
         columnsProductos: [
             {
@@ -177,6 +194,13 @@ export default {
                 toRight: true,
                 format: 'currency',
                 moneda: 'S/',
+                width: '8rem',
+                show: true,
+            },
+            {
+                id: 'cantidad',
+                title: 'Cantidad',
+                toRight: true,
                 width: '8rem',
                 show: true,
             },
@@ -428,6 +452,7 @@ export default {
         this.vista = this.useVistas.vDashboard
         this.initFiltros()
         this.useAuth.setColumns(this.tableName, this.columns)
+        this.setYearFilter()
 
         if (this.vista.loaded) return
 
@@ -435,11 +460,15 @@ export default {
     },
     methods: {
         initFiltros() {
+            this.setYearFilter()
+        },
+        setYearFilter() {
             this.columns[0].op = 'Está dentro de'
-            this.columns[0].val = dayjs().startOf('year').format('YYYY-MM-DD')
-            this.columns[0].val1 = dayjs().format('YYYY-MM-DD')
+            this.columns[0].val = dayjs(`${this.selectedYear}-01-01`).format('YYYY-MM-DD')
+            this.columns[0].val1 = dayjs(`${this.selectedYear}-12-31`).format('YYYY-MM-DD')
         },
         setQuery() {
+            this.setYearFilter()
             this.vista.qry = {
                 fltr: {
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
@@ -462,6 +491,10 @@ export default {
             if (res.code != 0) return
 
             this.vista.data = res.data
+        },
+        elegirAnio() {
+            if (!this.selectedYear) return
+            this.loadResumen()
         },
     },
 }
@@ -540,7 +573,7 @@ export default {
 
 .first {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
     margin-bottom: 2rem;
 
