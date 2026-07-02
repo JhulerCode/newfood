@@ -176,61 +176,112 @@
                         </div>
                     </div>
 
-                    <!-- <div>
-                        <div class="card"></div>
-                    </div> -->
-                </div>
+                    <div class="third" style="grid-row: 1/3; grid-column: 3/4">
+                        <template v-if="vista.pasado != true">
+                            <div class="card">
+                                <div class="icon" style="background-color: var(--verde)">
+                                    <i class="fa-solid fa-clock-rotate-left"></i>
+                                </div>
+                                <div>
+                                    <span
+                                        >S/
+                                        {{ redondear(vista.resumen.ventas_ayer?.total || 0) }}</span
+                                    >
+                                    <p>Ayer</p>
+                                </div>
+                            </div>
 
-                <div class="second">
-                    <div class="card">
-                        <div class="card-head">
-                            <p>Otros ingresos</p>
+                            <div class="card">
+                                <div class="icon" style="background-color: var(--verde)">
+                                    <i class="fa-solid fa-calendar-days"></i>
+                                </div>
+                                <div>
+                                    <span
+                                        >S/
+                                        {{ redondear(vista.resumen.ventas_mes?.total || 0) }}</span
+                                    >
+                                    <p>Mes</p>
+                                </div>
+                            </div>
 
-                            <div class="monto-resumen">
+                            <div class="card">
+                                <div class="icon" style="background-color: var(--verde)">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                </div>
+                                <div>
+                                    <span
+                                        >S/
+                                        {{
+                                            redondear(
+                                                vista.resumen.ventas_mes_sunat_aceptadas?.total ||
+                                                    0,
+                                            )
+                                        }}</span
+                                    >
+                                    <p>Mes aceptado por SUNAT</p>
+                                </div>
+                            </div>
+                        </template>
+
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--verde)">
+                                <i class="fa-solid fa-dollar-sign"></i>
+                            </div>
+                            <div>
                                 <span
                                     >S/
                                     {{
-                                        redondear(vista.resumen.efectivo_ingresos_extra_total)
+                                        redondear(vista.resumen.comprobantes_aceptados_total)
                                     }}</span
                                 >
-                                <p>Total ingresos</p>
+                                <p>{{ `${vista.pasado ? 'Ventas' : 'Hoy'}` }}</p>
                             </div>
                         </div>
 
-                        <JdTable
-                            :datos="vista.resumen.efectivo_ingresos || []"
-                            :columns="columnsOperaciones"
-                            :seeker="false"
-                            :download="false"
-                            height="15rem"
-                        />
-                    </div>
-
-                    <div class="card">
-                        <div class="card-head">
-                            <p>Egresos</p>
-
-                            <div class="monto-resumen">
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--rojo)">
+                                <i class="fa-solid fa-ban"></i>
+                            </div>
+                            <div>
                                 <span
-                                    >S/ {{ redondear(vista.resumen.efectivo_egresos_total) }}</span
+                                    >S/
+                                    {{ redondear(vista.resumen.comprobantes_anulados_total) }}</span
                                 >
-                                <p>Total egresos</p>
+                                <p>Anulaciones</p>
                             </div>
                         </div>
 
-                        <JdTable
-                            :datos="vista.resumen.efectivo_egresos || []"
-                            :columns="columnsOperaciones"
-                            :seeker="false"
-                            :download="false"
-                            height="15rem"
-                        />
-                    </div>
-                </div>
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--amarillo)">
+                                <i class="fa-solid fa-tags"></i>
+                            </div>
+                            <div>
+                                <div>
+                                    <span>S/ {{ redondear(vista.resumen.descuentos_total) }}</span>
 
-                <div class="third">
-                    <template v-if="vista.pasado != true">
-                        <div class="card info-ventas" style="grid-column: 1/3">
+                                    <small
+                                        >+S/{{
+                                            redondear(vista.resumen.descuentos_anulados_total)
+                                        }}</small
+                                    >
+                                </div>
+                                <p>Descuentos</p>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="icon" style="background-color: var(--morado)">
+                                <i class="fa-solid fa-note-sticky"></i>
+                            </div>
+                            <div>
+                                <span
+                                    >S/ {{ redondear(vista.resumen.pedidos_aceptados_total) }}</span
+                                >
+                                <p>Pedidos</p>
+                            </div>
+                        </div>
+
+                        <div class="card info-ventas">
                             <div class="icon" style="background-color: var(--primary-color)">
                                 <i class="fa-solid fa-info"></i>
                             </div>
@@ -242,83 +293,40 @@
                                 <p>- Verificar que: Hoy + Anulaciones + Descuentos = Pedidos.</p>
                             </div>
                         </div>
-
-                        <div class="card">
-                            <div class="icon" style="background-color: var(--verde)">
-                                <i class="fa-solid fa-dollar-sign"></i>
-                            </div>
-                            <div>
-                                <span
-                                    >S/ {{ redondear(vista.resumen.ventas_ayer?.total || 0) }}</span
-                                >
-                                <p>Ayer</p>
-                            </div>
-                        </div>
-
-                        <div class="card">
-                            <div class="icon" style="background-color: var(--verde)">
-                                <i class="fa-solid fa-dollar-sign"></i>
-                            </div>
-                            <div>
-                                <span
-                                    >S/ {{ redondear(vista.resumen.ventas_mes?.total || 0) }}</span
-                                >
-                                <p>Mes</p>
-                            </div>
-                        </div>
-                    </template>
-
-                    <div class="card">
-                        <div class="icon" style="background-color: var(--verde)">
-                            <i class="fa-solid fa-dollar-sign"></i>
-                        </div>
-                        <div>
-                            <span
-                                >S/
-                                {{ redondear(vista.resumen.comprobantes_aceptados_total) }}</span
-                            >
-                            <p>{{ `${vista.pasado ? 'Ventas' : 'Hoy'}` }}</p>
-                        </div>
                     </div>
 
-                    <div class="card">
-                        <div class="icon" style="background-color: var(--rojo)">
-                            <i class="fa-solid fa-ban"></i>
-                        </div>
-                        <div>
-                            <span
-                                >S/ {{ redondear(vista.resumen.comprobantes_anulados_total) }}</span
-                            >
-                            <p>Anulaciones</p>
-                        </div>
-                    </div>
+                    <div class="card" style="grid-column: 1/3">
+                        <div class="card-head">
+                            <p>Otros ingresos y egresos</p>
 
-                    <div class="card">
-                        <div class="icon" style="background-color: var(--amarillo)">
-                            <i class="fa-solid fa-tags"></i>
-                        </div>
-                        <div>
-                            <div>
-                                <span>S/ {{ redondear(vista.resumen.descuentos_total) }}</span>
+                            <div class="operaciones-totales">
+                                <div class="monto-resumen">
+                                    <span
+                                        >S/
+                                        {{
+                                            redondear(vista.resumen.efectivo_ingresos_extra_total)
+                                        }}</span
+                                    >
+                                    <p>Total ingresos</p>
+                                </div>
 
-                                <small
-                                    >+S/{{
-                                        redondear(vista.resumen.descuentos_anulados_total)
-                                    }}</small
-                                >
+                                <div class="monto-resumen">
+                                    <span
+                                        >S/
+                                        {{ redondear(vista.resumen.efectivo_egresos_total) }}</span
+                                    >
+                                    <p>Total egresos</p>
+                                </div>
                             </div>
-                            <p>Descuentos</p>
                         </div>
-                    </div>
 
-                    <div class="card">
-                        <div class="icon" style="background-color: var(--morado)">
-                            <i class="fa-solid fa-note-sticky"></i>
-                        </div>
-                        <div>
-                            <span>S/ {{ redondear(vista.resumen.pedidos_aceptados_total) }}</span>
-                            <p>Pedidos</p>
-                        </div>
+                        <JdTable
+                            :datos="vista.resumen.efectivo_operaciones || []"
+                            :columns="columnsOperaciones"
+                            :seeker="false"
+                            :download="false"
+                            height="15rem"
+                        />
                     </div>
                 </div>
 
@@ -405,7 +413,7 @@
                             :columns="columnsComprobantes"
                             :seeker="false"
                             :download="false"
-                            height="20rem"
+                            height="10rem"
                         />
                     </div>
 
@@ -419,7 +427,7 @@
                             :columns="columnsProductosAnulados"
                             :seeker="false"
                             :download="false"
-                            height="20rem"
+                            height="10rem"
                         />
                     </div>
                 </div>
@@ -593,16 +601,33 @@ export default {
 
         columnsOperaciones: [
             {
+                id: 'createdAt',
+                title: 'Fecha',
+                width: '10rem',
+                format: 'datetime',
+                show: true,
+                sort: true,
+            },
+            {
+                id: 'tipo',
+                title: 'Tipo',
+                width: '7rem',
+                show: true,
+                sort: true,
+            },
+            {
                 id: 'operacion',
                 title: 'Operación',
                 width: '10rem',
                 show: true,
+                sort: true,
             },
             {
                 id: 'detalle',
                 title: 'Detalle',
                 width: '13rem',
                 show: true,
+                sort: true,
             },
             {
                 id: 'monto',
@@ -612,6 +637,7 @@ export default {
                 moneda: 'S/',
                 width: '8rem',
                 show: true,
+                sort: true,
             },
         ],
 
@@ -938,9 +964,15 @@ export default {
     }
 }
 
+.operaciones-totales {
+    display: flex;
+    gap: 2rem;
+}
+
 .first {
     display: grid;
-    grid-template-columns: 1fr 1.3fr 1.3fr;
+    grid-template-columns: 1fr 1.3fr 1fr;
+    grid-template-rows: auto 1fr;
     gap: 2rem;
     margin-bottom: 2rem;
 
@@ -1016,9 +1048,7 @@ export default {
 
 .third {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
     gap: 2rem;
-    margin-bottom: 2rem;
 
     .card {
         display: grid;
@@ -1059,13 +1089,19 @@ export default {
 @media (max-width: 540px) {
     .first,
     .second,
-    .third,
     .forth,
     .fifth,
     .sixth {
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 1rem;
+    }
+
+    .first {
+        >div {
+            grid-column: initial !important;
+            grid-row: initial !important;
+        }
     }
 
     .third {
