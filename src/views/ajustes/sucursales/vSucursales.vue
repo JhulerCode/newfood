@@ -114,6 +114,15 @@ export default {
                 sort: true,
             },
             {
+                id: 'fecha_fin',
+                title: 'Fecha fin',
+                format: 'date',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'printer_status',
                 type: 'select',
                 prop: 'printer_status1.nombre',

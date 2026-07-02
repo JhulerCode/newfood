@@ -41,7 +41,7 @@ import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, patch, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
@@ -95,6 +95,17 @@ export default {
                 sort: true,
             },
             {
+                id: 'activo',
+                title: 'Estado',
+                prop: 'activo1.nombre',
+                format: 'yesno',
+                type: 'select',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'domicilio_fiscal',
                 title: 'Domicilio fiscal',
                 width: '10rem',
@@ -134,18 +145,7 @@ export default {
                 seek: true,
                 sort: true,
             },
-            {
-                id: 'activo',
-                title: 'Estado',
-                prop: 'activo1.nombre',
-                format: 'yesno',
-                type: 'select',
-                editable: true,
-                width: '10rem',
-                show: true,
-                seek: true,
-                sort: true,
-            },
+
         ],
         tableRowOptions: [
             {
@@ -171,6 +171,12 @@ export default {
                 icon: 'fa-solid fa-users-viewfinder',
                 action: 'sockets',
                 permiso: 'vTenants:listar',
+            },
+            {
+                label: 'Activar / desactivar',
+                icon: 'fa-solid fa-toggle-on',
+                action: 'cambiarEstado',
+                permiso: 'vTenants:editar',
             },
             {
                 label: 'Eliminar',
@@ -261,6 +267,24 @@ export default {
         },
         sockets(item) {
             this.useModals.setModal('mTenantSockets', 'Usuarios conectados', 2, item)
+        },
+        async cambiarEstado(item) {
+            const accion = item.activo ? 'desactivar' : 'activar'
+            const resQst = await jqst(`Esta seguro de ${accion} esta empresa?`)
+            if (resQst.isConfirmed == false) return
+
+            const send = {
+                id: item.id,
+                activo: !item.activo,
+            }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(`${urls.empresas}/estado`, send, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.useVistas.updateItem('vTenants', 'tenantes', res.data)
         },
     },
 }

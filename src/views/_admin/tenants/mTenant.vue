@@ -37,7 +37,12 @@
                 />
                 <JdInput label="Telefono" v-model="empresa.telefono" :disabled="is_readonly" />
                 <JdInput label="Correo" v-model="empresa.correo" :disabled="is_readonly" />
-                <JdSwitch label="Activo" v-model="empresa.activo" :disabled="is_readonly" />
+                <div class="field">
+                    <span>Estado</span>
+                    <span class="chip" :class="{ inactive: empresa.activo === false }">
+                        {{ empresa.activo === false ? 'Inactivo' : 'Activo' }}
+                    </span>
+                </div>
             </section>
 
             <section class="bloque">
@@ -167,6 +172,31 @@ export default {
     display: grid;
     gap: 0.5rem;
     height: fit-content;
+}
+
+.field {
+    display: grid;
+    gap: 0.25rem;
+}
+
+.field > span:first-child {
+    font-size: 0.85rem;
+    color: var(--text-color-2);
+}
+
+.chip {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 0.25rem 0.6rem;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.chip.inactive {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 @media (max-width: 900px) {

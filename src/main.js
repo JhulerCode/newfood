@@ -44,6 +44,6 @@ async function limpiarPWAAntigua() {
     }
 }
 
-await limpiarPWAAntigua()
-
-createApp(App).use(router).use(createPinia().use(piniaPluginPersistedstate)).mount('#app')
+limpiarPWAAntigua().finally(() => {
+    createApp(App).use(router).use(createPinia().use(piniaPluginPersistedstate)).mount('#app')
+})

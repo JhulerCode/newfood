@@ -92,7 +92,7 @@ export const useAuth = defineStore('auth', {
             // // Formato de fecha
             // this.showNavbar = this.usuario.menu_visible
 
-            this.connectSocket()
+            if (!this.isAdminSubdominio) this.connectSocket()
 
             return true
         },
@@ -112,8 +112,9 @@ export const useAuth = defineStore('auth', {
             }
 
             const sucursales = this.empresa.sucursales || []
-            const usuarioSucursal = sucursales.find((a) => a.id == this.usuario.sucursal)
-            const sucursalActual = sucursales.find((a) => a.id == this.sucursal?.id)
+            const sucursalesDisponibles = sucursales.filter((a) => this.isSucursalDisponible(a))
+            const usuarioSucursal = sucursalesDisponibles.find((a) => a.id == this.usuario.sucursal)
+            const sucursalActual = sucursalesDisponibles.find((a) => a.id == this.sucursal?.id)
             const puedeCambiarSucursal = this.verifyPermiso('vSucursales:cambiarSucursal')
 
             if (puedeCambiarSucursal && sucursalActual) {
@@ -121,10 +122,20 @@ export const useAuth = defineStore('auth', {
             } else if (usuarioSucursal) {
                 this.sucursal = deepCopy(usuarioSucursal)
             } else if (!this.sucursal.id || !sucursales.some((a) => a.id == this.sucursal.id)) {
-                if (sucursales[0]) {
-                    this.sucursal = deepCopy(sucursales[0])
+                if (sucursalesDisponibles[0]) {
+                    this.sucursal = deepCopy(sucursalesDisponibles[0])
                 }
             }
+        },
+        isSucursalDisponible(sucursal) {
+            if (!sucursal || sucursal.activo === false) return false
+            if (!sucursal.fecha_fin) return true
+
+            const hoy = new Date()
+            hoy.setHours(0, 0, 0, 0)
+
+            const fechaFin = new Date(`${sucursal.fecha_fin}T00:00:00`)
+            return fechaFin >= hoy
         },
         connectSocket() {
             this.disconnectSocket()

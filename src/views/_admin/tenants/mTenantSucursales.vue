@@ -23,18 +23,18 @@
         </div>
     </JdModal>
 
-    <mTenantSucursal v-if="useModals.show.mTenantSucursal" @updated="loadSucursales" />
+    <mSucursal v-if="useModals.show.mSucursal" @updated="loadSucursales" />
 </template>
 
 <script>
 import { JdModal, JdTable, JdButton } from '@jhuler/components'
 
-import mTenantSucursal from '@/views/_admin/tenants/mTenantSucursal.vue'
+import mSucursal from '@/views/ajustes/sucursales/mSucursal.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
-import { urls, get, delet } from '@/utils/crud'
+import { urls, get, patch, delet } from '@/utils/crud'
 import { jqst } from '@/utils/swal'
 
 export default {
@@ -42,7 +42,7 @@ export default {
         JdModal,
         JdTable,
         JdButton,
-        mTenantSucursal,
+        mSucursal,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -93,12 +93,27 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'fecha_fin',
+                title: 'Fecha fin',
+                format: 'date',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
         ],
         table_row_options: [
             {
                 label: 'Editar',
                 icon: 'fa-solid fa-pen-to-square',
                 action: 'editar',
+                permiso: 'vTenantSucursales:editar',
+            },
+            {
+                label: 'Activar / desactivar',
+                icon: 'fa-solid fa-toggle-on',
+                action: 'cambiarEstado',
                 permiso: 'vTenantSucursales:editar',
             },
             {
@@ -119,7 +134,7 @@ export default {
         },
         async loadSucursales() {
             const qry = {
-                cols: ['codigo', 'direccion', 'telefono', 'correo', 'activo'],
+                cols: ['codigo', 'direccion', 'telefono', 'correo', 'activo', 'fecha_fin'],
                 ordr: [['codigo', 'ASC']],
             }
 
@@ -141,7 +156,7 @@ export default {
             }
 
             this.useModals.setModal(
-                'mTenantSucursal',
+                'mSucursal',
                 'Nueva sucursal',
                 1,
                 { empresa: this.empresa, item },
@@ -150,12 +165,31 @@ export default {
         },
         editar(item) {
             this.useModals.setModal(
-                'mTenantSucursal',
+                'mSucursal',
                 'Editar sucursal',
                 2,
                 { empresa: this.empresa, item: { ...item } },
                 true,
             )
+        },
+        async cambiarEstado(item) {
+            const accion = item.activo ? 'desactivar' : 'activar'
+            const res_qst = await jqst(`Esta seguro de ${accion} esta sucursal?`)
+            if (res_qst.isConfirmed == false) return
+
+            const send = {
+                id: item.id,
+                activo: !item.activo,
+            }
+
+            this.useAuth.setLoading(true, 'Actualizando...')
+            const res = await patch(`${this.getUrl()}/estado`, send, false)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const index = this.sucursales.findIndex((sucursal) => sucursal.id == item.id)
+            if (index >= 0) this.sucursales.splice(index, 1, res.data)
         },
         async eliminar(item) {
             const res_qst = await jqst('¿Está seguro de eliminar?')
