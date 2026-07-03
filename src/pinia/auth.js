@@ -18,7 +18,6 @@ import menuAdmin from '@/menus/menuAdmin.js'
 
 export const useAuth = defineStore('auth', {
     state: () => ({
-        token: null,
         usuario: {},
         socket: null,
         empresa: {},
@@ -67,7 +66,6 @@ export const useAuth = defineStore('auth', {
     },
     actions: {
         initVars() {
-            this.token = null
             this.permisos = []
             this.usuario = {}
             this.tables = {}
@@ -76,14 +74,11 @@ export const useAuth = defineStore('auth', {
 
         // --- LOGIN --- //
         async login() {
-            if (this.token == null) return false
-
             this.setLoading(true, 'Cargando cuenta...')
-            const result = await get(`${urls.colaboradores}/login`)
+            const result = await get(`${urls.colaboradores}/login`, { silent401: true })
             this.setLoading(false)
 
             if (result.code != 0) {
-                this.token = null
                 this.disconnectSocket()
                 return false
             }
@@ -150,7 +145,7 @@ export const useAuth = defineStore('auth', {
         showAccessNotice(access_notice) {
             if (!access_notice || this.isAdminSubdominio) return
 
-            const key = `access_notice:${this.token}:${access_notice.title}:${access_notice.text}`
+            const key = `access_notice:${access_notice.title}:${access_notice.text}`
             if (sessionStorage.getItem(key)) return
 
             sessionStorage.setItem(key, 'true')
@@ -462,6 +457,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['token', 'isDarkMode', 'tables', 'avances', 'sucursal'],
+        paths: ['isDarkMode', 'tables', 'avances', 'sucursal'],
     },
 })

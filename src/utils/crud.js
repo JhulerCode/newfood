@@ -39,94 +39,64 @@ const urls = {
     decolecta: `${host}/api/decolecta`,
 }
 
-async function get(url) {
-    let response
-
-    try {
-        response = await fetch(url, {
-            method: 'GET',
-            headers: setHeaders(),
-        })
-    } catch (error) {
-        jmsg('error', error)
-        return { code: -2 }
-    }
-
-    return await process(response, false)
+async function get(url, options = {}) {
+    return await request('GET', url, null, false, true, options)
 }
 
-async function post(url, item, ms) {
-    let response
-
-    try {
-        response = await fetch(url, {
-            method: 'POST',
-            headers: setHeaders(item),
-            body: setBody(item),
-        })
-    } catch (error) {
-        jmsg('error', error)
-        return { code: -2 }
-    }
-
+async function post(url, item = {}, ms) {
     if (ms !== false && ms == null) {
-        ms = 'Creado con éxito'
+        ms = 'Creado con exito'
     }
 
-    return await process(response, ms)
+    return await request('POST', url, item, ms)
 }
 
 async function patch(url, item, ms) {
-    let response
-
-    try {
-        response = await fetch(`${url}/${item.id}`, {
-            method: 'PATCH',
-            headers: setHeaders(item),
-            body: setBody(item),
-        })
-    } catch (error) {
-        jmsg('error', error)
-        return { code: -2 }
-    }
-
     if (ms !== false && ms == null) {
-        ms = 'Actualizado con éxito'
+        ms = 'Actualizado con exito'
     }
 
-    return await process(response, ms)
+    return await request('PATCH', `${url}/${item.id}`, item, ms)
 }
 
 async function delet(url, item, ms) {
+    if (ms !== false && ms == null) {
+        ms = 'Eliminado con exito'
+    }
+
+    return await request('DELETE', `${url}/${item.id}`, item, ms)
+}
+
+async function request(method, url, item, ms, retry = true, options = {}) {
     let response
 
     try {
-        response = await fetch(`${url}/${item.id}`, {
-            method: 'DELETE',
+        response = await fetch(url, {
+            method,
             headers: setHeaders(item),
-            body: setBody(item),
+            body: item ? setBody(item) : undefined,
+            credentials: 'include',
         })
     } catch (error) {
         jmsg('error', error)
         return { code: -2 }
     }
 
-    if (ms !== false && ms == null) {
-        ms = 'Eliminado con éxito'
-    }
-
-    return await process(response, ms)
+    return await process(
+        response,
+        ms,
+        () => request(method, url, item, ms, false, options),
+        retry,
+        options,
+    )
 }
 
 function setHeaders(item) {
-    const headers = {
-        Authorization: `Bearer ${useAuth().token}`,
-    }
+    const headers = {}
 
     if (item && !item.formData) headers['Content-Type'] = 'application/json'
 
     headers['x-app-version'] = useAuth().app_version
-
     headers['x-empresa'] = getSubdominio()
     headers['x-sucursal'] = getSucursal()
 
@@ -140,40 +110,42 @@ function setBody(item) {
 
     const { archivo, archivos, ...resto } = item
 
-    // Si hay un solo archivo (propiedad archivo)
     if (archivo) {
         formData.append('archivo', archivo)
     }
 
-    // Si hay múltiples archivos (propiedad archivos como array)
     if (archivos && Array.isArray(archivos)) {
         archivos.forEach((file) => {
-            formData.append('archivos', file) // backend recibirá como array
+            formData.append('archivos', file)
         })
     }
 
-    // Agregar el resto de datos como JSON
     formData.append('datos', JSON.stringify(resto))
 
     return formData
 }
 
-async function process(response, ms) {
+async function process(response, ms, retry_request, retry = true, options = {}) {
     const contentType = response.headers.get('Content-Type')
 
     if (contentType && contentType.includes('application/json')) {
         const res = await response.json()
 
         if ([401, 403, 404, 426].includes(response.status)) {
-            jmsg('error', res.msg)
+            if (response.status == 401 && retry && !response.url.endsWith('/api/auth/refresh')) {
+                const refreshed = await refreshAuth()
+                if (refreshed) return await retry_request()
+            }
 
-            if (response.status == 401)
-                useModals().setModal('mLogin', 'Sesión terminada', null, null)
+            if (!options.silent401 || response.status != 401) jmsg('error', res.msg)
+
+            if (response.status == 401 && !options.silent401)
+                useModals().setModal('mLogin', 'Sesion terminada', null, null)
 
             return { code: response.status }
         }
 
-        if (res.code == -1) jmsg('error', 'Algo salió mal')
+        if (res.code == -1) jmsg('error', 'Algo salio mal')
 
         if (res.code > 0) jmsg('error', res.msg)
 
@@ -183,6 +155,24 @@ async function process(response, ms) {
     } else {
         const blob = await response.blob()
         return blob
+    }
+}
+
+async function refreshAuth() {
+    try {
+        const response = await fetch(`${urls.signin}/refresh`, {
+            method: 'POST',
+            headers: setHeaders({}),
+            body: JSON.stringify({}),
+            credentials: 'include',
+        })
+
+        if (!response.ok) return false
+
+        const res = await response.json()
+        return res.code == 0
+    } catch {
+        return false
     }
 }
 

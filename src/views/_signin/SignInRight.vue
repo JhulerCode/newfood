@@ -60,7 +60,6 @@ export default {
 
         usuario: '',
         contrasena: '',
-        token: '',
         shown: false,
     }),
     created() {},
@@ -95,12 +94,11 @@ export default {
             }
 
             this.useAuth.setLoading(true, 'Ingresando...')
-            const { code, token } = await post(urls.signin, auth, 'Acceso correcto')
+            const { code } = await post(urls.signin, auth, 'Acceso correcto')
             this.useAuth.setLoading(false)
 
             if (code != 0) return
 
-            this.useAuth.token = token
             const login = await this.useAuth.login()
             if (!login) return
 
