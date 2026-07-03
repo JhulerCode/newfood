@@ -23,8 +23,7 @@ export const useAuth = defineStore('auth', {
         empresa: {},
         sucursal: {},
         app_version: '1.7.1',
-
-
+        token: null,
 
         showNavbar: true,
         loading: { show: false, text: '' },
@@ -70,6 +69,10 @@ export const useAuth = defineStore('auth', {
             this.usuario = {}
             this.tables = {}
             this.sucursal = {}
+            this.token = null
+        },
+        setToken(token) {
+            this.token = token
         },
 
         // --- LOGIN --- //
@@ -307,6 +310,7 @@ export const useAuth = defineStore('auth', {
             // useVistas().initVars()
             // useModals().initVars()
             this.disconnectSocket()
+            this.setToken(null)
 
             window.location.reload()
         },
@@ -457,6 +461,6 @@ export const useAuth = defineStore('auth', {
     },
     persist: {
         storage: localStorage,
-        paths: ['isDarkMode', 'tables', 'avances', 'sucursal'],
+        paths: ['token', 'isDarkMode', 'tables', 'avances', 'sucursal'],
     },
 })

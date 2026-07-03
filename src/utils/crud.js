@@ -92,11 +92,14 @@ async function request(method, url, item, ms, retry = true, options = {}) {
 }
 
 function setHeaders(item) {
+    const auth = useAuth()
     const headers = {}
+
+    if (auth.token) headers.Authorization = `Bearer ${auth.token}`
 
     if (item && !item.formData) headers['Content-Type'] = 'application/json'
 
-    headers['x-app-version'] = useAuth().app_version
+    headers['x-app-version'] = auth.app_version
     headers['x-empresa'] = getSubdominio()
     headers['x-sucursal'] = getSucursal()
 
@@ -167,11 +170,21 @@ async function refreshAuth() {
             credentials: 'include',
         })
 
-        if (!response.ok) return false
+        if (!response.ok) {
+            useAuth().setToken(null)
+            return false
+        }
 
         const res = await response.json()
-        return res.code == 0
+        if (res.code != 0 || !res.access_token) {
+            useAuth().setToken(null)
+            return false
+        }
+
+        useAuth().setToken(res.access_token)
+        return true
     } catch {
+        useAuth().setToken(null)
         return false
     }
 }

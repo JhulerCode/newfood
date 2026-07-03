@@ -91,13 +91,16 @@ export default {
             const auth = {
                 usuario: this.usuario,
                 contrasena: this.contrasena,
+                client_info: this.getClientInfo(),
             }
 
             this.useAuth.setLoading(true, 'Ingresando...')
-            const { code } = await post(urls.signin, auth, 'Acceso correcto')
+            const result = await post(urls.signin, auth, 'Acceso correcto')
             this.useAuth.setLoading(false)
 
-            if (code != 0) return
+            if (result.code != 0 || !result.access_token) return
+
+            this.useAuth.setToken(result.access_token)
 
             const login = await this.useAuth.login()
             if (!login) return
@@ -106,6 +109,20 @@ export default {
             localStorage.setItem('remember-usuario', this.usuario)
             this.$router.replace({ name: 'ConsolaView' })
             this.useVistas.showVista(this.useAuth.vistaInicial)
+        },
+        getClientInfo() {
+            return {
+                user_agent: navigator.userAgent,
+                platform: navigator.userAgentData?.platform || navigator.platform || null,
+                language: navigator.language,
+                languages: navigator.languages,
+                screen: {
+                    width: window.screen?.width,
+                    height: window.screen?.height,
+                    pixel_ratio: window.devicePixelRatio,
+                },
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+            }
         },
     },
 }
