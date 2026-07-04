@@ -14,7 +14,7 @@
                     class="btn option"
                     @click="this.toggleList(a.label)"
                     :class="{
-                        'option-active': a.children.some((b) => useVistas.show?.[b.goto]),
+                        'option-active': (a.children || []).some((b) => useVistas.show?.[b.goto]),
                         'has-children': !a.goto,
                     }"
                 >
@@ -52,12 +52,12 @@
         <div class="footer">
             <div
                 class="btn user-info"
-                v-if="useAuth.usuario"
+                v-if="useAuth.usuario?.nombres"
                 @click="openUserMenu"
                 :class="{ 'user-info-active': useModals?.show?.mUserMenu }"
             >
                 <div class="user-foto">
-                    {{ useAuth.usuario.nombres[0] }}
+                    {{ useAuth.usuario.nombres?.[0] || '' }}
                 </div>
 
                 <transition name="to-width-cero">

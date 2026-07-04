@@ -1,6 +1,7 @@
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { jmsg } from '@/utils/swal'
+import Swal from 'sweetalert2'
 
 const host = import.meta.env.VITE_API_HOST
 const subdominio_prueba = import.meta.env.VITE_SUBDOMINIO_PRUEBA
@@ -140,6 +141,11 @@ async function process(response, ms, retry_request, retry = true, options = {}) 
                 if (refreshed) return await retry_request()
             }
 
+            if (response.status == 403 && res.code === 'SUCURSAL_NO_DISPONIBLE') {
+                await showSucursalNoDisponible(res)
+                return { code: response.status }
+            }
+
             if (!options.silent401 || response.status != 401) jmsg('error', res.msg)
 
             if (response.status == 401 && !options.silent401)
@@ -158,6 +164,28 @@ async function process(response, ms, retry_request, retry = true, options = {}) 
     } else {
         const blob = await response.blob()
         return blob
+    }
+}
+
+async function showSucursalNoDisponible(res) {
+    const can_change_sucursal = res.can_change_sucursal === true
+
+    const result = await Swal.fire({
+        icon: 'warning',
+        title: res.msg || 'Sucursal no disponible',
+        text: can_change_sucursal
+            ? 'Debe cambiar manualmente a una sucursal activa para continuar.'
+            : 'No tiene permiso para cambiar de sucursal. Contacte a un administrador.',
+        showCancelButton: can_change_sucursal,
+        confirmButtonText: can_change_sucursal ? 'Cambiar sucursal' : 'Entendido',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: 'var(--primary-color)',
+        background: 'var(--bg-color)',
+        color: 'var(--text-color2)',
+    })
+
+    if (can_change_sucursal && result.isConfirmed) {
+        useModals().setModal('mSucursalCambiar', 'Cambiar de sucursal')
     }
 }
 

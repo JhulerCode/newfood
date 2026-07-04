@@ -123,10 +123,10 @@ export const useAuth = defineStore('auth', {
             const sucursalActual = sucursalesDisponibles.find((a) => a.id == this.sucursal?.id)
             const puedeCambiarSucursal = this.verifyPermiso('vSucursales:cambiarSucursal')
 
-            if (usuarioSucursal) {
-                this.sucursal = deepCopy(usuarioSucursal)
-            } else if (puedeCambiarSucursal && sucursalActual) {
+            if (puedeCambiarSucursal && sucursalActual) {
                 this.sucursal = deepCopy(sucursalActual)
+            } else if (usuarioSucursal) {
+                this.sucursal = deepCopy(usuarioSucursal)
             } else if (puedeCambiarSucursal && sucursalesDisponibles[0]) {
                 this.sucursal = deepCopy(sucursalesDisponibles[0])
             } else {
@@ -177,6 +177,7 @@ export const useAuth = defineStore('auth', {
                     id: this.usuario.colaborador,
                     nombres: this.usuario.nombres,
                     apellidos: this.usuario.apellidos,
+                    session_id: this.usuario.session_id,
                     empresa: this.empresa.id,
                     sucursal: this.sucursal.id,
                 })
@@ -271,7 +272,7 @@ export const useAuth = defineStore('auth', {
                 if (data.venta_canal == 1) useVistas().vPedidos?.setMesasPedidos()
             })
 
-            this.socket.on('pc_principal_socket_not_found', () => {
+            this.socket.on('printer_agent_socket_not_found', () => {
                 jmsg('error', 'DivergeRest Printer no iniciado')
             })
 

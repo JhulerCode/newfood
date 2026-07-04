@@ -28,6 +28,7 @@
     <mTenant v-if="useModals.show.mTenant" />
     <mTenantSucursales v-if="useModals.show.mTenantSucursales" />
     <mTenantSockets v-if="useModals.show.mTenantSockets" />
+    <mTenantSessions v-if="useModals.show.mTenantSessions" />
 </template>
 
 <script>
@@ -36,6 +37,7 @@ import { JdTable, JdButton } from '@jhuler/components'
 import mTenant from '@/views/_admin/tenants/mTenant.vue'
 import mTenantSucursales from '@/views/_admin/tenants/mTenantSucursales.vue'
 import mTenantSockets from '@/views/_admin/tenants/mTenantSockets.vue'
+import mTenantSessions from '@/views/_admin/tenants/mTenantSessions.vue'
 
 import { useModals } from '@/pinia/modals'
 import { useAuth } from '@/pinia/auth'
@@ -52,6 +54,7 @@ export default {
         mTenant,
         mTenantSucursales,
         mTenantSockets,
+        mTenantSessions,
     },
     data: () => ({
         useModals: useModals(),
@@ -173,6 +176,12 @@ export default {
                 permiso: 'vTenants:listar',
             },
             {
+                label: 'Sesiones',
+                icon: 'fa-solid fa-id-card-clip',
+                action: 'sessions',
+                permiso: 'vTenants:listar',
+            },
+            {
                 label: 'Activar / desactivar',
                 icon: 'fa-solid fa-toggle-on',
                 action: 'cambiarEstado',
@@ -267,6 +276,9 @@ export default {
         },
         sockets(item) {
             this.useModals.setModal('mTenantSockets', 'Usuarios conectados', 2, item)
+        },
+        sessions(item) {
+            this.useModals.setModal('mTenantSessions', 'Sesiones activas', 2, item)
         },
         async cambiarEstado(item) {
             const accion = item.activo ? 'desactivar' : 'activar'
