@@ -1,12 +1,45 @@
 <template>
     <div class="left">
-        <!-- <img src="@/assets/img/login-icon.webp" alt="" /> -->
-        <img src="@/assets/img/logo.webp" alt="logo-divergerest"/>
+        <div class="container-logo">
+            <img :src="empresa_logo" />
+        </div>
+
+        <strong v-if="empresa?.razon_social" class="empresa-nombre">
+            {{ empresa.razon_social }}
+        </strong>
     </div>
 </template>
 
 <script>
-export default {}
+import defaultLogo from '@/assets/img/logo.webp'
+import { urls, get, getSubdominio } from '@/utils/crud'
+
+export default {
+    data: () => ({
+        empresa: null,
+    }),
+    computed: {
+        empresa_logo() {
+            return this.empresa?.logo_url || defaultLogo
+        },
+    },
+    created() {
+        this.loadEmpresa()
+    },
+    methods: {
+        async loadEmpresa() {
+            try {
+                const subdominio = getSubdominio()
+                const res = await get(`${urls.public}/empresas/${encodeURIComponent(subdominio)}`)
+                if (res.code != 0) return
+
+                this.empresa = res.data
+            } catch {
+                this.empresa = null
+            }
+        },
+    },
+}
 </script>
 
 <style lang="scss" scoped>
@@ -26,9 +59,23 @@ export default {}
     // backdrop-filter: blur(3px);
     // -webkit-backdrop-filter: blur(3px);
 
-    img {
-        // height: 8rem;
-        width: 20rem;
+    .container-logo {
+        max-height: 8rem;
+        max-width: 20rem;
+        margin-bottom: 1rem;
+
+        img {
+            border-radius: 1rem;
+            max-height: 100%;
+            max-width: 100%;
+        }
+    }
+
+    .empresa-nombre {
+        max-width: 24rem;
+        color: var(--text-color);
+        font-size: 1.05rem;
+        text-align: center;
     }
 }
 </style>

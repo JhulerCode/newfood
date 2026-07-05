@@ -30,6 +30,11 @@
                 <span>Actualizar sesión</span>
             </li>
 
+            <li @click="refreshEmpresa">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>Actualizar empresa</span>
+            </li>
+
             <li @click="logout">
                 <i class="fa-solid fa-right-from-bracket"></i>
                 <span>Salir del sistema</span>
@@ -64,6 +69,9 @@ export default {
         },
         updateSession() {
             this.useAuth.login()
+        },
+        refreshEmpresa() {
+            this.useAuth.refreshEmpresa()
         },
         async logout() {
             await this.useAuth.logout(this.$router)

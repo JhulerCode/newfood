@@ -7,6 +7,7 @@ const host = import.meta.env.VITE_API_HOST
 const subdominio_prueba = import.meta.env.VITE_SUBDOMINIO_PRUEBA
 
 const urls = {
+    public: `${host}/api/public`,
     signin: `${host}/api/auth`,
 
     sistema: `${host}/api/sistema`,

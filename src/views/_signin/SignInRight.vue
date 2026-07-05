@@ -15,14 +15,6 @@
             </div>
         </div>
 
-        <div class="container-logo">
-            <img :src="empresa_logo" />
-        </div>
-
-        <strong v-if="empresa?.razon_social" class="empresa-nombre">
-            {{ empresa.razon_social }}
-        </strong>
-
         <div class="info">
             <strong>¡Bienvenido!</strong>
             <p>Ingrese sus datos de acceso</p>
@@ -49,8 +41,7 @@ import { JdInput, JdInputPassword, JdButton } from '@jhuler/components'
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
 
-import defaultLogo from '@/assets/img/logo.webp'
-import { host, urls, post, getSubdominio } from '@/utils/crud'
+import { urls, post } from '@/utils/crud'
 import { jmsg } from '@/utils/swal'
 
 export default {
@@ -65,12 +56,7 @@ export default {
 
         usuario: '',
         contrasena: '',
-        empresa: null,
-        shown: false,
     }),
-    created() {
-        this.loadEmpresa()
-    },
     mounted() {
         const remembered = localStorage.getItem('remember-usuario')
         if (remembered) {
@@ -89,23 +75,6 @@ export default {
             }
 
             this.useAuth.setTheme(send.theme)
-        },
-
-        async loadEmpresa() {
-            try {
-                const subdominio = getSubdominio()
-                const response = await fetch(
-                    `${host}/api/public/empresas/${encodeURIComponent(subdominio)}`,
-                )
-                if (!response.ok) return
-
-                const res = await response.json()
-                if (res.code != 0) return
-
-                this.empresa = res.data
-            } catch {
-                this.empresa = null
-            }
         },
 
         async signin() {
@@ -149,11 +118,6 @@ export default {
                 },
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             }
-        },
-    },
-    computed: {
-        empresa_logo() {
-            return this.empresa?.logo_url || defaultLogo
         },
     },
 }
@@ -201,24 +165,7 @@ export default {
         }
     }
 
-    .container-logo {
-        height: 8rem;
-        max-width: 20rem;
-        margin-bottom: 1rem;
 
-        img {
-            border-radius: 1rem;
-            max-height: 100%;
-            max-width: 100%;
-        }
-    }
-
-    .empresa-nombre {
-        max-width: 24rem;
-        margin-bottom: 1.5rem;
-        color: var(--text-color);
-        font-size: 1.05rem;
-    }
 
     .info {
         margin-bottom: 2rem;

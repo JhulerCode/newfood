@@ -345,6 +345,15 @@ export const useAuth = defineStore('auth', {
         verifyFeature(feature_id) {
             return hasFeature(this.empresa, feature_id)
         },
+        async refreshEmpresa() {
+            this.setLoading(true, 'Actualizando empresa...')
+            const res = await post(`${urls.signin}/refresh-empresa`)
+            this.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.empresa = res.data
+        },
 
         // --- TABLES --- //
         updateQuery(columns, qry) {
