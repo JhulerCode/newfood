@@ -117,9 +117,11 @@
                         label="Sucursal"
                         :nec="true"
                         v-model="colaborador.sucursal"
-                        :lista="useAuth.empresa.sucursales || []"
+                        :lista="modal.sucursales || []"
                         mostrar="codigo"
                         :disabled="modal.mode == 3"
+                        :loaded="true"
+                        @reload="loadSucursales"
                     />
 
                     <JdInput
@@ -253,13 +255,14 @@ export default {
                 .flat()
         },
     },
-    created() {
+    async created() {
         this.modal = this.useModals.mColaborador
         this.colaborador = this.useModals.mColaborador.item
         this.menu = JSON.parse(JSON.stringify(this.useAuth.menuByFeatures))
 
         this.showButtons()
-        this.loadDatosSistema()
+        await this.loadDatosSistema()
+        await this.loadSucursales()
         this.sincronizarChecksConPermisos()
     },
     methods: {
@@ -466,7 +469,6 @@ export default {
                     'vCajaComprobantes:enviarWhatsapp',
                     'vCajaComprobantes:imprimir',
                     'vCajaComprobantes:descargarPdf',
-
                 ],
                 MOZO: [
                     'vPedidos:listar',
@@ -502,6 +504,22 @@ export default {
 
             this.colaborador.permisos = permisos[this.colaborador.cargo] || []
             this.sincronizarChecksConPermisos()
+        },
+
+        async loadSucursales() {
+            const qry = {
+                fltr: {},
+                ordr: [['codigo', 'ASC']],
+                cols: ['codigo', 'fecha_fin', 'activo'],
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sucursales}/cambiar?qry=${JSON.stringify(qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.modal.sucursales = res.data
         },
     },
 }

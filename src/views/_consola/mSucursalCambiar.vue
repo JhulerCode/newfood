@@ -2,9 +2,10 @@
     <JdModal modal="mSucursalCambiar">
         <JdTable
             :columns="columns"
-            :datos="useAuth.empresa.sucursales || []"
+            :datos="sucursales"
             :seeker="false"
             :download="false"
+            :reload="loadSucursales"
         >
             <template v-slot:cElegir="{ item }">
                 <JdButton
@@ -27,6 +28,7 @@ import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 import { useVistas } from '@/pinia/vistas'
 import { deepCopy } from '@/utils/mine'
+import { get, urls } from '@/utils/crud'
 
 export default {
     components: {
@@ -41,10 +43,11 @@ export default {
 
         modal: {},
         colaborador: {},
+        sucursales: [],
 
         columns: [
             {
-                id: 'sucursal',
+                id: 'codigo',
                 title: 'Sucursal',
                 prop: 'codigo',
                 width: '15rem',
@@ -63,10 +66,29 @@ export default {
             },
         ],
     }),
-    created() {
+    async created() {
         this.modal = this.useModals.mSucursalCambiar
+        await this.loadSucursales()
     },
     methods: {
+        setQuery() {
+            this.qry = {
+                fltr: {},
+                ordr: [['codigo', 'ASC']],
+                cols: ['codigo', 'fecha_fin', 'activo'],
+            }
+        },
+        async loadSucursales() {
+            this.setQuery()
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.sucursales}/cambiar?qry=${JSON.stringify(this.qry)}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            this.sucursales = res.data
+        },
         isSucursalActual(item) {
             return item?.id == this.useAuth.sucursal?.id
         },
