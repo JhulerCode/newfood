@@ -213,6 +213,7 @@ export default {
                 venta_canales,
                 venta_pago_metodos,
                 venta_comprobantes,
+                pedidos_anulados,
             } = res.data
 
             const send = {
@@ -225,6 +226,7 @@ export default {
                 venta_canales,
                 venta_pago_metodos,
                 venta_comprobantes,
+                pedidos_anulados,
                 sucursal: this.useAuth.sucursal.id,
             }
 

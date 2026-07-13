@@ -55,8 +55,7 @@ const menuUser = [
                             { id: 'vPedidos:addProductos', label: 'Añadir productos' },
                             { id: 'vPedidos:editarDetalles', label: 'Editar detalles' },
                             { id: 'vPedidos:anular', label: 'Anular' },
-                            // { id: 'vPedidos:editar', label: 'Editar' },
-                            { id: 'vPedidos:eliminar', label: 'Eliminar' },
+                            // { id: 'vPedidos:eliminar', label: 'Eliminar' },
 
                             { id: 'vPedidos:imprimirComanda', label: 'Reimprimir pedido' },
                             { id: 'vPedidos:imprimirPrecuenta', label: 'Imprimir precuenta' },

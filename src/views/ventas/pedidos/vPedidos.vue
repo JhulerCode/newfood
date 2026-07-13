@@ -309,13 +309,13 @@ export default {
                 permiso: 'vPedidos:anular',
                 ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
             },
-            {
-                label: 'Eliminar',
-                icon: 'fa-solid fa-trash-can',
-                action: 'eliminar',
-                permiso: 'vPedidos:eliminar',
-                ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
-            },
+            // {
+            //     label: 'Eliminar',
+            //     icon: 'fa-solid fa-trash-can',
+            //     action: 'eliminar',
+            //     permiso: 'vPedidos:eliminar',
+            //     ocultar: { estado: 0, comprobantes_monto: { op: '>', val: 0 } },
+            // },
             {
                 label: 'Reimprimir pedido',
                 icon: 'fa-solid fa-print',
