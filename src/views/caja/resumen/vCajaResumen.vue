@@ -281,7 +281,7 @@
                             </div>
                         </div>
 
-                        <div class="card info-ventas">
+                        <div class="card info-ventas" v-if="vista.pasado != true">
                             <div class="icon" style="background-color: var(--primary-color)">
                                 <i class="fa-solid fa-info"></i>
                             </div>
@@ -383,6 +383,9 @@
                         <JdTable
                             :datos="vista.resumen.comprobantes_aceptados || []"
                             :columns="columnsComprobantes"
+                            :colAct="true"
+                            :rowOptions="comprobanteRowOptions"
+                            @rowOptionSelected="runMethod"
                             :seeker="false"
                             :download="false"
                             height="20rem"
@@ -411,6 +414,9 @@
                         <JdTable
                             :datos="vista.resumen.comprobantes_anulados || []"
                             :columns="columnsComprobantes"
+                            :colAct="true"
+                            :rowOptions="comprobanteRowOptions"
+                            @rowOptionSelected="runMethod"
                             :seeker="false"
                             :download="false"
                             height="10rem"
@@ -441,6 +447,9 @@
                         <JdTable
                             :datos="vista.resumen.comprobantes_canjeados || []"
                             :columns="columnsComprobantesCanjeados"
+                            :colAct="true"
+                            :rowOptions="comprobanteRowOptions"
+                            @rowOptionSelected="runMethod"
                             :seeker="false"
                             :download="false"
                             height="10rem"
@@ -478,6 +487,9 @@
                         <JdTable
                             :datos="vista.resumen.pedidos_aceptados || []"
                             :columns="columnsPedidosAnulados"
+                            :colAct="true"
+                            :rowOptions="pedidoRowOptions"
+                            @rowOptionSelected="runMethod"
                             :seeker="false"
                             :download="false"
                             height="15rem"
@@ -499,6 +511,9 @@
                         <JdTable
                             :datos="vista.resumen.pedidos_anulados || []"
                             :columns="columnsPedidosAnulados"
+                            :colAct="true"
+                            :rowOptions="pedidoRowOptions"
+                            @rowOptionSelected="runMethod"
                             :seeker="false"
                             :download="false"
                             height="15rem"
@@ -514,12 +529,16 @@
         @aperturado="cajaAperturada"
         @cerrado="((vista.caja_apertura = null), (vista.resumen = null))"
     />
+    <mPedidoDetalles v-if="useModals.show.mPedidoDetalles" />
+    <mComprobante v-if="useModals.show.mComprobante" />
 </template>
 
 <script>
 import { JdTable, JdButton } from '@jhuler/components'
 
 import mCajaAperturar from './mCajaAperturar.vue'
+import mPedidoDetalles from '@/views/ventas/pedidos/mPedidoDetalles.vue'
+import mComprobante from '@/views/reportes/comprobantes/mComprobante.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -534,6 +553,8 @@ export default {
     components: {
         JdButton,
         mCajaAperturar,
+        mPedidoDetalles,
+        mComprobante,
         JdTable,
     },
     data: () => ({
@@ -544,6 +565,21 @@ export default {
         redondear,
         copyToClipboard,
         dayjs,
+
+        comprobanteRowOptions: [
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'verComprobante',
+            },
+        ],
+        pedidoRowOptions: [
+            {
+                label: 'Ver',
+                icon: 'fa-regular fa-folder-open',
+                action: 'verPedido',
+            },
+        ],
 
         columnsPagoMetodos: [
             {
@@ -852,6 +888,68 @@ export default {
         this.vista.pasado = false
     },
     methods: {
+        runMethod(method, item) {
+            this[method](item)
+        },
+        async verComprobante(item) {
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.comprobantes}/uno/${item.id}`)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            const send = {
+                comprobante: { ...res.data },
+                comprobante_estados: [{ ...res.data.estado1 }],
+            }
+
+            this.useModals.setModal('mComprobante', 'Comprobante', null, send, true)
+        },
+        async verPedido(item) {
+            const qry = {
+                incl: ['socio1', 'venta_mesa1', 'venta_pago_metodo1'],
+                iccl: { venta_mesa1: { incl: ['salon1'] } },
+            }
+
+            this.useAuth.setLoading(true, 'Cargando...')
+            const res = await get(`${urls.transacciones}/uno/${item.id}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code != 0) {
+                this.useAuth.setLoading(false)
+                return
+            }
+
+            const itemsQry = {
+                incl: ['articulo1'],
+                cols: { exclude: [] },
+                fltr: { transaccion: { op: 'Es', val: item.id } },
+                ordr: [['createdAt', 'ASC']],
+            }
+            const itemsRes = await get(
+                `${urls.transaccion_items}?qry=${JSON.stringify(itemsQry)}`,
+            )
+            this.useAuth.setLoading(false)
+
+            if (itemsRes.code != 0) return
+
+            res.data.transaccion_items = itemsRes.data
+            const send = {
+                pedido: { ...res.data },
+                socios: [{ id: res.data.socio, ...res.data.venta_socio_datos }],
+                pago_metodos: res.data.venta_pago_metodo1
+                    ? [{ ...res.data.venta_pago_metodo1 }]
+                    : [],
+                transaccion_estados: res.data.estado1 ? [{ ...res.data.estado1 }] : [],
+            }
+
+            this.useModals.setModal(
+                'mPedidoDetalles',
+                `Pedido N° ${res.data.venta_codigo}`,
+                3,
+                send,
+                true,
+            )
+        },
         async loadCajaApertura() {
             const qry = {
                 fltr: {
@@ -1049,11 +1147,13 @@ export default {
 .third {
     display: grid;
     gap: 2rem;
+    align-content: start;
 
     .card {
         display: grid;
         grid-template-columns: 3rem 1fr;
-        min-height: 5rem;
+        // min-height: 5rem;
+        // height: fit-content;
         gap: 2rem;
 
         span {
