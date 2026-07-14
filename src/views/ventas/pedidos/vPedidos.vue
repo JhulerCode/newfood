@@ -281,13 +281,13 @@ export default {
                 action: 'ver',
                 permiso: 'vPedidos:ver',
             },
-            {
-                label: 'Editar',
-                icon: 'fa-regular fa-pen-to-square',
-                action: 'editar',
-                permiso: 'vPedidos:editar',
-                ocultar: { venta_facturado: true },
-            },
+            // {
+            //     label: 'Editar',
+            //     icon: 'fa-regular fa-pen-to-square',
+            //     action: 'editar',
+            //     permiso: 'vPedidos:editar',
+            //     ocultar: { venta_facturado: true },
+            // },
             {
                 label: 'Editar detalles',
                 icon: 'fa-solid fa-pen-to-square',
@@ -300,6 +300,13 @@ export default {
                 icon: 'fa-solid fa-plus',
                 action: 'addProductos',
                 permiso: 'vPedidos:addProductos',
+                ocultar: { estado: 0, venta_facturado: true },
+            },
+            {
+                label: 'Eliminar productos',
+                icon: 'fa-solid fa-trash-can',
+                action: 'eliminarProductos',
+                permiso: 'vPedidos:eliminarProductos',
                 ocultar: { estado: 0, venta_facturado: true },
             },
             {
@@ -703,6 +710,25 @@ export default {
             const vistaComanda = this.useVistas.vComanda
             vistaComanda.mode = 2.1
             vistaComanda.pedido = { ...item, transaccion_items: [] }
+        },
+        async eliminarProductos(item) {
+            const res = await this.loadPedido(item)
+            if (res == false) return
+
+            const send = {
+                pedido: { ...res.data },
+                socios: [{ id: res.data.socio, ...res.data.venta_socio_datos }],
+                pago_metodos: [{ ...res.data.venta_pago_metodo1 }],
+                transaccion_estados: [{ ...res.data.estado1 }],
+            }
+
+            this.useModals.setModal(
+                'mPedidoDetalles',
+                `Eliminar productos del pedido N° ${item.venta_codigo}`,
+                4,
+                send,
+                true,
+            )
         },
         async eliminar(item) {
             const resQst = await jqst('¿Está seguro de eliminar?')

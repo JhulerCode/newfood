@@ -33,7 +33,7 @@
 
             <div
                 v-if="
-                    modal.mode != 3 &&
+                    !modoSoloLectura &&
                     (modal.pedido.venta_canal == 2 || modal.pedido.venta_canal == 3)
                 "
                 class="dato-cliente"
@@ -63,7 +63,7 @@
                 :label="modal.mode == 2 ? 'Nombres' : 'Cliente'"
                 :nec="true"
                 v-model="modal.pedido.venta_socio_datos.nombres"
-                :disabled="modal.mode == 3"
+                :disabled="modoSoloLectura"
                 style="grid-column: 1/4"
             />
 
@@ -72,7 +72,7 @@
                     label="Teléfono"
                     :nec="true"
                     v-model="modal.pedido.venta_socio_datos.telefono"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     style="grid-column: 1/3"
                 />
 
@@ -80,7 +80,7 @@
                     label="Dirección"
                     :nec="true"
                     v-model="modal.pedido.venta_socio_datos.direccion"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     style="grid-column: 1/4"
                 />
 
@@ -89,7 +89,7 @@
                     v-model="modal.pedido.repartidor"
                     :lista="modal.colaboradores || []"
                     mostrar="nombres_apellidos"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     style="grid-column: 1/4"
                 />
 
@@ -98,7 +98,7 @@
                     :nec="true"
                     v-model="modal.pedido.venta_pago_metodo"
                     :lista="modal.pago_metodos || []"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     style="grid-column: 1/3"
                 />
 
@@ -107,7 +107,7 @@
                     :nec="true"
                     type="number"
                     v-model="modal.pedido.venta_pago_con"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     v-if="
                         modal.pedido.venta_canal == 3 &&
                         venta_pago_metodo_actual.nombre == 'EFECTIVO'
@@ -124,15 +124,26 @@
             :seeker="false"
             :colNro="false"
             :download="false"
-            v-if="modal.mode == 3"
-        />
+            :colAct="modal.mode == 4"
+            v-if="modoSoloLectura"
+        >
+            <template v-slot:cAction="{ item }">
+                <JdButton
+                    :small="true"
+                    tipo="2"
+                    icon="fa-solid fa-trash-can"
+                    title="Eliminar"
+                    @click="eliminarProducto(item)"
+                />
+            </template>
+        </JdTable>
 
         <div class="datos-bottom">
             <div class="left">
                 <JdInput
                     label="Observación"
                     v-model="modal.pedido.observacion"
-                    :disabled="modal.mode == 3"
+                    :disabled="modoSoloLectura"
                     style="grid-column: 1/2"
                 />
 
@@ -171,8 +182,8 @@ import mSocio from '@/views/compras/proveedores/mSocio.vue'
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
 
-import { jmsg } from '@/utils/swal'
-import { urls, get, patch } from '@/utils/crud'
+import { jmsg, jqst } from '@/utils/swal'
+import { urls, get, patch, delet } from '@/utils/crud'
 import { incompleteData } from '@/utils/mine'
 import { redondear, copyToClipboard } from '@/utils/mine'
 
@@ -234,6 +245,9 @@ export default {
         ],
     }),
     computed: {
+        modoSoloLectura() {
+            return [3, 4].includes(this.modal.mode)
+        },
         atencion() {
             if (this.modal.pedido.venta_canal == 1) {
                 return (
@@ -267,6 +281,59 @@ export default {
         }
     },
     methods: {
+        async eliminarProducto(item) {
+            if (this.modal.mode != 4) return
+
+            const qst = await jqst('¿Está seguro de eliminar este producto?')
+            if (!qst.isConfirmed) return
+
+            const send = {
+                id: this.modal.pedido.id,
+                transaccion_item: item.id,
+            }
+
+            this.useAuth.setLoading(true, 'Eliminando...')
+            const res = await delet(`${urls.transacciones}/eliminar-producto`, send)
+            this.useAuth.setLoading(false)
+
+            if (res.code != 0) return
+
+            await this.imprimirProductoEliminado(item)
+
+            const index = this.modal.pedido.transaccion_items.findIndex((a) => a.id == item.id)
+            if (index >= 0) this.modal.pedido.transaccion_items.splice(index, 1)
+
+            this.calcularTotales()
+            this.modal.pedido.monto = res.data.monto
+            this.useAuth.socket.emit('mPedidoDetalles:modificar', res.data)
+        },
+        async imprimirProductoEliminado(item) {
+            const qry = {
+                fltr: {
+                    sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
+                    articulo: { op: 'Es', val: item.articulo },
+                },
+                cols: ['articulo'],
+                incl: ['impresion_area1'],
+            }
+            const res = await get(`${urls.sucursal_articulos}?qry=${JSON.stringify(qry)}`)
+
+            if (res.code == 0) {
+                const sucursalArticulo = res.data.find((a) => a.articulo == item.articulo)
+                if (sucursalArticulo) {
+                    item.articulo1.impresion_area1 = sucursalArticulo.impresion_area1
+                }
+            }
+
+            const send = {
+                ...this.modal.pedido,
+                transaccion_items: [item],
+                print_status: 'ELIMINADO',
+                sucursal: this.useAuth.sucursal.id,
+            }
+
+            this.useAuth.socket.emit('vComanda:imprimir', send)
+        },
         async loadSocios(txtBuscar) {
             if (!txtBuscar) {
                 this.modal.socios.length = 0
