@@ -573,7 +573,11 @@ export default {
             this.vista.venta_canal = key
         },
 
-        nuevo(datosMesa) {
+        async nuevo(datosMesa) {
+            if (!this.useAuth.empresa?.clientes_varios) {
+                await this.useAuth.refreshEmpresa()
+            }
+
             let send = {
                 tipo: 2,
                 venta_canal: this.vista.venta_canal,
