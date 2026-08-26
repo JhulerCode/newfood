@@ -127,6 +127,15 @@ export default {
             //     sort: true,
             // },
             {
+                id: 'codigo_barra',
+                title: 'Código de barras',
+                type: 'text',
+                width: '10rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'nombre',
                 title: 'Nombre',
                 type: 'text',
