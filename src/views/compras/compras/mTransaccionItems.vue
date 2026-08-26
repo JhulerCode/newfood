@@ -19,6 +19,14 @@
                 :disabled="buscandoCodigoBarra"
                 @keydown.enter="buscarPorCodigoBarra"
             />
+
+            <JdButton
+                icon="fa-solid fa-plus"
+                text="Nuevo producto"
+                tipo="2"
+                @click="nuevoProducto"
+                v-if="useAuth.verifyPermiso('vProductos:crear')"
+            />
         </div>
 
         <JdTable
@@ -45,12 +53,24 @@
                     @click="quitar(item)"
                 />
             </template>
+
+            <template v-slot:cNombre="{ item }">
+                <p>{{ item.articulo1.nombre }}</p>
+                <small >{{ item.articulo1.codigo_barra }}</small>
+            </template>
         </JdTable>
     </div>
+
+    <mArticulo
+        @created="addProductoCreado"
+        v-if="useModals.show.mArticulo"
+    />
 </template>
 
 <script>
 import { JdSelectQuery, JdButton, JdInput, JdTable } from '@jhuler/components'
+
+import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -65,6 +85,7 @@ export default {
         JdButton,
         JdInput,
         JdTable,
+        mArticulo,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -82,7 +103,8 @@ export default {
             {
                 id: 'nombre',
                 title: 'Artículo',
-                prop: 'articulo1.nombre',
+                slot: 'cNombre',
+                // prop: 'articulo1.nombre',
                 width: '20rem',
                 show: true,
                 sort: true,
@@ -238,8 +260,8 @@ export default {
 
             await this.addArticulo(res.data[0], true)
         },
-        async addArticulo(item, fromScanner = false) {
-            if (!fromScanner && this.nuevo == null) return
+        async addArticulo(item, fromScanner = false, force = false) {
+            if (!fromScanner && !force && this.nuevo == null) return
             this.nuevo = null
             this.codigoBarra = null
             this.modal.articulos = []
@@ -300,6 +322,22 @@ export default {
             this.modal.transaccion.transaccion_items.push(send)
             this.sumarUno(send)
             this.focusCodigoBarra()
+        },
+        nuevoProducto() {
+            const item = {
+                tipo: '2',
+                igv_afectacion: 10,
+                unidad: 'NIU',
+                codigo_barra: String(this.codigoBarra || '').trim() || null,
+                has_receta: false,
+                activo: true,
+                is_combo: false,
+            }
+
+            this.useModals.setModal('mArticulo', 'Nuevo producto', 1, item)
+        },
+        async addProductoCreado(item) {
+            await this.addArticulo(item, false, true)
         },
 
         calcularUno(item) {
@@ -399,7 +437,7 @@ export default {
 <style scoped>
 .agregar {
     display: grid;
-    grid-template-columns: 1fr 14rem;
+    grid-template-columns: 1fr 14rem auto;
     gap: 0.5rem;
     margin-bottom: 1rem;
 }

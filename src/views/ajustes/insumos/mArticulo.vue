@@ -173,6 +173,7 @@ export default {
             this.useAuth.socket.emit('mArticulo:crear')
 
             this.useModals.show.mArticulo = false
+            this.$emit('created', res.data)
         },
         async modificar() {
             if (this.checkDatos()) return
