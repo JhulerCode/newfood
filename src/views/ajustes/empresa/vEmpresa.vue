@@ -121,7 +121,6 @@
 
                 <JdInputFile
                     label="Logo"
-                    :nec="true"
                     accept="image/*"
                     v-model="vista.empresa.logo"
                     @handleFile="
@@ -220,7 +219,7 @@ export default {
 
                 'telefono',
                 'correo',
-                'logo',
+                // 'logo',
             ]
 
             if (incompleteData(this.vista.empresa, props)) {
