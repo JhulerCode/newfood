@@ -144,6 +144,19 @@ export default {
                 sort: true,
             },
             {
+                id: 'stock_valorizado',
+                title: 'Stock valorizado',
+                type: 'number',
+                format: 'currency',
+                moneda: 'S/',
+                toRight: true,
+                filtrable: false,
+                width: '9rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
                 id: 'categoria',
                 title: 'Categoría',
                 prop: 'categoria1.nombre',
@@ -237,7 +250,8 @@ export default {
                     'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
                     'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'sucursal_articulos', 'kardexes'],
+                incl: ['categoria1', 'sucursal_articulos'],
+                sqls: ['stock_valorizado'],
                 ordr: [['nombre', 'ASC']],
                 iccl: {
                     sucursal_articulos: {
