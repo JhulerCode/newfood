@@ -24,7 +24,14 @@
 
                 <JdButton
                     text="Grabar e imprimir"
-                    @click="grabar(true)"
+                    @click="grabar({ print: true })"
+                    v-if="useAuth.verifyPermiso('vCajaComprobantes:crear')"
+                />
+
+                <JdButton
+                    text="Grabar y enviar por WhatsApp"
+                    icon="fa-brands fa-whatsapp"
+                    @click="grabar({ whatsapp: true })"
                     v-if="useAuth.verifyPermiso('vCajaComprobantes:crear')"
                 />
             </div>
@@ -267,12 +274,18 @@
     </div>
 
     <mSocio @created="setSocioCreated" v-if="useModals.show.mSocio" />
+    <mComprobanteWhatsapp
+        v-if="useModals.show.mComprobanteWhatsapp"
+        @enviado="finalizarEmision"
+        @omitido="finalizarEmision"
+    />
 </template>
 
 <script>
 import { JdTable, JdButton, JdInput, JdSelect, JdSelectQuery } from '@jhuler/components'
 
 import mSocio from '@/views/compras/proveedores/mSocio.vue'
+import mComprobanteWhatsapp from '@/views/reportes/comprobantes/mComprobanteWhatsapp.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -290,6 +303,7 @@ export default {
         JdSelectQuery,
         JdTable,
         mSocio,
+        mComprobanteWhatsapp,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -299,6 +313,7 @@ export default {
         getItemFromArray,
 
         vista: {},
+        grabando: false,
 
         newPago: {},
 
@@ -1085,19 +1100,41 @@ export default {
 
         //     console.log(this.vista.comprobante)
         // },
-        async grabar(print) {
+        async grabar(options = {}) {
+            if (this.grabando) return
             if (this.checkDatos()) return
             this.shapeDatos()
 
+            this.grabando = true
             this.useAuth.setLoading(true, 'Grabando...')
             const res = await post(urls.comprobantes, this.vista.comprobante)
             this.useAuth.setLoading(false)
+            this.grabando = false
 
             if (res.code != 0) return
 
-            if (print == true) await this.imprimir(res.data)
+            if (options.print == true) await this.imprimir(res.data)
 
             this.useAuth.socket.emit('vEmitirComprobante:grabar', res.data_transaccion)
+
+            if (options.whatsapp == true) {
+                this.useModals.setModal(
+                    'mComprobanteWhatsapp',
+                    'Enviar comprobante por WhatsApp',
+                    null,
+                    {
+                        ...res.data,
+                        phone_to_send:
+                            this.vista.socio?.telefono || res.data.cliente_datos?.telefono || '',
+                    },
+                )
+                this.useModals.mComprobanteWhatsapp.afterEmit = true
+                return
+            }
+
+            this.finalizarEmision()
+        },
+        finalizarEmision() {
             if (this.vista.comprobante.transaccion1.venta_canal == '4') {
                 this.useVistas.closePestana('vEmitirComprobante', 'vPos')
                 this.useVistas.vPos.initPedido()

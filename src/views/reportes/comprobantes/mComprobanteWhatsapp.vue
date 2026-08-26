@@ -2,6 +2,7 @@
     <JdModal
         modal="mComprobanteWhatsapp"
         :buttons="buttons"
+        :btnClose="!modal.afterEmit"
         @button-click="(action) => this[action]()"
     >
         <div class="container-datos">
@@ -32,6 +33,7 @@ export default {
         JdModal,
         JdInput,
     },
+    emits: ['enviado', 'omitido'],
     data: () => ({
         useAuth: useAuth(),
         useModals: useModals(),
@@ -40,12 +42,24 @@ export default {
         usuario: null,
         contrasena: null,
 
-        buttons: [{ text: 'Enviar whatsapp', action: 'enviarWhatsapp', show: true }],
+        buttons: [
+            { text: 'Omitir', action: 'omitir', tipo: 2, show: false },
+            { text: 'Enviar whatsapp', action: 'enviarWhatsapp', show: true },
+        ],
     }),
     created() {
         this.modal = this.useModals.mComprobanteWhatsapp
+        this.modal.item.phone_to_send = this.normalizePhone(
+            this.modal.item.phone_to_send || this.modal.item.cliente_datos?.telefono,
+        )
+        this.buttons[0].show = this.modal.afterEmit === true
     },
     methods: {
+        normalizePhone(phone) {
+            const digits = String(phone || '').replace(/\D/g, '')
+
+            return digits.length == 11 && digits.startsWith('51') ? digits.slice(2) : digits
+        },
         checkDatos() {
             const props = ['phone_to_send']
             if (incompleteData(this.modal.item, props)) {
@@ -53,7 +67,9 @@ export default {
                 return true
             }
 
-            if (this.modal.item.phone_to_send.toString().length != 9) {
+            this.modal.item.phone_to_send = this.normalizePhone(this.modal.item.phone_to_send)
+
+            if (!/^9\d{8}$/.test(this.modal.item.phone_to_send)) {
                 jmsg('warning', 'Ingrese un nro celular válido')
                 return true
             }
@@ -74,6 +90,11 @@ export default {
             if (res.code != 0) return
 
             this.useModals.show.mComprobanteWhatsapp = false
+            this.$emit('enviado')
+        },
+        omitir() {
+            this.useModals.show.mComprobanteWhatsapp = false
+            this.$emit('omitido')
         },
     },
 }
