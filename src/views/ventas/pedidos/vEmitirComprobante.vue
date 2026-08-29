@@ -97,16 +97,20 @@
                     <span>Ope. gravadas:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_GRAVADO) }}</p>
 
-                    <template v-if="false">
+                    <template v-if="vista.totals.MNT_TOT_EXONERADO > 0">
                         <span>Ope. exoneradas:</span>
                         <p>{{ redondear(vista.totals.MNT_TOT_EXONERADO) }}</p>
+                    </template>
 
+                    <template v-if="vista.totals.MNT_TOT_INAFECTO > 0">
                         <span>Ope. inafectas:</span>
                         <p>{{ redondear(vista.totals.MNT_TOT_INAFECTO) }}</p>
                     </template>
 
-                    <span>Ope. gratuitas:</span>
-                    <p>{{ redondear(vista.totals.MNT_TOT_GRATUITO) }}</p>
+                    <template v-if="vista.totals.MNT_TOT_GRATUITO > 0">
+                        <span>Ope. gratuitas:</span>
+                        <p>{{ redondear(vista.totals.MNT_TOT_GRATUITO) }}</p>
+                    </template>
 
                     <span>Descuentos:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_DESCUENTO) }}</p>
@@ -114,18 +118,18 @@
                     <span>IGV:</span>
                     <p>{{ redondear(vista.totals.MNT_TOT_TRIB_IGV) }}</p>
 
-                    <template v-if="false">
+                    <template v-if="vista.totals.MNT_TOT_TRIB_ISC > 0">
                         <span>ISC:</span>
                         <p>{{ redondear(vista.totals.MNT_TOT_TRIB_ISC) }}</p>
+                    </template>
 
+                    <template v-if="vista.totals.MNT_IMPUESTO_BOLSAS > 0">
                         <span>ICBPER:</span>
                         <p>{{ redondear(vista.totals.MNT_IMPUESTO_BOLSAS) }}</p>
                     </template>
 
                     <strong>Importe total:</strong>
-                    <strong class="total">
-                        {{ redondear(vista.totals.MNT_TOT) }}
-                    </strong>
+                    <strong class="total"> {{ redondear(vista.totals.MNT_TOT) }}</strong>
                 </div>
 
                 <!-- <div class="totales" v-if="vista.totals">
@@ -1021,6 +1025,14 @@ export default {
             if (elegido.tipo == '03') {
                 if (['6', '4', '7'].includes(this.vista.socio.doc_tipo)) {
                     jmsg('error', 'El cliente debe tener DNI')
+                    return true
+                }
+
+                if (this.vista.totals.MNT_TOT > 700) {
+                    jmsg(
+                        'error',
+                        'Debe ingresar los datos de identificación del cliente porque la venta es superior a S/.700',
+                    )
                     return true
                 }
             }

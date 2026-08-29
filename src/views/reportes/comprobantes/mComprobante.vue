@@ -3,7 +3,7 @@
         <div class="container-datos">
             <JdInput
                 label="Fecha"
-                v-model="modal.comprobante.fecha_emision"
+                v-model="fecha_formateada"
                 :disabled="true"
                 style="grid-column: 1/3"
             />
@@ -19,14 +19,7 @@
                 label="Serie y correlativo"
                 v-model="modal.comprobante.serie_correlativo"
                 :disabled="true"
-                style="grid-column: 1/3"
-            />
-
-            <JdInput
-                label="Atención"
-                v-model="modal.comprobante.atencion"
-                :disabled="true"
-                style="grid-column: 1/3"
+                style="grid-column: 5/6"
             />
 
             <JdInput
@@ -37,15 +30,15 @@
             />
 
             <JdInput
-                label="Cliente"
-                v-model="modal.comprobante.cliente_datos.razon_social_nombres"
+                label="Atención"
+                v-model="modal.comprobante.atencion"
                 :disabled="true"
-                style="grid-column: 1/4"
+                style="grid-column: 5/6"
             />
 
             <JdInput
-                label="Dirección"
-                v-model="modal.comprobante.cliente_datos.direccion"
+                label="Cliente"
+                v-model="modal.comprobante.cliente_datos.razon_social_nombres"
                 :disabled="true"
                 style="grid-column: 1/4"
             />
@@ -55,7 +48,14 @@
                 v-model="modal.comprobante.estado"
                 :lista="modal.comprobante_estados"
                 :disabled="true"
-                style="grid-column: 1/3"
+                style="grid-column: 5/6"
+            />
+
+            <JdInput
+                label="Dirección"
+                v-model="modal.comprobante.cliente_datos.direccion"
+                :disabled="true"
+                style="grid-column: 1/4"
             />
         </div>
 
@@ -66,16 +66,52 @@
             :seeker="false"
             :colNro="false"
             :download="false"
-        />
+        >
+            <template v-slot:colDescuento="{ item }">
+                {{ mostrarDescuento(item) }}
+            </template>
+        </JdTable>
 
         <div class="datos-bottom">
-            <div>
+            <div></div>
 
-            </div>
+            <div class="right" v-if="modal.totals">
+                <span>Ope. gravadas:</span>
+                <p>{{ redondear(modal.totals.MNT_TOT_GRAVADO) }}</p>
 
-            <div class="right">
-                <strong>Total:</strong>
-                <strong class="total"> S/ {{ redondear(modal.mtoImpVenta) }} </strong>
+                <template v-if="modal.totals.MNT_TOT_EXONERADO > 0">
+                    <span>Ope. exoneradas:</span>
+                    <p>{{ redondear(modal.totals.MNT_TOT_EXONERADO) }}</p>
+                </template>
+
+                <template v-if="modal.totals.MNT_TOT_INAFECTO > 0">
+                    <span>Ope. inafectas:</span>
+                    <p>{{ redondear(modal.totals.MNT_TOT_INAFECTO) }}</p>
+                </template>
+
+                <template v-if="modal.totals.MNT_TOT_GRATUITO > 0">
+                    <span>Ope. gratuitas:</span>
+                    <p>{{ redondear(modal.totals.MNT_TOT_GRATUITO) }}</p>
+                </template>
+
+                <span>Descuentos:</span>
+                <p>{{ redondear(modal.totals.MNT_TOT_DESCUENTO) }}</p>
+
+                <span>IGV:</span>
+                <p>{{ redondear(modal.totals.MNT_TOT_TRIB_IGV) }}</p>
+
+                <template v-if="modal.totals.MNT_TOT_TRIB_ISC > 0">
+                    <span>ISC:</span>
+                    <p>{{ redondear(modal.totals.MNT_TOT_TRIB_ISC) }}</p>
+                </template>
+
+                <template v-if="modal.totals.MNT_IMPUESTO_BOLSAS > 0">
+                    <span>ICBPER:</span>
+                    <p>{{ redondear(modal.totals.MNT_IMPUESTO_BOLSAS) }}</p>
+                </template>
+
+                <strong>Importe total:</strong>
+                <strong class="total"> {{ redondear(modal.totals.MNT_TOT) }} </strong>
             </div>
         </div>
 
@@ -98,6 +134,8 @@ import { useModals } from '@/pinia/modals'
 
 import { urls, get } from '@/utils/crud'
 import { redondear, copyToClipboard } from '@/utils/mine'
+
+import dayjs from 'dayjs'
 
 export default {
     emits: ['detallesModificados'],
@@ -143,9 +181,34 @@ export default {
             },
             {
                 id: 'pu',
-                title: 'Pu',
+                title: 'Precio',
+                format: 'decimal',
                 toRight: true,
                 width: '5rem',
+                show: true,
+            },
+            {
+                id: 'descuento',
+                title: 'Descuento',
+                slot: 'colDescuento',
+                toRight: true,
+                width: '7rem',
+                show: true,
+            },
+            {
+                id: 'valor_venta',
+                title: 'Subtotal',
+                format: 'decimal',
+                toRight: true,
+                width: '6rem',
+                show: true,
+            },
+            {
+                id: 'igv',
+                title: 'Impuesto',
+                format: 'decimal',
+                toRight: true,
+                width: '6rem',
                 show: true,
             },
             {
@@ -156,6 +219,23 @@ export default {
                 width: '6rem',
                 show: true,
             },
+        ],
+
+        codigosAfectacionGratuitas: [
+            '11',
+            '12',
+            '13',
+            '14',
+            '15',
+            '16',
+            '21',
+            '31',
+            '32',
+            '33',
+            '34',
+            '35',
+            '36',
+            '37',
         ],
     }),
     computed: {
@@ -171,6 +251,9 @@ export default {
                     ? 'PARA LLEVAR'
                     : 'DELIVERY'
             }
+        },
+        fecha_formateada() {
+            return dayjs(this.modal.comprobante.fecha_emision).format('DD/MM/YYYY')
         },
     },
     created() {
@@ -257,41 +340,150 @@ export default {
         },
 
         sumarItems() {
-            for (const a of this.modal.comprobante.comprobante_items) this.calcularUno(a)
-
             this.calcularTotales()
         },
-        calcularUno(item) {
-            item.vu =
-                item.igv_afectacion == '10' ? item.pu / (1 + item.igv_porcentaje / 100) : item.pu
+        mostrarDescuento(item) {
+            if (!Number(item.descuento_valor)) return '-'
 
-            item.mtoValorVenta = item.cantidad * item.vu
-            item.igv =
-                item.igv_afectacion == '10' ? item.mtoValorVenta * (item.igv_porcentaje / 100) : 0
-            item.total = item.mtoValorVenta + item.igv
+            return item.descuento_tipo == 1
+                ? `${this.redondear(item.descuento_valor)}`
+                : `${this.redondear(item.descuento_valor)}%`
         },
-        calcularTotales() {
-            this.modal.mtoOperGravadas = 0
-            this.modal.mtoOperExoneradas = 0
-            this.modal.mtoOperInafectas = 0
-            this.modal.mtoIGV = 0
+        calcularUno(item) {
+            const cantidad = Number(item.cantidad) || 0
+            const pu = Number(item.pu) || 0
+            const igvPorcentaje = Number(item.igv_porcentaje) || 0
+            const igvAfectacion = item.igv_afectacion
+            const descuentoTipo = item.descuento_tipo
+            const descuentoValor = Number(item.descuento_valor) || 0
+            const impuestoBolsaUnitario = item.has_bolsa_tax === true ? 0.5 : 0
+            const iscPorcentaje = Number(item.isc_porcentaje) || 0
+            const iscMontoFijoUnitario = Number(item.isc_monto_fijo_uni) || 0
+            const ivapPorcentaje = Number(item.ivap_porcentaje) || 0
+            const tasaIsc = iscPorcentaje / 100
 
-            for (const a of this.modal.comprobante.comprobante_items) {
-                if (a.igv_afectacion == '10') {
-                    this.modal.mtoOperGravadas += a.mtoValorVenta
-                    this.modal.mtoIGV += a.igv
-                } else if (a.igv_afectacion == '20') {
-                    this.modal.mtoOperExoneradas += a.mtoValorVenta
-                } else if (a.igv_afectacion == '30') {
-                    this.modal.mtoOperInafectas += a.mtoValorVenta
+            let tasaIgv = 0
+            if (igvAfectacion === '10') tasaIgv = igvPorcentaje / 100
+            if (igvAfectacion === '17') tasaIgv = (ivapPorcentaje || igvPorcentaje) / 100
+            if (['11', '12', '13', '14', '15', '16'].includes(igvAfectacion)) {
+                tasaIgv = igvPorcentaje / 100
+            }
+
+            const operacionGratuita = this.codigosAfectacionGratuitas.includes(igvAfectacion)
+            let valorUnitarioBruto
+            let iscUnitario = 0
+
+            if (iscMontoFijoUnitario > 0) {
+                iscUnitario = iscMontoFijoUnitario
+                valorUnitarioBruto =
+                    tasaIgv > 0 ? pu / (1 + tasaIgv) - iscUnitario : pu - iscUnitario
+            } else if (iscPorcentaje > 0) {
+                valorUnitarioBruto =
+                    tasaIgv > 0 ? pu / ((1 + tasaIsc) * (1 + tasaIgv)) : pu / (1 + tasaIsc)
+                iscUnitario = valorUnitarioBruto * tasaIsc
+            } else {
+                valorUnitarioBruto = tasaIgv > 0 ? pu / (1 + tasaIgv) : pu
+            }
+
+            valorUnitarioBruto = Math.max(0, valorUnitarioBruto)
+
+            let descuentoUnitarioSinTributos = 0
+            if (descuentoValor > 0 && cantidad > 0) {
+                if (descuentoTipo == 1) {
+                    let descuentoSinTributos
+
+                    if (iscMontoFijoUnitario > 0) {
+                        const descuentoSinIgv =
+                            tasaIgv > 0 ? descuentoValor / (1 + tasaIgv) : descuentoValor
+                        descuentoSinTributos = Math.max(
+                            0,
+                            descuentoSinIgv - iscMontoFijoUnitario * cantidad,
+                        )
+                    } else if (iscPorcentaje > 0) {
+                        let factorImpuestos = 1 + tasaIsc
+                        if (tasaIgv > 0) factorImpuestos *= 1 + tasaIgv
+                        descuentoSinTributos = descuentoValor / factorImpuestos
+                    } else {
+                        descuentoSinTributos =
+                            tasaIgv > 0 ? descuentoValor / (1 + tasaIgv) : descuentoValor
+                    }
+
+                    descuentoUnitarioSinTributos = descuentoSinTributos / cantidad
+                } else if (descuentoTipo == 2) {
+                    descuentoUnitarioSinTributos = valorUnitarioBruto * (descuentoValor / 100)
                 }
             }
 
-            this.modal.valorVenta =
-                this.modal.mtoOperGravadas +
-                this.modal.mtoOperExoneradas +
-                this.modal.mtoOperInafectas
-            this.modal.mtoImpVenta = this.modal.valorVenta + this.modal.mtoIGV
+            const valorUnitario = Math.max(0, valorUnitarioBruto - descuentoUnitarioSinTributos)
+            iscUnitario =
+                iscMontoFijoUnitario > 0
+                    ? iscMontoFijoUnitario
+                    : iscPorcentaje > 0
+                      ? valorUnitario * tasaIsc
+                      : 0
+
+            const igvUnitario = tasaIgv > 0 ? (valorUnitario + iscUnitario) * tasaIgv : 0
+            const precioVentaUnitario =
+                valorUnitario + iscUnitario + igvUnitario + impuestoBolsaUnitario
+
+            item.VAL_VTA_ITEM = valorUnitario * cantidad
+            item.MNT_IGV_ITEM = igvUnitario * cantidad
+            item.MNT_ISC_ITEM = iscUnitario * cantidad
+            item.MNT_DSCTO_ITEM = descuentoUnitarioSinTributos * cantidad
+            item.IMPUESTO_BOLSAS_UNIT = impuestoBolsaUnitario
+
+            if (operacionGratuita) {
+                item.valor_venta = 0
+                item.igv = 0
+                item.total = 0
+            } else {
+                item.valor_venta = item.VAL_VTA_ITEM
+                item.igv = item.MNT_IGV_ITEM
+                item.total = precioVentaUnitario * cantidad
+            }
+        },
+        calcularTotales() {
+            const totals = {
+                MNT_TOT_GRAVADO: 0,
+                MNT_TOT_EXONERADO: 0,
+                MNT_TOT_INAFECTO: 0,
+                MNT_TOT_GRATUITO: 0,
+                MNT_TOT_DESCUENTO: 0,
+                MNT_TOT_TRIB_IGV: 0,
+                MNT_TOT_TRIB_ISC: 0,
+                MNT_IMPUESTO_BOLSAS: 0,
+                MNT_TOT: 0,
+            }
+
+            for (const item of this.modal.comprobante.comprobante_items || []) {
+                this.calcularUno(item)
+
+                totals.MNT_TOT_DESCUENTO += item.MNT_DSCTO_ITEM || 0
+                totals.MNT_TOT_TRIB_ISC += item.MNT_ISC_ITEM || 0
+                totals.MNT_IMPUESTO_BOLSAS +=
+                    (item.IMPUESTO_BOLSAS_UNIT || 0) * (Number(item.cantidad) || 0)
+
+                if (this.codigosAfectacionGratuitas.includes(item.igv_afectacion)) {
+                    totals.MNT_TOT_GRATUITO += item.VAL_VTA_ITEM || 0
+                } else if (item.igv_afectacion === '10' || item.igv_afectacion === '17') {
+                    totals.MNT_TOT_GRAVADO += item.VAL_VTA_ITEM || 0
+                    totals.MNT_TOT_TRIB_IGV += item.MNT_IGV_ITEM || 0
+                } else if (item.igv_afectacion === '20') {
+                    totals.MNT_TOT_EXONERADO += item.VAL_VTA_ITEM || 0
+                } else if (item.igv_afectacion === '30' || item.igv_afectacion === '40') {
+                    totals.MNT_TOT_INAFECTO += item.VAL_VTA_ITEM || 0
+                }
+            }
+
+            totals.MNT_TOT =
+                totals.MNT_TOT_GRAVADO +
+                totals.MNT_TOT_EXONERADO +
+                totals.MNT_TOT_INAFECTO +
+                totals.MNT_TOT_TRIB_IGV +
+                totals.MNT_TOT_TRIB_ISC +
+                totals.MNT_IMPUESTO_BOLSAS
+
+            this.modal.totals = totals
         },
     },
 }
@@ -300,7 +492,7 @@ export default {
 <style lang="scss" scoped>
 .container-datos {
     display: grid;
-    grid-template-columns: 10rem 10rem 10rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) 15rem;
     gap: 0.5rem;
     margin-bottom: 2rem;
 
@@ -327,7 +519,7 @@ export default {
         padding: 1rem;
         border-radius: 0.5rem;
         display: grid;
-        grid-template-columns: 4rem 9rem;
+        grid-template-columns: 10rem 9rem;
         gap: 0.5rem;
         align-items: center;
         height: fit-content;
