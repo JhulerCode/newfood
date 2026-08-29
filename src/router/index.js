@@ -4,13 +4,13 @@ const routes = [
     {
         path: '/signin',
         name: 'SignIn',
-        meta: { title: 'DivergeRest - Sign In' },
+        meta: { title: 'DivergeCore - Iniciar sesión' },
         component: () => import('@/views/_signin/SignIn.vue'),
     },
     {
         path: '/consola',
         name: 'ConsolaView',
-        meta: { title: 'DivergeRest - Consola' },
+        meta: { title: 'DivergeCore - Consola' },
         component: () => import('@/views/_consola/ConsolaView.vue'),
     },
 ]

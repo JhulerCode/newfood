@@ -273,7 +273,7 @@ export const useAuth = defineStore('auth', {
             })
 
             this.socket.on('printer_agent_socket_not_found', () => {
-                jmsg('error', 'DivergeRest Printer no iniciado')
+                jmsg('error', 'DivergeCore Printer no iniciado')
             })
 
             // --- Articulos --- //
