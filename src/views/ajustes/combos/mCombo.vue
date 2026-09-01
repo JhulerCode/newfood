@@ -11,6 +11,15 @@
                 style="grid-column: 1/4"
             />
 
+            <JdButton
+                icon="fa-solid fa-plus"
+                tipo="2"
+                title="Nueva categoría"
+                @click="nuevaCategoria"
+                v-if="useAuth.verifyPermiso('vArticuloCategorias:crear')"
+                class="btn-nueva-categoria"
+            />
+
             <JdInput
                 label="Nombre"
                 :nec="true"
@@ -58,9 +67,9 @@
         <div class="agregar">
             <strong style="grid-column: 1/5">--- Componentes ---</strong>
             <JdSelectQuery
-                label="Artículo"
+                label="Producto"
                 :nec="true"
-                v-model="nuevo.articulo"
+                v-model="nuevo.articulo_variant"
                 :spin="spinArticulos"
                 :lista="modal.articulos"
                 @search="searchArticulos"
@@ -86,6 +95,10 @@
             :colAct="true"
             :download="false"
         >
+            <template v-slot:cArticulo="{ item }">
+                {{ componentName(item) }}
+            </template>
+
             <template v-slot:cAction="{ item }">
                 <JdButton
                     tipo="2"
@@ -97,6 +110,11 @@
             </template>
         </JdTable>
     </JdModal>
+
+    <mArticuloCategoria
+        @created="setCategoriaCreada"
+        v-if="useModals.show.mArticuloCategoria"
+    />
 </template>
 
 <script>
@@ -110,6 +128,8 @@ import {
     JdButton,
     JdInputFile,
 } from '@jhuler/components'
+
+import mArticuloCategoria from '@/views/ajustes/categorias/mArticuloCategoria.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useModals } from '@/pinia/modals'
@@ -129,6 +149,7 @@ export default {
         JdSwitch,
         JdTable,
         JdInputFile,
+        mArticuloCategoria,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -150,8 +171,8 @@ export default {
         columns: [
             {
                 id: 'articulo',
-                title: 'Artículo',
-                prop: 'articulo1.nombre',
+                title: 'Producto',
+                slot: 'cArticulo',
                 width: '23rem',
                 show: true,
             },
@@ -198,18 +219,14 @@ export default {
             }
 
             const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '2' },
-                    is_combo: { op: 'Es', val: false },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad', 'igv_afectacion'],
-                ordr: [['nombre', 'ASC']],
+                search: txtBuscar,
+                tipo: '2',
+                is_combo: false,
+                limit: 50,
             }
 
             this.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.spinArticulos = false
 
             if (res.code !== 0) return
@@ -221,30 +238,60 @@ export default {
                 this.nuevo = {}
             } else {
                 this.nuevo.nombre = a.nombre
+                this.nuevo.articulo_nombre = a.articulo_nombre
+                this.nuevo.articulo = a.articulo
+                this.nuevo.articulo_variant = a.articulo_variant
+                this.nuevo.variant_nombre = a.variant_nombre
                 this.nuevo.unidad = a.unidad
             }
         },
         async addArticulo() {
-            if (this.nuevo.articulo == null || this.nuevo.cantidad == null)
-                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
+            if (
+                this.nuevo.articulo == null ||
+                this.nuevo.articulo_variant == null ||
+                this.nuevo.cantidad == null
+            )
+                return jmsg('warning', 'Selecciona una variante e ingrese la cantidad')
+
+            if (Number(this.nuevo.cantidad) <= 0)
+                return jmsg('warning', 'La cantidad debe ser mayor a cero')
 
             const i = this.articulo.combo_articulos.findIndex(
-                (a) => a.articulo == this.nuevo.articulo,
+                (a) => a.articulo_variant == this.nuevo.articulo_variant,
             )
-            if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
+            if (i !== -1) return jmsg('warning', 'La variante ya está agregada')
 
             this.articulo.combo_articulos.push({
                 id: genId(this.articulo.combo_articulos),
                 articulo: this.nuevo.articulo,
-                articulo1: { nombre: this.nuevo.nombre, unidad: this.nuevo.unidad },
+                articulo_variant: this.nuevo.articulo_variant,
+                articulo1: {
+                    nombre: this.nuevo.articulo_nombre,
+                    unidad: this.nuevo.unidad,
+                },
+                articulo_variant1: {
+                    id: this.nuevo.articulo_variant,
+                    articulo: this.nuevo.articulo,
+                    nombre: this.nuevo.variant_nombre,
+                },
+                nombre: this.nuevo.nombre,
                 cantidad: this.nuevo.cantidad,
             })
 
             this.nuevo = {}
         },
         async quitar(item) {
-            const i = this.articulo.combo_articulos.findIndex((a) => a.articulo == item.articulo)
+            const i = this.articulo.combo_articulos.findIndex(
+                (a) => a.articulo_variant == item.articulo_variant,
+            )
             this.articulo.combo_articulos.splice(i, 1)
+        },
+
+        componentName(item) {
+            if (item.nombre) return item.nombre
+            const articleName = item.articulo1?.nombre || ''
+            const variantName = item.articulo_variant1?.nombre
+            return variantName ? `${articleName} / ${variantName}` : articleName
         },
 
         checkDatos() {
@@ -261,8 +308,12 @@ export default {
             }
 
             for (const a of this.articulo.combo_articulos) {
-                if (incompleteData(a, ['articulo', 'cantidad'])) {
+                if (incompleteData(a, ['articulo', 'articulo_variant', 'cantidad'])) {
                     jmsg('warning', 'Ingrese los datos necesarios de los artículos')
+                    return true
+                }
+                if (Number(a.cantidad) <= 0) {
+                    jmsg('warning', 'Las cantidades deben ser mayores a cero')
                     return true
                 }
             }
@@ -326,6 +377,31 @@ export default {
 
             this.modal.articulo_categorias = res.data
         },
+        nuevaCategoria() {
+            const send = {
+                item: {
+                    tipo: 2,
+                    activo: true,
+                },
+                lock_tipo: true,
+            }
+
+            this.useModals.setModal(
+                'mArticuloCategoria',
+                'Nueva categoría',
+                1,
+                send,
+                true,
+            )
+        },
+        setCategoriaCreada(item) {
+            const index = this.modal.articulo_categorias.findIndex((a) => a.id == item.id)
+
+            if (index == -1) this.modal.articulo_categorias.push(item)
+            else this.modal.articulo_categorias[index] = item
+
+            this.articulo.categoria = item.id
+        },
         async loadProduccionAreas() {
             const qry = {
                 fltr: {
@@ -361,6 +437,10 @@ export default {
     display: grid;
     grid-template-columns: repeat(4, 10rem);
     gap: 0.5rem;
+
+    .btn-nueva-categoria {
+        align-self: end;
+    }
 
     .producto-foto {
         width: 9rem;

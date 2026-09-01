@@ -232,7 +232,14 @@ export default {
             }
 
             for (const a of this.modal.transaccion.transaccion_items) {
-                const props1 = ['articulo', 'cantidad', 'pu', 'igv_afectacion', 'igv_porcentaje']
+                const props1 = [
+                    'articulo',
+                    'articulo_variant',
+                    'cantidad',
+                    'pu',
+                    'igv_afectacion',
+                    'igv_porcentaje',
+                ]
 
                 if (incompleteData(a, props1)) {
                     jmsg('warning', 'Ingrese los datos necesarios de los articulos')

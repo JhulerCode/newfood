@@ -97,6 +97,13 @@ export default {
                 show: true,
             },
             {
+                id: 'articulo_variant',
+                title: 'Variante',
+                prop: 'articulo_variant1.nombre',
+                width: '10rem',
+                show: true,
+            },
+            {
                 id: 'articulo1.unidad',
                 title: 'Unidad',
                 prop: 'articulo1.unidad',
@@ -146,7 +153,7 @@ export default {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
-                incl: ['articulo1', 'transaccion1', 'comprobante1'],
+                incl: ['articulo1', 'articulo_variant1', 'transaccion1', 'comprobante1'],
                 iccl: {
                     comprobante1: {
                         incl: ['socio1'],

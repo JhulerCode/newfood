@@ -408,8 +408,12 @@ export default {
                     return jmsg('error', res.msg)
                 }
 
-                await this.loadProductos()
+                await Promise.all([this.loadProductos(), this.loadProductoVariants()])
                 const productosMap = this.vista.productos.reduce(
+                    (obj, a) => ((obj[a.nombre] = a), obj),
+                    {},
+                )
+                const variantsMap = this.vista.producto_variants.reduce(
                     (obj, a) => ((obj[a.nombre] = a), obj),
                     {},
                 )
@@ -418,9 +422,15 @@ export default {
                     a.articulo_principal1 = productosMap[a.Combo]
                     a.articulo_principal = a.articulo_principal1?.id
 
-                    a.articulo1 = productosMap[a.Componente]
-                    a.articulo = a.articulo1?.id
-                    // console.log(a.articulo_principal1, a.articulo1)
+                    const variant = variantsMap[a.Componente]
+                    a.articulo = variant?.articulo
+                    a.articulo_variant = variant?.articulo_variant
+                    a.articulo1 = variant
+                        ? { id: variant.articulo, nombre: variant.articulo_nombre }
+                        : null
+                    a.articulo_variant1 = variant
+                        ? { id: variant.articulo_variant, nombre: variant.variant_nombre }
+                        : null
 
                     a.cantidad = a.Cantidad
                 }
@@ -521,7 +531,7 @@ export default {
                 incl: ['combo_articulos'],
                 iccl: {
                     combo_articulos: {
-                        incl: ['articulo1'],
+                        incl: ['articulo1', 'articulo_variant1'],
                     },
                 },
             }
@@ -551,7 +561,7 @@ export default {
                 incl: ['combo_articulos'],
                 iccl: {
                     combo_articulos: {
-                        incl: ['articulo1'],
+                        incl: ['articulo1', 'articulo_variant1'],
                     },
                 },
             }
@@ -646,6 +656,19 @@ export default {
             if (res.code != 0) return
 
             this.vista.productos = res.data
+        },
+        async loadProductoVariants() {
+            this.vista.producto_variants = []
+            const qry = {
+                tipo: '2',
+                is_combo: false,
+                limit: 2000,
+            }
+
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
+            if (res.code != 0) return
+
+            this.vista.producto_variants = res.data
         },
         async loadDatosSistema() {
             const qry = ['igv_afectaciones', 'unidades', 'activo_estados']

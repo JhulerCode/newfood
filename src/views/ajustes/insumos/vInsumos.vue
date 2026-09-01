@@ -129,6 +129,27 @@ export default {
                 seek: false,
                 sort: true,
             },
+            {
+                id: 'has_variants',
+                title: 'Tiene variantes',
+                prop: 'has_variants1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'variants_summary',
+                title: 'Variantes',
+                type: 'text',
+                width: '18rem',
+                filtrable: false,
+                show: true,
+                seek: false,
+                sort: false,
+            },
             // {
             //     id: 'activo',
             //     title: 'Estado',
@@ -218,11 +239,14 @@ export default {
         setQuery() {
             this.vista.qry = {
                 fltr: { tipo: { op: 'Es', val: '1' } },
-                incl: ['categoria1'],
+                incl: ['categoria1', 'articulo_variants'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
+            if (!this.vista.qry.cols.includes('has_variants')) {
+                this.vista.qry.cols.push('has_variants')
+            }
         },
         async loadArticulos() {
             this.setQuery()
@@ -261,6 +285,7 @@ export default {
                 igv_afectacion: 10,
 
                 has_receta: false,
+                has_variants: false,
                 activo: true,
 
                 is_combo: false,
@@ -324,6 +349,7 @@ export default {
                 if (a.id == 'unidad') a.lista = this.vista.unidades
                 if (a.id == 'activo') a.lista = this.vista.activo_estados
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
+                if (a.id == 'has_variants') a.lista = this.vista.estados
                 if (a.id == 'categoria') a.reload = this.loadCategorias
             }
             const cols = this.columns
@@ -432,7 +458,13 @@ export default {
                 column: 'articulo',
             }
 
-            this.useModals.setModal('mRelacionadoSucursales', `${item.nombre} - sucursales`, 2, send, true)
+            this.useModals.setModal(
+                'mRelacionadoSucursales',
+                `${item.nombre} - sucursales`,
+                2,
+                send,
+                true,
+            )
         },
 
         async loadCategorias() {
@@ -453,7 +485,7 @@ export default {
             return res.data
         },
         async loadDatosSistema() {
-            const qry = ['igv_afectaciones', 'unidades', 'activo_estados']
+            const qry = ['igv_afectaciones', 'unidades', 'activo_estados', 'estados']
             const res = await get(`${urls.sistema}?qry=${JSON.stringify(qry)}`)
 
             if (res.code != 0) return

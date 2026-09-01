@@ -141,7 +141,7 @@
                             </p>
                             <ul v-if="item.is_combo" class="combo_items">
                                 <li v-for="(a, i) in item.combo_articulos" :key="i">
-                                    <small>- ({{ a.cantidad }}) {{ a.articulo1.nombre }}</small>
+                                    <small>- ({{ a.cantidad }}) {{ comboComponentName(a) }}</small>
                                 </li>
                             </ul>
                         </div>
@@ -299,6 +299,12 @@ export default {
         window.removeEventListener('resize', this.handleResize)
     },
     methods: {
+        comboComponentName(item) {
+            const articleName = item.articulo1?.nombre || ''
+            const variantName = item.articulo_variant1?.nombre
+            return variantName ? `${articleName} / ${variantName}` : articleName
+        },
+
         async loadCategorias() {
             const qry = {
                 fltr: {
@@ -325,38 +331,11 @@ export default {
             })
         },
         async loadArticulos() {
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '2' },
-                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
-                    'sucursal_articulos.estado': { op: 'Es', val: true },
-                },
-                cols: [
-                    'nombre',
-                    'precio_venta',
-                    'has_receta',
-                    'is_combo',
-                    'igv_afectacion',
-                    'codigo_barra',
-                    'precios_semana',
-                    'foto_path',
-                    'foto_url',
-                    'categoria',
-                ],
-                incl: ['receta_insumos', 'combo_articulos', 'sucursal_articulos'],
-                iccl: {
-                    combo_articulos: {
-                        incl: ['articulo1'],
-                    },
-                    sucursal_articulos: {
-                        incl: ['impresion_area1'],
-                    },
-                },
-            }
+            const qry = { tipo: '2', limit: 2000 }
 
             this.vista.articulosLoaded = false
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -425,6 +404,10 @@ export default {
             this.focusCodigoBarra()
         },
         showPrecio(item) {
+            if (item.variant_price !== null && item.variant_price !== undefined) {
+                return item.precio_venta
+            }
+
             const numeroDiaSemana = dayjs().day()
             const promocion_hoy = (item.precios_semana || []).find((a) => a.id == numeroDiaSemana)
 
@@ -460,39 +443,10 @@ export default {
                 return
             }
 
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '2' },
-                    activo: { op: 'Es', val: true },
-                    codigo_barra: { op: 'Es', val: codigo },
-                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
-                    'sucursal_articulos.estado': { op: 'Es', val: true },
-                },
-                cols: [
-                    'nombre',
-                    'precio_venta',
-                    'has_receta',
-                    'is_combo',
-                    'igv_afectacion',
-                    'codigo_barra',
-                    'precios_semana',
-                    'foto_path',
-                    'foto_url',
-                    'categoria',
-                ],
-                incl: ['receta_insumos', 'combo_articulos', 'sucursal_articulos'],
-                iccl: {
-                    combo_articulos: {
-                        incl: ['articulo1'],
-                    },
-                    sucursal_articulos: {
-                        incl: ['impresion_area1'],
-                    },
-                },
-            }
+            const qry = { tipo: '2', barcode: codigo, limit: 1 }
 
             this.buscandoCodigoBarra = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.buscandoCodigoBarra = false
             this.codigoBarra = null
 
@@ -510,13 +464,16 @@ export default {
             await this.addArticulo(res.data[0], true)
         },
         async addArticulo(item, fromScanner = false) {
-            const i = this.vista.pedido.transaccion_items.findIndex((a) => a.articulo == item.id)
+            const i = this.vista.pedido.transaccion_items.findIndex(
+                (a) => (a.articulo_variant || a.articulo) == item.articulo_variant,
+            )
             const sucursal_articulo = this.getSucursalArticulo(item)
             const pu = this.showPrecio(item)
 
             if (i === -1) {
                 this.vista.pedido.transaccion_items.push({
-                    articulo: item.id,
+                    articulo: item.articulo,
+                    articulo_variant: item.articulo_variant,
                     codigo_barra: item.codigo_barra,
                     nombre: item.nombre,
                     unidad: item.unidad,

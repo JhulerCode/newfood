@@ -627,7 +627,7 @@ export default {
             if (res.code != 0) return false
 
             const qry1 = {
-                incl: ['articulo1'],
+                incl: ['articulo1', 'articulo_variant1'],
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
                 ordr: [['createdAt', 'ASC']],
@@ -841,6 +841,7 @@ export default {
                 .map((a) => ({
                     id1: a.id,
                     articulo: a.articulo,
+                    articulo_variant: a.articulo_variant,
                     has_receta: a.has_receta,
                     receta_insumos: a.receta_insumos,
                     is_combo: a.is_combo,

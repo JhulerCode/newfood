@@ -190,7 +190,7 @@ export default {
                     tipo: { op: 'Es', val: 1 },
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
-                incl: ['socio1']
+                incl: ['socio1'],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -264,7 +264,7 @@ export default {
             if (res.code != 0) return
 
             const qry1 = {
-                incl: ['articulo1'],
+                incl: ['articulo1', 'articulo_variant1'],
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
             }
@@ -296,7 +296,7 @@ export default {
             if (res.code != 0) return
 
             const qry1 = {
-                incl: ['articulo1'],
+                incl: ['articulo1', 'articulo_variant1'],
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
             }

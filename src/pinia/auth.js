@@ -279,10 +279,12 @@ export const useAuth = defineStore('auth', {
             // --- Articulos --- //
             this.socket.on('mArticulo:crear', () => {
                 useVistas().vComanda?.loadArticulos()
+                useVistas().vPos?.loadArticulos()
             })
 
             this.socket.on('mArticulo:modificar', () => {
                 useVistas().vComanda?.loadArticulos()
+                useVistas().vPos?.loadArticulos()
             })
 
             // --- Categorias --- //

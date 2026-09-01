@@ -920,7 +920,7 @@ export default {
             }
 
             const itemsQry = {
-                incl: ['articulo1'],
+                incl: ['articulo1', 'articulo_variant1'],
                 cols: { exclude: [] },
                 fltr: { transaccion: { op: 'Es', val: item.id } },
                 ordr: [['createdAt', 'ASC']],

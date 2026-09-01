@@ -22,7 +22,7 @@
             <JdSelectQuery
                 label="Artículo"
                 :nec="true"
-                v-model="modal.transaccion.articulo"
+                v-model="modal.transaccion.articulo_variant"
                 :spin="modal.spinArticulos"
                 :lista="modal.articulos"
                 @search="searchArticulos"
@@ -81,11 +81,13 @@ export default {
 
         buttons: [{ text: 'Grabar', action: 'grabar', show: true }],
     }),
-    created() {
+    async created() {
         this.modal = this.useModals.mAjusteStock
 
         this.loadDatosSistema()
-        // this.loadLotes()
+        if (this.modal.transaccion.articulo) {
+            await this.loadArticleVariants(this.modal.transaccion.articulo)
+        }
     },
     methods: {
         initTransaccion() {
@@ -103,16 +105,15 @@ export default {
             }
 
             const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: this.modal.articulo_tipo.toString() },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad', 'igv_afectacion'],
+                tipo: this.modal.articulo_tipo.toString(),
+                search: txtBuscar,
+                include_inactive: true,
+                include_disabled_branch: true,
+                limit: 50,
             }
 
             this.modal.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.modal.spinArticulos = false
 
             if (res.code !== 0) return
@@ -121,10 +122,37 @@ export default {
         },
         setArticulo(item) {
             this.modal.articulo1 = item
+            this.modal.transaccion.articulo = item.articulo
+            this.modal.transaccion.articulo_variant = item.articulo_variant
+        },
+        async loadArticleVariants(articulo) {
+            const qry = {
+                articulo,
+                tipo: this.modal.articulo_tipo.toString(),
+                include_inactive: true,
+                include_disabled_branch: true,
+                limit: 200,
+            }
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
+            if (res.code != 0) return
+
+            this.modal.articulos = res.data
+            if (res.data.length == 1) {
+                this.setArticulo(res.data[0])
+            } else {
+                this.modal.transaccion.articulo_variant = null
+            }
         },
 
         checkDatos() {
-            const props = ['fecha', 'tipo', 'articulo', 'cantidad', 'observacion']
+            const props = [
+                'fecha',
+                'tipo',
+                'articulo',
+                'articulo_variant',
+                'cantidad',
+                'observacion',
+            ]
 
             if (incompleteData(this.modal.transaccion, props)) {
                 jmsg('warning', 'Completa los campos requeridos')
@@ -144,6 +172,7 @@ export default {
 
             this.initTransaccion()
             this.useModals.show.mAjusteStock = false
+            this.$emit('saved')
         },
 
         async loadDatosSistema() {

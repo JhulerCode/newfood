@@ -1,10 +1,10 @@
 <template>
     <JdModal modal="mArticuloReceta">
-        <div class="agregar" v-if="useAuth.verifyPermiso('vProductos:listarReceta')">
+        <div class="agregar" v-if="useAuth.verifyPermiso('vProductos:crearReceta')">
             <JdSelectQuery
                 label="Artículo"
                 :nec="true"
-                v-model="nuevo.articulo"
+                v-model="nuevo.articulo_variant"
                 :spin="spinArticulos"
                 :lista="articulos"
                 @search="searchArticulos"
@@ -35,6 +35,10 @@
             @onChange="(action, a) => this[action](a)"
             :inputsDisabled="!this.useAuth.verifyPermiso('vProductos:editarReceta')"
         >
+            <template v-slot:cArticulo="{ item }">
+                {{ componentName(item) }}
+            </template>
+
             <template v-slot:cAction="{ item }">
                 <JdButton
                     :small="true"
@@ -100,6 +104,7 @@ export default {
         getItemFromArray,
 
         modal: {},
+        receta: { receta_insumos: [] },
         nuevo: {},
         articulos: [],
         spinArticulos: false,
@@ -115,7 +120,7 @@ export default {
             {
                 id: 'articulo',
                 title: 'Artículo',
-                prop: 'articulo1.nombre',
+                slot: 'cArticulo',
                 width: '20rem',
                 show: true,
             },
@@ -140,7 +145,10 @@ export default {
     }),
     created() {
         this.modal = this.useModals.mArticuloReceta
-        this.receta = this.useModals.mArticuloReceta.item
+        this.receta = this.useModals.mArticuloReceta.item || {}
+        this.receta.articulo_principal ||= this.receta.id
+        this.receta.articulo_principal_variant ||= this.receta.id
+        this.receta.receta_insumos ||= []
 
         if (this.useAuth.verifyPermiso('vProductos:editarReceta') == false)
             this.columns[0].show = false
@@ -154,17 +162,10 @@ export default {
                 return
             }
 
-            const qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '1' },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: ['nombre', 'unidad'],
-            }
+            const qry = { search: txtBuscar, tipo: '1', limit: 50 }
 
             this.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.spinArticulos = false
 
             if (res.code !== 0) return
@@ -176,20 +177,34 @@ export default {
                 this.nuevo = {}
             } else {
                 this.nuevo.nombre = a.nombre
+                this.nuevo.articulo = a.articulo
+                this.nuevo.articulo_variant = a.articulo_variant
+                this.nuevo.articulo_nombre = a.articulo_nombre
+                this.nuevo.variant_nombre = a.variant_nombre
                 this.nuevo.unidad = a.unidad
             }
         },
         async crear() {
-            if (this.nuevo.articulo == null || this.nuevo.cantidad == null)
-                return jmsg('warning', 'Selecciona un artículo e ingrese la cantidad')
+            if (
+                this.nuevo.articulo == null ||
+                this.nuevo.articulo_variant == null ||
+                this.nuevo.cantidad == null
+            )
+                return jmsg('warning', 'Selecciona una variante e ingrese la cantidad')
 
-            const i = this.receta.receta_insumos.findIndex((a) => a.articulo == this.nuevo.articulo)
-            if (i !== -1) return jmsg('warning', 'El artículo ya está agregado')
+            if (Number(this.nuevo.cantidad) <= 0)
+                return jmsg('warning', 'La cantidad debe ser mayor a cero')
+
+            const i = this.receta.receta_insumos.findIndex(
+                (a) => a.articulo_variant == this.nuevo.articulo_variant,
+            )
+            if (i !== -1) return jmsg('warning', 'La variante ya está agregada')
 
             this.useAuth.setLoading(true, 'Agregando...')
             const res = await post(urls.receta_insumos, {
                 ...this.nuevo,
-                articulo_principal: this.receta.id,
+                articulo_principal: this.receta.articulo_principal || this.receta.id,
+                articulo_principal_variant: this.receta.articulo_principal_variant,
                 orden: this.receta.receta_insumos.length + 1,
             })
             this.useAuth.setLoading(false)
@@ -207,8 +222,13 @@ export default {
 
             if (res.code !== 0) return
 
-            const i = this.receta.receta_insumos.findIndex((a) => a.articulo == item.articulo)
+            const i = this.receta.receta_insumos.findIndex((a) => a.id == item.id)
             this.receta.receta_insumos.splice(i, 1)
+        },
+        componentName(item) {
+            const articleName = item.articulo1?.nombre || item.articulo_nombre || ''
+            const variantName = item.articulo_variant1?.nombre || item.variant_nombre
+            return variantName ? `${articleName} / ${variantName}` : articleName
         },
         async modificar(item) {
             this.useAuth.setLoading(true, 'Modificando...')
@@ -240,10 +260,20 @@ export default {
         async loadReceta() {
             const qry = {
                 fltr: {
-                    articulo_principal: { op: 'Es', val: this.receta.id },
+                    articulo_principal_variant: {
+                        op: 'Es',
+                        val: this.receta.articulo_principal_variant,
+                    },
                 },
-                cols: ['articulo', 'cantidad', 'orden'],
-                incl: ['articulo1'],
+                cols: [
+                    'articulo_principal',
+                    'articulo_principal_variant',
+                    'articulo',
+                    'articulo_variant',
+                    'cantidad',
+                    'orden',
+                ],
+                incl: ['articulo1', 'articulo_variant1'],
             }
 
             this.receta.receta_insumos = []

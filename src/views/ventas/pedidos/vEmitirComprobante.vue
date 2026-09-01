@@ -916,7 +916,8 @@ export default {
         },
         setCortesia(item) {
             const i = this.vista.comprobante.comprobante_items.findIndex(
-                (a) => a.articulo == item.articulo,
+                (a) =>
+                    (a.articulo_variant || a.articulo) == (item.articulo_variant || item.articulo),
             )
 
             const afectacionMap = {

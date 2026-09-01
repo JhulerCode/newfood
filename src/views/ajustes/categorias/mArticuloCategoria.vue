@@ -10,7 +10,7 @@
                 :nec="true"
                 v-model="articulo_categoria.tipo"
                 :lista="modal.articulo_tipos"
-                :disabled="modal.mode == 3"
+                :disabled="modal.mode == 3 || modal.lock_tipo"
             />
 
             <JdInput
@@ -105,6 +105,7 @@ export default {
             this.useAuth.socket.emit('mArticuloCategoria:crear')
 
             this.useModals.show.mArticuloCategoria = false
+            this.$emit('created', res.data)
         },
         async modificar() {
             if (this.checkDatos()) return

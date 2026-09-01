@@ -57,7 +57,9 @@
 
     <mImportarArticulos v-if="useModals.show.mImportarArticulos" />
     <mArticulo v-if="useModals.show.mArticulo" />
-    <mArticuloReceta v-if="useModals.show.mArticuloReceta" />
+    <mArticuloReceta
+        v-if="useModals.show.mArticuloReceta && !useModals.show.mArticulo"
+    />
     <mArticuloPreciosSemana v-if="useModals.show.mArticuloPreciosSemana" />
     <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
@@ -155,6 +157,27 @@ export default {
                 show: true,
                 seek: false,
                 sort: true,
+            },
+            {
+                id: 'has_variants',
+                title: 'Tiene variantes',
+                prop: 'has_variants1.nombre',
+                type: 'select',
+                format: 'yesno',
+                width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'variants_summary',
+                title: 'Variantes',
+                type: 'text',
+                width: '18rem',
+                filtrable: false,
+                show: true,
+                seek: false,
+                sort: false,
             },
             // {
             //     id: 'stock',
@@ -272,7 +295,7 @@ export default {
                 icon: 'fa-solid fa-flask',
                 action: 'showReceta',
                 permiso: 'vProductos:listarReceta',
-                ocultar: { has_receta: false },
+                ocultar: { has_receta: false, has_variants: true },
             },
             {
                 label: 'Precios por día',
@@ -312,12 +335,15 @@ export default {
                     // 'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
                     // 'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos'],
+                incl: ['categoria1', 'produccion_area1', 'sucursal_articulos', 'articulo_variants'],
                 ordr: [['nombre', 'ASC']],
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
             this.vista.qry.cols.push('unidad')
+            if (!this.vista.qry.cols.includes('has_variants')) {
+                this.vista.qry.cols.push('has_variants')
+            }
         },
         async loadArticulos() {
             this.setQuery()
@@ -361,6 +387,7 @@ export default {
                 unidad: 'NIU',
 
                 has_receta: false,
+                has_variants: false,
                 activo: true,
 
                 is_combo: false,
@@ -437,6 +464,7 @@ export default {
                 if (a.id == 'activo') a.lista = this.vista.activo_estados
                 if (a.id == 'igv_afectacion') a.lista = this.vista.igv_afectaciones
                 if (a.id == 'has_receta') a.lista = this.vista.estados
+                if (a.id == 'has_variants') a.lista = this.vista.estados
                 if (a.id == 'categoria') a.reload = this.loadCategorias
                 if (a.id == 'produccion_area') a.reload = this.loadProduccionAreas
             }
@@ -543,6 +571,8 @@ export default {
         async showReceta(item) {
             const send = {
                 id: item.id,
+                articulo_principal: item.id,
+                articulo_principal_variant: item.id,
             }
 
             this.useModals.setModal('mArticuloReceta', `Receta - ${item.nombre}`, null, send)

@@ -55,16 +55,13 @@
             </template>
 
             <template v-slot:cNombre="{ item }">
-                <p>{{ item.articulo1.nombre }}</p>
-                <small >{{ item.articulo1.codigo_barra }}</small>
+                <p>{{ item.nombre || variantDisplayName(item) }}</p>
+                <small>{{ item.codigo_barra || item.articulo_variant1?.codigo_barras }}</small>
             </template>
         </JdTable>
     </div>
 
-    <mArticulo
-        @created="addProductoCreado"
-        v-if="useModals.show.mArticulo"
-    />
+    <mArticulo @created="addProductoCreado" v-if="useModals.show.mArticulo" />
 </template>
 
 <script>
@@ -178,25 +175,14 @@ export default {
             }
 
             const qry = {
-                fltr: {
-                    has_receta: { op: 'No es', val: true },
-                    is_combo: { op: 'No es', val: true },
-                    activo: { op: 'Es', val: true },
-                    nombre: { op: 'Contiene', val: txtBuscar },
-                },
-                cols: [
-                    'nombre',
-                    'unidad',
-                    'precio_venta',
-                    'igv_afectacion',
-                    'has_receta',
-                    'codigo_barra',
-                ],
-                ordr: [['nombre', 'ASC']],
+                search: txtBuscar,
+                has_receta: false,
+                is_combo: false,
+                limit: 50,
             }
 
             this.spinArticulos = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.spinArticulos = false
 
             if (res.code !== 0) return
@@ -211,7 +197,7 @@ export default {
             }
 
             const i = this.modal.transaccion.transaccion_items.findIndex(
-                (a) => a.codigo_barra == codigo || a.articulo1?.codigo_barra == codigo,
+                (a) => a.codigo_barra == codigo || a.articulo_variant1?.codigo_barras == codigo,
             )
             if (i !== -1) {
                 const current = this.modal.transaccion.transaccion_items[i]
@@ -223,26 +209,11 @@ export default {
                 return
             }
 
-            const qry = {
-                fltr: {
-                    has_receta: { op: 'No es', val: true },
-                    is_combo: { op: 'No es', val: true },
-                    activo: { op: 'Es', val: true },
-                    codigo_barra: { op: 'Es', val: codigo },
-                },
-                cols: [
-                    'nombre',
-                    'unidad',
-                    'precio_venta',
-                    'igv_afectacion',
-                    'has_receta',
-                    'codigo_barra',
-                ],
-            }
+            const qry = { barcode: codigo, has_receta: false, is_combo: false, limit: 1 }
 
             this.useAuth.setLoading(true, 'Buscando producto...')
             this.buscandoCodigoBarra = true
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(qry)}`)
+            const res = await get(`${urls.articulos}/variants?qry=${JSON.stringify(qry)}`)
             this.buscandoCodigoBarra = false
             this.useAuth.setLoading(false)
             this.codigoBarra = null
@@ -267,7 +238,7 @@ export default {
             this.modal.articulos = []
 
             const i = this.modal.transaccion.transaccion_items.findIndex(
-                (a) => a.articulo == item.id,
+                (a) => (a.articulo_variant || a.articulo) == item.articulo_variant,
             )
             if (i !== -1 && fromScanner) {
                 const current = this.modal.transaccion.transaccion_items[i]
@@ -281,12 +252,17 @@ export default {
 
             const send = {
                 id: crypto.randomUUID(),
-                articulo: item.id,
+                articulo: item.articulo,
+                articulo_variant: item.articulo_variant,
                 articulo1: {
-                    nombre: item.nombre,
+                    nombre: item.articulo_nombre || item.nombre,
                     unidad: item.unidad,
-                    codigo_barra: item.codigo_barra,
                 },
+                articulo_variant1: {
+                    nombre: item.variant_nombre,
+                    codigo_barras: item.codigo_barra,
+                },
+                nombre: item.nombre,
 
                 codigo_barra: item.codigo_barra,
                 cantidad: fromScanner ? 1 : null,
@@ -337,7 +313,30 @@ export default {
             this.useModals.setModal('mArticulo', 'Nuevo producto', 1, item)
         },
         async addProductoCreado(item) {
-            await this.addArticulo(item, false, true)
+            const variant = item.articulo_variants?.[0]
+            if (!variant) return jmsg('warning', 'El producto no tiene una variante registrada')
+
+            await this.addArticulo(
+                {
+                    id: variant.id,
+                    articulo: item.id,
+                    articulo_variant: variant.id,
+                    nombre: variant.nombre ? `${item.nombre} / ${variant.nombre}` : item.nombre,
+                    articulo_nombre: item.nombre,
+                    variant_nombre: variant.nombre,
+                    unidad: item.unidad,
+                    codigo_barra: variant.codigo_barras,
+                    precio_venta: variant.price ?? item.precio_venta,
+                    igv_afectacion: item.igv_afectacion,
+                },
+                false,
+                true,
+            )
+        },
+        variantDisplayName(item) {
+            const base = item.articulo1?.nombre || ''
+            const variant = item.articulo_variant1?.nombre
+            return variant ? `${base} / ${variant}` : base
         },
 
         calcularUno(item) {

@@ -61,10 +61,24 @@ export default {
                 seek: true,
                 sort: true,
             },
+            {
+                id: 'stock',
+                title: 'Stock',
+                type: 'number',
+                format: 'decimal',
+                toRight: true,
+                width: '8rem',
+                show: false,
+                seek: false,
+                sort: true,
+            },
         ],
     }),
     async created() {
         this.modal = this.useModals.mRelacionadoSucursales
+        if (this.modal.url == 'sucursal_articulo_variants') {
+            this.columns.find((column) => column.id == 'stock').show = true
+        }
 
         await this.loadDatosSistema()
         this.loadSucursales()
@@ -76,7 +90,10 @@ export default {
                     [this.modal.column]: { op: 'Es', val: this.modal.item.id },
                 },
                 incl: ['sucursal1'],
-                cols: ['estado'],
+                cols:
+                    this.modal.url == 'sucursal_articulo_variants'
+                        ? ['estado', 'stock']
+                        : ['estado'],
             }
 
             this.modal.sucursales = []
@@ -109,6 +126,13 @@ export default {
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
+
+            if (
+                this.modal.url == 'sucursal_articulos' ||
+                this.modal.url == 'sucursal_articulo_variants'
+            ) {
+                this.useAuth.socket.emit('mArticulo:modificar')
+            }
         },
     },
 }

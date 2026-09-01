@@ -40,8 +40,8 @@ export default {
             },
             {
                 id: 'articulo',
-                title: 'Componente',
-                prop: 'articulo1.nombre',
+                title: 'Componente / variante',
+                prop: 'Componente',
                 show: true,
                 width: '18rem',
             },
@@ -64,7 +64,12 @@ export default {
         },
         checkDatos() {
             for (const a of this.modal.articulos) {
-                if (!a.articulo_principal || !a.articulo || !a.cantidad) {
+                if (
+                    !a.articulo_principal ||
+                    !a.articulo ||
+                    !a.articulo_variant ||
+                    !a.cantidad
+                ) {
                     jmsg('error', 'Debe llenar todos los campos')
                     return true
                 }

@@ -47,7 +47,8 @@
 
     <mArticulo v-if="useModals.show.mArticulo" />
     <mKardex v-if="useModals.show.mKardex" />
-    <mAjusteStock v-if="useModals.show.mAjusteStock" />
+    <mAjusteStock v-if="useModals.show.mAjusteStock" @saved="loadArticulos" />
+    <mRelacionadoSucursales v-if="useModals.show.mRelacionadoSucursales" />
 
     <mConfigCols v-if="useModals.show.mConfigCols" />
     <mConfigFiltros v-if="useModals.show.mConfigFiltros" />
@@ -60,6 +61,7 @@ import { JdTable, JdButton, mConfigCols, mConfigFiltros, mEditar } from '@jhuler
 import mArticulo from '@/views/ajustes/insumos/mArticulo.vue'
 import mKardex from '@/views/inventario/mKardex.vue'
 import mAjusteStock from '@/views/inventario/mAjusteStock.vue'
+import mRelacionadoSucursales from '@/views/ajustes/comprobante_tipos/mRelacionadoSucursales.vue'
 
 import { useAuth } from '@/pinia/auth'
 import { useVistas } from '@/pinia/vistas'
@@ -82,6 +84,7 @@ export default {
         mArticulo,
         mKardex,
         mAjusteStock,
+        mRelacionadoSucursales,
     },
     data: () => ({
         useAuth: useAuth(),
@@ -155,6 +158,16 @@ export default {
                 show: true,
                 seek: false,
                 sort: true,
+            },
+            {
+                id: 'variants_stock_summary',
+                title: 'Stock por variante',
+                type: 'text',
+                filtrable: false,
+                width: '20rem',
+                show: true,
+                seek: false,
+                sort: false,
             },
             {
                 id: 'categoria',
@@ -250,14 +263,19 @@ export default {
                     'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
                     'sucursal_articulos.estado': { op: 'Es', val: true },
                 },
-                incl: ['categoria1', 'sucursal_articulos'],
+                incl: [
+                    'categoria1',
+                    'sucursal_articulos',
+                    'articulo_variants',
+                    'sucursal_articulo_variants',
+                ],
                 sqls: ['stock_valorizado'],
                 ordr: [['nombre', 'ASC']],
                 iccl: {
                     sucursal_articulos: {
-                        incl: ['impresion_area1']
-                    }
-                }
+                        incl: ['impresion_area1'],
+                    },
+                },
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
