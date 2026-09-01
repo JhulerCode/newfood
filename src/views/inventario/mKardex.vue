@@ -151,6 +151,14 @@ export default {
             this.modal.qry = {
                 fltr: {
                     articulo: { op: 'Es', val: this.modal.articulo.id },
+                    ...(this.modal.articulo_variant
+                        ? {
+                              articulo_variant: {
+                                  op: 'Es',
+                                  val: this.modal.articulo_variant,
+                              },
+                          }
+                        : {}),
                     sucursal: { op: 'Es', val: this.useAuth.sucursal.id },
                 },
                 incl: ['articulo1', 'articulo_variant1', 'transaccion1', 'comprobante1'],

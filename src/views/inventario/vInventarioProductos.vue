@@ -124,6 +124,15 @@ export default {
                 sort: true,
             },
             {
+                id: 'codigo_barras',
+                title: 'Código de barras',
+                type: 'text',
+                width: '12rem',
+                show: true,
+                seek: true,
+                sort: true,
+            },
+            {
                 id: 'precio_venta',
                 title: 'Precio de venta',
                 type: 'number',
@@ -136,9 +145,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'sucursal1.stock',
+                id: 'stock',
                 title: 'Stock',
-                prop: 'sucursal1.stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
@@ -158,16 +166,6 @@ export default {
                 show: true,
                 seek: false,
                 sort: true,
-            },
-            {
-                id: 'variants_stock_summary',
-                title: 'Stock por variante',
-                type: 'text',
-                filtrable: false,
-                width: '20rem',
-                show: true,
-                seek: false,
-                sort: false,
             },
             {
                 id: 'categoria',
@@ -235,7 +233,6 @@ export default {
     async created() {
         this.vista = this.useVistas.vInventarioProductos
         this.useAuth.setColumns(this.tableName, this.columns)
-        this.columns[1].host = urls.uploads
         this.hideColumns()
 
         this.verifyRowSelectIsActive()
@@ -257,36 +254,23 @@ export default {
         },
         setQuery() {
             this.vista.qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '2' },
-                    // is_combo: { op: 'Es', val: false },
-                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
-                    'sucursal_articulos.estado': { op: 'Es', val: true },
-                },
-                incl: [
-                    'categoria1',
-                    'sucursal_articulos',
-                    'articulo_variants',
-                    'sucursal_articulo_variants',
-                ],
-                sqls: ['stock_valorizado'],
-                ordr: [['nombre', 'ASC']],
-                iccl: {
-                    sucursal_articulos: {
-                        incl: ['impresion_area1'],
-                    },
-                },
+                tipo: '2',
+                sucursal: this.useAuth.sucursal.id,
+                include_inactive: true,
+                limit: 2000,
+                fltr: {},
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
-            this.vista.qry.cols.push('unidad')
         },
         async loadArticulos() {
             this.setQuery()
 
             this.vista.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.articulos}/variants?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -426,7 +410,9 @@ export default {
             this[method](item)
         },
         async eliminarBulk() {
-            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
+            const ids = [
+                ...new Set(this.vista.articulos.filter((a) => a.selected).map((b) => b.articulo)),
+            ]
 
             const resQst = await jqst(`¿Está seguro de eliminar ${ids.length} registros?`)
             if (resQst.isConfirmed == false) return
@@ -453,7 +439,9 @@ export default {
             }
             const cols = this.columns
 
-            const ids = this.vista.articulos.filter((a) => a.selected).map((b) => b.id)
+            const ids = [
+                ...new Set(this.vista.articulos.filter((a) => a.selected).map((b) => b.articulo)),
+            ]
 
             const send = {
                 uri: 'articulos',
@@ -466,7 +454,7 @@ export default {
         },
         updatedBulk(item) {
             for (const a of this.vista.articulos) {
-                if (!item.ids.includes(a.id)) continue
+                if (!item.ids.includes(a.articulo)) continue
 
                 a.selected = false
                 a[item.prop] = item.val
@@ -478,7 +466,7 @@ export default {
 
         async editar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.articulo}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -490,16 +478,18 @@ export default {
             if (resQst.isConfirmed == false) return
 
             this.useAuth.setLoading(true, 'Eliminando...')
-            const res = await delet(urls.articulos, item)
+            const res = await delet(urls.articulos, { ...item, id: item.articulo })
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
 
-            this.useVistas.removeItem('vInventarioProductos', 'articulos', item)
+            this.vista.articulos = this.vista.articulos.filter(
+                (row) => row.articulo != item.articulo,
+            )
         },
         async clonar(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.articulo}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return
@@ -513,7 +503,9 @@ export default {
         },
         async showReceta(item) {
             const send = {
-                id: item.id,
+                id: item.articulo,
+                articulo_principal: item.articulo,
+                articulo_principal_variant: item.articulo_variant,
             }
 
             this.useModals.setModal('mArticuloReceta', `Receta - ${item.nombre}`, null, send)
@@ -521,26 +513,28 @@ export default {
         async verKardex(item) {
             const send = {
                 articulo: {
-                    id: item.id,
+                    id: item.articulo,
                     nombre: item.nombre,
                     unidad: item.unidad,
                 },
+                articulo_variant: item.articulo_variant,
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+            this.useModals.setModal('mKardex', 'Kardex de variante', null, send, true)
         },
         async ajusteStock(item) {
             const send = {
                 transaccion: {
                     fecha: dayjs().format('YYYY-MM-DD'),
-                    articulo: item.id,
+                    articulo: item.articulo,
+                    articulo_variant: item.articulo_variant,
                     estado: 1,
                 },
                 articulo1: {
                     igv_afectacion: item.igv_afectacion,
                     has_fv: item.has_fv,
                 },
-                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulos: [item],
                 articulo_tipo: 2,
                 // is_nuevo_lote: false,
             }
@@ -549,7 +543,7 @@ export default {
         },
         async openPreciosSemana(item) {
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}/uno/${item.id}`)
+            const res = await get(`${urls.articulos}/uno/${item.articulo}`)
             this.useAuth.setLoading(false)
 
             if (res.code != 0) return

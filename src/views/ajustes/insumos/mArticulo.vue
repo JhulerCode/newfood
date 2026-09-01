@@ -58,7 +58,11 @@
                 type="number"
                 v-model="articulo.precio_venta"
                 style="grid-column: 1/3"
-                v-if="articulo.tipo == 2"
+                v-if="
+                    articulo.tipo == 2 &&
+                    (articulo.has_variants != true ||
+                        articulo.variants_different_prices != true)
+                "
             />
 
             <JdInputFile
@@ -73,20 +77,28 @@
 
             <template v-if="useAuth.verifyFeature('recetas')">
                 <JdSwitch
-                    label="Es producto transformado?"
+                    label="¿Es producto transformado?"
                     v-model="articulo.has_receta"
                     style="grid-column: 1/3"
                     v-if="articulo.tipo == 2"
                 />
             </template>
 
-            <JdSwitch label="Activo?" v-model="articulo.activo" style="grid-column: 1/3" />
+            <JdSwitch label="Activo?" v-model="articulo.activo"  />
 
             <JdSwitch
                 label="¿Tiene variantes?"
                 v-model="articulo.has_variants"
                 @update:modelValue="toggleVariants"
                 style="grid-column: 1/3"
+            />
+
+            <JdSwitch
+                label="¿Precios diferentes?"
+                v-model="articulo.variants_different_prices"
+                @update:modelValue="toggleVariantPrices"
+                style="grid-column: 3/5"
+                v-if="articulo.tipo == 2 && articulo.has_variants == true"
             />
 
             <div
@@ -173,9 +185,12 @@
                         <JdInput label="Nombre" :nec="true" v-model="variant.nombre" />
                         <JdInput label="Código de barras" v-model="variant.codigo_barras" />
                         <JdInput
-                            v-if="articulo.tipo == 2"
-                            label="Precio propio"
-                            placeholder="vacío = precio principal"
+                            v-if="
+                                articulo.tipo == 2 &&
+                                articulo.variants_different_prices == true
+                            "
+                            label="Precio de venta"
+                            :nec="true"
                             type="number"
                             v-model="variant.price"
                         />
@@ -258,7 +273,12 @@ export default {
                 if (this.articulo.tipo == 2) props.push('has_receta')
             }
 
-            if (this.articulo.tipo == 2) props.push('precio_venta')
+            if (
+                this.articulo.tipo == 2 &&
+                this.articulo.variants_different_prices != true
+            ) {
+                props.push('precio_venta')
+            }
 
             if (incompleteData(this.articulo, props)) {
                 jmsg('warning', 'Ingrese los datos necesarios')
@@ -272,12 +292,24 @@ export default {
         shapeDatos() {
             if (this.articulo.has_variants != true) {
                 this.articulo.has_variants = false
+                this.articulo.variants_different_prices = false
+            }
+
+            if (this.articulo.variants_different_prices == true) {
+                this.articulo.precio_venta = null
+            } else {
+                for (const variant of this.articulo.articulo_variants || []) {
+                    variant.price = null
+                }
             }
 
             if (this.articulo.archivo) this.articulo.formData = true
         },
         initVariants() {
             this.articulo.has_variants = this.articulo.has_variants == true
+            this.articulo.variants_different_prices =
+                this.articulo.has_variants == true &&
+                this.articulo.variants_different_prices == true
 
             if (!Array.isArray(this.articulo.articulo_variants)) {
                 this.articulo.articulo_variants = []
@@ -325,6 +357,7 @@ export default {
 
                 if (
                     this.articulo.tipo == 2 &&
+                    this.articulo.variants_different_prices == true &&
                     defaultVariant?.price !== null &&
                     defaultVariant?.price !== undefined &&
                     defaultVariant?.price !== ''
@@ -332,8 +365,13 @@ export default {
                     this.articulo.precio_venta = defaultVariant.price
                 }
 
+                this.articulo.variants_different_prices = false
+
                 return
             }
+        },
+        toggleVariantPrices(value) {
+            this.articulo.variants_different_prices = value == true
         },
         addVariant() {
             const isDefault = this.articulo.articulo_variants.length == 0
@@ -404,17 +442,20 @@ export default {
                 return true
             }
 
-            if (
-                variants.some(
-                    (variant) =>
-                        variant.price !== null &&
-                        variant.price !== undefined &&
-                        variant.price !== '' &&
-                        (!Number.isFinite(Number(variant.price)) || Number(variant.price) < 0),
-                )
-            ) {
-                jmsg('warning', 'Ingrese un precio válido para las variantes')
-                return true
+            if (this.articulo.variants_different_prices == true) {
+                if (
+                    variants.some(
+                        (variant) =>
+                            variant.price === null ||
+                            variant.price === undefined ||
+                            variant.price === '' ||
+                            !Number.isFinite(Number(variant.price)) ||
+                            Number(variant.price) < 0,
+                    )
+                ) {
+                    jmsg('warning', 'Ingrese un precio válido para todas las variantes')
+                    return true
+                }
             }
 
             for (const [prop, label] of [

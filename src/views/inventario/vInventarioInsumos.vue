@@ -98,9 +98,8 @@ export default {
                 sort: true,
             },
             {
-                id: 'sucursal1.stock',
+                id: 'stock',
                 title: 'Stock',
-                prop: 'sucursal1.stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
@@ -118,16 +117,6 @@ export default {
                 show: true,
                 seek: true,
                 sort: true,
-            },
-            {
-                id: 'variants_stock_summary',
-                title: 'Stock por variante',
-                type: 'text',
-                filtrable: false,
-                width: '20rem',
-                show: true,
-                seek: false,
-                sort: false,
             },
             {
                 id: 'igv_afectacion',
@@ -166,24 +155,11 @@ export default {
     methods: {
         setQuery() {
             this.vista.qry = {
-                fltr: {
-                    tipo: { op: 'Es', val: '1' },
-                    'sucursal_articulos.sucursal': { op: 'Es', val: this.useAuth.sucursal.id },
-                    'sucursal_articulos.estado': { op: 'Es', val: true },
-                },
-                incl: [
-                    'categoria1',
-                    'sucursal_articulos',
-                    'sucursal_articulo_variants',
-                    'articulo_variants',
-                    'kardexes',
-                ],
-                ordr: [['nombre', 'ASC']],
-                iccl: {
-                    sucursal_articulos: {
-                        incl: ['impresion_area1'],
-                    },
-                },
+                tipo: '1',
+                sucursal: this.useAuth.sucursal.id,
+                include_inactive: true,
+                limit: 2000,
+                fltr: {},
             }
 
             this.useAuth.updateQuery(this.columns, this.vista.qry)
@@ -193,7 +169,9 @@ export default {
 
             this.vista.articulos = []
             this.useAuth.setLoading(true, 'Cargando...')
-            const res = await get(`${urls.articulos}?qry=${JSON.stringify(this.vista.qry)}`)
+            const res = await get(
+                `${urls.articulos}/variants?qry=${JSON.stringify(this.vista.qry)}`,
+            )
             this.useAuth.setLoading(false)
             this.vista.loaded = true
 
@@ -229,25 +207,27 @@ export default {
         async verKardex(item) {
             const send = {
                 articulo: {
-                    id: item.id,
+                    id: item.articulo,
                     nombre: item.nombre,
                     unidad: item.unidad,
                 },
+                articulo_variant: item.articulo_variant,
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de artículo', null, send, true)
+            this.useModals.setModal('mKardex', 'Kardex de variante', null, send, true)
         },
         async ajusteStock(item) {
             const send = {
                 transaccion: {
                     fecha: dayjs().format('YYYY-MM-DD'),
-                    articulo: item.id,
+                    articulo: item.articulo,
+                    articulo_variant: item.articulo_variant,
                 },
                 articulo1: {
                     igv_afectacion: item.igv_afectacion,
                     has_fv: item.has_fv,
                 },
-                articulos: [{ id: item.id, nombre: item.nombre }],
+                articulos: [item],
                 articulo_tipo: 1,
                 // is_nuevo_lote: false,
             }

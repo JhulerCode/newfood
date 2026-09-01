@@ -85,7 +85,10 @@ export default {
         this.modal = this.useModals.mAjusteStock
 
         this.loadDatosSistema()
-        if (this.modal.transaccion.articulo) {
+        if (
+            this.modal.transaccion.articulo &&
+            !this.modal.transaccion.articulo_variant
+        ) {
             await this.loadArticleVariants(this.modal.transaccion.articulo)
         }
     },
