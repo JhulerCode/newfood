@@ -97,13 +97,6 @@ export default {
                 show: true,
             },
             {
-                id: 'articulo_variant',
-                title: 'Variante',
-                prop: 'articulo_variant1.nombre',
-                width: '10rem',
-                show: true,
-            },
-            {
                 id: 'articulo1.unidad',
                 title: 'Unidad',
                 prop: 'articulo1.unidad',

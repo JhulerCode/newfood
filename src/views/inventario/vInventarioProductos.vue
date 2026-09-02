@@ -145,7 +145,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'stock',
+                id: 'articulo_variant_stock',
                 title: 'Stock',
                 toRight: true,
                 filtrable: false,
@@ -155,7 +155,7 @@ export default {
                 sort: true,
             },
             {
-                id: 'stock_valorizado',
+                id: 'articulo_variant_stock_valorizado',
                 title: 'Stock valorizado',
                 type: 'number',
                 format: 'currency',
@@ -219,14 +219,14 @@ export default {
                 icon: 'fa-solid fa-table-list',
                 action: 'verKardex',
                 permiso: 'vInventarioProductos:kardex',
-                ocultar: { has_receta: true },
+                ocultar: { has_receta: true, is_combo: true },
             },
             {
                 label: 'Ajuste stock',
                 icon: 'fa-solid fa-wrench',
                 action: 'ajusteStock',
                 permiso: 'vInventarioProductos:ajusteStock',
-                ocultar: { has_receta: true },
+                ocultar: { has_receta: true, is_combo: true },
             },
         ],
     }),
@@ -257,6 +257,7 @@ export default {
                 tipo: '2',
                 sucursal: this.useAuth.sucursal.id,
                 include_inactive: true,
+                include_components: false,
                 limit: 2000,
                 fltr: {},
             }
@@ -520,7 +521,7 @@ export default {
                 articulo_variant: item.articulo_variant,
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de variante', null, send, true)
+            this.useModals.setModal('mKardex', 'Kardex', null, send, true)
         },
         async ajusteStock(item) {
             const send = {

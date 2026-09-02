@@ -180,16 +180,6 @@ export default {
                 sort: false,
             },
             // {
-            //     id: 'stock',
-            //     title: 'Stock',
-            //     toRight: true,
-            //     filtrable: false,
-            //     width: '8rem',
-            //     show: true,
-            //     seek: true,
-            //     sort: true,
-            // },
-            // {
             //     id: 'activo',
             //     title: 'Estado',
             //     prop: 'activo1.nombre',

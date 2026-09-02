@@ -98,11 +98,24 @@ export default {
                 sort: true,
             },
             {
-                id: 'stock',
+                id: 'articulo_variant_stock',
                 title: 'Stock',
                 toRight: true,
                 filtrable: false,
                 width: '8rem',
+                show: true,
+                seek: false,
+                sort: true,
+            },
+            {
+                id: 'articulo_variant_stock_valorizado',
+                title: 'Stock valorizado',
+                type: 'number',
+                format: 'currency',
+                moneda: 'S/',
+                toRight: true,
+                filtrable: false,
+                width: '9rem',
                 show: true,
                 seek: false,
                 sort: true,
@@ -158,6 +171,7 @@ export default {
                 tipo: '1',
                 sucursal: this.useAuth.sucursal.id,
                 include_inactive: true,
+                include_components: false,
                 limit: 2000,
                 fltr: {},
             }
@@ -214,7 +228,7 @@ export default {
                 articulo_variant: item.articulo_variant,
             }
 
-            this.useModals.setModal('mKardex', 'Kardex de variante', null, send, true)
+            this.useModals.setModal('mKardex', 'Kardex', null, send, true)
         },
         async ajusteStock(item) {
             const send = {
