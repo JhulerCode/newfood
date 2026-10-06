@@ -960,7 +960,7 @@ export default {
             if (item.monto > 0) {
                 item.monto = null
             } else {
-                item.monto = redondear(this.vista.totals.importe_total, 2)
+                item.monto = Math.round(this.vista.totals.importe_total * 100) / 100
             }
 
             this.calcularPorPagar()
@@ -1066,12 +1066,14 @@ export default {
             }
 
             if (this.vista.comprobante.pago_condicion == 1) {
-                if (redondear(this.vista.porPagar) > 0) {
+                // if (redondear(this.vista.porPagar) > 0) {
+                if (Math.round(this.vista.porPagar * 100) / 100 > 0) {
                     jmsg('warning', 'Importes de pago insuficientes')
                     return true
                 }
 
-                if (redondear(this.vista.vuelto) > 0) {
+                // if (redondear(this.vista.vuelto) > 0) {
+                if (Math.round(this.vista.vuelto * 100) / 100 > 0) {
                     jmsg('warning', 'Importes de pago exceden al total')
                     return true
                 }
